@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Play, HelpCircle, Heart } from "lucide-react";
 import { Icon } from "@/components/icons";
-import { LeaderboardByOwnerAndDate } from "@/components/leaderboard/Leaderboard";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Footer } from "@/components/Footer";

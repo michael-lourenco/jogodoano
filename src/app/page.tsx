@@ -47,7 +47,7 @@ export default function Home() {
           <CardContent className="space-y-8">
             <div className="flex justify-center">
               <Button
-                onClick={handleNavigation("/gameplay")}
+                onClick={handleNavigation("/voting")}
                 className="w-32 h-32 rounded-full bg-gradient-to-r from-chart-2 to-green-500 hover:from-chart-2 hover:to-green-400 shadow-lg hover:shadow-green-500/25 transition-all duration-300 transform hover:scale-105"
                 size="lg"
               >

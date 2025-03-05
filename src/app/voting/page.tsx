@@ -47,32 +47,116 @@ export default function VotingPage() {
         {
           id: "action1",
           title: "GTA VI",
-          imageUrl: "/placeholder.svg?height=200&width=350",
+          imageUrl: "/gta-vi.jpg?height=200&width=350",
           developer: "RockStar",
         },
         {
           id: "action2",
           title: "Ghost of Yotei",
-          imageUrl: "/placeholder.svg?height=200&width=350",
+          imageUrl: "/ghost-of-yotei.jpg?height=200&width=350",
           developer: "Sucker Punch Productions",
         },
         {
           id: "action3",
           title: "Doom: The Dark Ages",
-          imageUrl: "/placeholder.svg?height=200&width=350",
+          imageUrl: "/doom-dark-ages.jpg?height=200&width=350",
           developer: "Id Software / Bethesda Softworks",
         },
         {
           id: "action4",
           title: "Like a Dragon: Pirate Yakuza in Hawaii",
-          imageUrl: "/placeholder.svg?height=200&width=350",
+          imageUrl: "/like-a-dragon-pirate-yakusa.jpg?height=200&width=350",
           developer: "Ryu Ga Gotoku Studio, Sega",
         },
         {
           id: "action5",
           title: "Split Fiction",
-          imageUrl: "/placeholder.svg?height=200&width=350",
+          imageUrl: "/split-fiction.jpg?height=200&width=350",
           developer: "Hazelight Studios",
+        },
+        {
+          id: "action6",
+          title: "Borderlands 4",
+          imageUrl: "/borderlands-4.png?height=200&width=350",
+          developer: "Gearbox Software",
+        },
+        {
+          id: "action7",
+          title: "Fatal Fury: City of Wolves",
+          imageUrl: "/fatal-fury-city-of-wolves.jpg?height=200&width=350",
+          developer: "SNK",
+        },
+        {
+          id: "action8",
+          title: "Sid Meier’s Civilization 7",
+          imageUrl: "/sid-meiers-civilization-7.jpg?height=200&width=350",
+          developer: "Firaxis Games",
+        },
+        {
+          id: "action9",
+          title: "Slay The Spire II",
+          imageUrl: "/slay-the-spire-ii.png?height=200&width=350",
+          developer: "Mega Crit",
+        },
+        {
+          id: "action10",
+          title: "Avowed",
+          imageUrl: "/avowed.png?height=200&width=350",
+          developer: "Obsidian",
+        },
+        {
+          id: "action11",
+          title: "Assasin’s Creed Shadows",
+          imageUrl: "/assassins-creed-shadows.png?height=200&width=350",
+          developer: "Ubisoft",
+        },
+        {
+          id: "action12",
+          title: "Hades II",
+          imageUrl: "/hades-2.png?height=200&width=350",
+          developer: "Supergiant Games",
+        },
+        {
+          id: "action13",
+          title: "Monster Hunter Wilds",
+          imageUrl: "/monster-hunter-wilds.png?height=200&width=350",
+          developer: "Capcom",
+        },
+        {
+          id: "action14",
+          title: "Indiana Jones and the Great Circle",
+          imageUrl: "/indiana-jones.jpg?height=200&width=350",
+          developer: "MachineGames",
+        },
+        {
+          id: "action15",
+          title: "Mark of the Deep",
+          imageUrl: "/mark-of-the-deep.jpg?height=200&width=350",
+          developer: "Mad Mimic",
+        },
+        {
+          id: "action16",
+          title: "Kingdom Come: Deliverance 2",
+          imageUrl: "/kingdom-come-deliverance-2.jpg?height=200&width=350",
+          developer: "Warhorse Studios",
+        },
+        {
+          id: "action17",
+          title: "Expedition 33",
+          imageUrl: "/expedition-33.jpg?height=200&width=350",
+          developer: "Sandfall Interactive",
+        },
+        {
+          id: "action18",
+          title: "Citizen Sleeper 2: Starward Vector",
+          imageUrl: "/citizen-sleeper-2.jpg?height=200&width=350",
+          developer: "Jump Over The Age",
+        },
+        {
+          id: "action19",
+          title: "Ender Magnolia: Bloom in the Mist",
+          imageUrl: "/ender-magnolia.jpg?height=200&width=350",
+          developer: "Adglobe, Live Wire Inc.",
         },
       ],
     },
@@ -84,32 +168,225 @@ export default function VotingPage() {
         {
           id: "goty1",
           title: "GTA VI",
-          imageUrl: "/placeholder.svg?height=200&width=350",
+          imageUrl: "/gta-vi.jpg?height=200&width=350",
           developer: "RockStar",
         },
         {
           id: "goty2",
           title: "Ghost of Yotei",
-          imageUrl: "/placeholder.svg?height=200&width=350",
+          imageUrl: "/ghost-of-yotei.jpg?height=200&width=350",
           developer: "Sucker Punch Productions",
         },
         {
           id: "goty3",
           title: "Doom: The Dark Ages",
-          imageUrl: "/placeholder.svg?height=200&width=350",
+          imageUrl: "/doom-dark-ages.jpg?height=200&width=350",
           developer: "Id Software / Bethesda Softworks",
         },
         {
           id: "goty4",
           title: "Like a Dragon: Pirate Yakuza in Hawaii",
-          imageUrl: "/placeholder.svg?height=200&width=350",
+          imageUrl: "/like-a-dragon-pirate-yakusa.jpg?height=200&width=350",
           developer: "Ryu Ga Gotoku Studio, Sega",
         },
         {
           id: "goty5",
           title: "Split Fiction",
-          imageUrl: "/placeholder.svg?height=200&width=350",
+          imageUrl: "/split-fiction.jpg?height=200&width=350",
           developer: "Hazelight Studios",
+        },
+        {
+          id: "goty6",
+          title: "Borderlands 4",
+          imageUrl: "/borderlands-4.png?height=200&width=350",
+          developer: "Gearbox Software",
+        },
+        {
+          id: "goty7",
+          title: "Fatal Fury: City of Wolves",
+          imageUrl: "/fatal-fury-city-of-wolves.jpg?height=200&width=350",
+          developer: "SNK",
+        },
+        {
+          id: "goty8",
+          title: "Sid Meier’s Civilization 7",
+          imageUrl: "/sid-meiers-civilization-7.jpg?height=200&width=350",
+          developer: "Firaxis Games",
+        },
+        {
+          id: "goty9",
+          title: "Slay The Spire II",
+          imageUrl: "/slay-the-spire-ii.png?height=200&width=350",
+          developer: "Mega Crit",
+        },
+        {
+          id: "goty10",
+          title: "Avowed",
+          imageUrl: "/avowed.png?height=200&width=350",
+          developer: "Obsidian",
+        },
+        {
+          id: "goty11",
+          title: "Assasin’s Creed Shadows",
+          imageUrl: "/assassins-creed-shadows.png?height=200&width=350",
+          developer: "Ubisoft",
+        },
+        {
+          id: "goty12",
+          title: "Hades II",
+          imageUrl: "/hades-2.png?height=200&width=350",
+          developer: "Supergiant Games",
+        },
+        {
+          id: "goty13",
+          title: "Monster Hunter Wilds",
+          imageUrl: "/monster-hunter-wilds.png?height=200&width=350",
+          developer: "Capcom",
+        },
+        {
+          id: "goty14",
+          title: "Indiana Jones and the Great Circle",
+          imageUrl: "/indiana-jones.jpg?height=200&width=350",
+          developer: "MachineGames",
+        },
+        {
+          id: "goty15",
+          title: "Mark of the Deep",
+          imageUrl: "/mark-of-the-deep.jpg?height=200&width=350",
+          developer: "Mad Mimic",
+        },
+        {
+          id: "goty16",
+          title: "Kingdom Come: Deliverance 2",
+          imageUrl: "/kingdom-come-deliverance-2.jpg?height=200&width=350",
+          developer: "Warhorse Studios",
+        },
+        {
+          id: "goty17",
+          title: "Expedition 33",
+          imageUrl: "/expedition-33.jpg?height=200&width=350",
+          developer: "Sandfall Interactive",
+        },
+        {
+          id: "goty18",
+          title: "Citizen Sleeper 2: Starward Vector",
+          imageUrl: "/citizen-sleeper-2.jpg?height=200&width=350",
+          developer: "Jump Over The Age",
+        },
+      ],
+    },
+    {
+      id: "gotybr",
+      name: "Jogo do Ano BR",
+      description: "O melhor jogo brasileiro de 2025",
+      games: [
+        {
+          id: "gotybr1",
+          title: "GTA VI",
+          imageUrl: "/gta-vi.jpg?height=200&width=350",
+          developer: "RockStar",
+        },
+        {
+          id: "gotybr2",
+          title: "Ghost of Yotei",
+          imageUrl: "/ghost-of-yotei.jpg?height=200&width=350",
+          developer: "Sucker Punch Productions",
+        },
+        {
+          id: "gotybr3",
+          title: "Doom: The Dark Ages",
+          imageUrl: "/doom-dark-ages.jpg?height=200&width=350",
+          developer: "Id Software / Bethesda Softworks",
+        },
+        {
+          id: "gotybr4",
+          title: "Like a Dragon: Pirate Yakuza in Hawaii",
+          imageUrl: "/like-a-dragon-pirate-yakusa.jpg?height=200&width=350",
+          developer: "Ryu Ga Gotoku Studio, Sega",
+        },
+        {
+          id: "gotybr5",
+          title: "Split Fiction",
+          imageUrl: "/split-fiction.jpg?height=200&width=350",
+          developer: "Hazelight Studios",
+        },
+        {
+          id: "gotybr6",
+          title: "Borderlands 4",
+          imageUrl: "/borderlands-4.png?height=200&width=350",
+          developer: "Gearbox Software",
+        },
+        {
+          id: "gotybr7",
+          title: "Fatal Fury: City of Wolves",
+          imageUrl: "/fatal-fury-city-of-wolves.jpg?height=200&width=350",
+          developer: "SNK",
+        },
+        {
+          id: "gotybr8",
+          title: "Sid Meier’s Civilization 7",
+          imageUrl: "/sid-meiers-civilization-7.jpg?height=200&width=350",
+          developer: "Firaxis Games",
+        },
+        {
+          id: "gotybr9",
+          title: "Slay The Spire II",
+          imageUrl: "/slay-the-spire-ii.png?height=200&width=350",
+          developer: "Mega Crit",
+        },
+        {
+          id: "gotybr10",
+          title: "Avowed",
+          imageUrl: "/avowed.png?height=200&width=350",
+          developer: "Obsidian",
+        },
+        {
+          id: "gotybr11",
+          title: "Assasin’s Creed Shadows",
+          imageUrl: "/assassins-creed-shadows.png?height=200&width=350",
+          developer: "Ubisoft",
+        },
+        {
+          id: "gotybr12",
+          title: "Hades II",
+          imageUrl: "/hades-2.png?height=200&width=350",
+          developer: "Supergiant Games",
+        },
+        {
+          id: "gotybr13",
+          title: "Monster Hunter Wilds",
+          imageUrl: "/monster-hunter-wilds.png?height=200&width=350",
+          developer: "Capcom",
+        },
+        {
+          id: "gotybr14",
+          title: "Indiana Jones and the Great Circle",
+          imageUrl: "/indiana-jones.jpg?height=200&width=350",
+          developer: "MachineGames",
+        },
+        {
+          id: "gotybr15",
+          title: "Mark of the Deep",
+          imageUrl: "/mark-of-the-deep.jpg?height=200&width=350",
+          developer: "Mad Mimic",
+        },
+        {
+          id: "gotybr16",
+          title: "Kingdom Come: Deliverance 2",
+          imageUrl: "/kingdom-come-deliverance-2.jpg?height=200&width=350",
+          developer: "Warhorse Studios",
+        },
+        {
+          id: "gotybr17",
+          title: "Expedition 33",
+          imageUrl: "/expedition-33.jpg?height=200&width=350",
+          developer: "Sandfall Interactive",
+        },
+        {
+          id: "gotybr18",
+          title: "Citizen Sleeper 2: Starward Vector",
+          imageUrl: "/citizen-sleeper-2.jpg?height=200&width=350",
+          developer: "Jump Over The Age",
         },
       ],
     },
@@ -504,6 +781,8 @@ function GameCard({
   isSelected: boolean
   onSelect: () => void
 }) {
+  const imageUrl = game.imageUrl ? game.imageUrl.split("?")[0] : "/placeholder.svg"
+
   return (
     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
       <Card
@@ -513,8 +792,8 @@ function GameCard({
         onClick={onSelect}
       >
         <div className="relative aspect-video">
-          {game.imageUrl && game.imageUrl.startsWith("http") ? (
-            <Image src={game.imageUrl || "/placeholder.svg"} alt={game.title} fill className="object-cover" />
+          {game.imageUrl ? (
+            <Image src={game.imageUrl || "/placeholder.svg"} alt={game.title} fill className="object-cover" unoptimized  />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
               <span className="text-white/70 text-sm font-medium">{game.title}</span>

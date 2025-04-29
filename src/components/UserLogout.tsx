@@ -1,6 +1,8 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { UserData } from "@/application/entities/User";
+import {
+  UserData,
+} from "@/services/firebase/FirebaseService";
 import { Icon } from "./icons";
 import { Heart } from "lucide-react";
 

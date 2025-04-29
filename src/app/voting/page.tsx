@@ -454,8 +454,9 @@ export default function VotingPage() {
           // Está no formato antigo (sem ano), converter para o novo formato
           // Assumimos que os votos existentes são do ano atual (2025)
           setVotes({
-            "2025": votesData as Record<string, string>,
+            "2025": votesData as unknown as Record<string, string>,
           })
+          
         }
       } else {
         setVotes({})

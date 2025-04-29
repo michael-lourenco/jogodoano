@@ -26,6 +26,7 @@ export default function Home() {
   }
 
   return (
+    <>
     <div className="flex flex-col min-h-screen bg-background text-primary">
       <main className="flex-grow flex flex-col items-center justify-start pt-4">
         <div className="max-w-4xl mx-auto">
@@ -56,14 +57,14 @@ export default function Home() {
             </div>
 
             <div className="space-y-4">
-              <Button
+              {/* <Button
                 onClick={handleNavigation("/about")}
                 variant="ghost"
                 className="w-full group transition-all duration-300 hover:bg-background"
               >
                 <HelpCircle className="w-5 h-5 mr-2 text-primary group-hover:text-chart-2" />
                 <span className="text-primary group-hover:text-chart-2">Sobre</span>
-              </Button>
+              </Button> */}
 
               <Button
                 onClick={() => window.open("https://buy.stripe.com/00g02GeSnaJC12g5kk", "_blank")}
@@ -81,5 +82,6 @@ export default function Home() {
       </main>
       <Footer />
     </div>
+    </>
   );
 }

@@ -1,8 +1,8 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Trophy, ArrowLeft, CheckCircle2, Calendar } from "lucide-react"
+import { Trophy, ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useAuth } from "@/hooks/useAuth"
 import { Footer } from "@/components/Footer"
@@ -14,7 +14,6 @@ import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
 import { dbFirestore, updateUserVotes } from "@/services/firebase/FirebaseService"
 import { UserInfo } from "@/components/UserInfo"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface Game {
   id: string
@@ -40,12 +39,15 @@ export default function VotingPage() {
   const navigationService = useNavigation()
   const { user, loading, status, handleLogin, handleLogout } = useAuth()
 
-  const [selectedYear, setSelectedYear] = useState<string>("")
+  const [selectedYear, setSelectedYear] = useState<string>("2025") // Default year is now 2025
   const [votes, setVotes] = useState<Record<string, Record<string, string>>>({})
   const [activeCategory, setActiveCategory] = useState<string>("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [hasVoted, setHasVoted] = useState(false)
   const [votedYear, setVotedYear] = useState<string>("")
+  
+  // References for tab scrolling
+  const tabsContainerRef = useRef<HTMLDivElement>(null)
 
   const years: YearData[] = [
     {
@@ -58,50 +60,50 @@ export default function VotingPage() {
           description: "O melhor jogo de 2025",
           games: [
             {
-              id: "goty1",
+              id: "gtavi",
               title: "GTA VI",
               imageUrl: "/gta-vi.jpg?height=200&width=350",
               developer: "RockStar",
             },
             {
-              id: "goty2",
+              id: "gosthofyotei",
               title: "Ghost of Yotei",
               imageUrl: "/ghost-of-yotei.jpg?height=200&width=350",
               developer: "Sucker Punch Productions",
             },
             {
-              id: "goty3",
+              id: "doomthedarkages",
               title: "Doom: The Dark Ages",
               imageUrl: "/doom-dark-ages.jpg?height=200&width=350",
               developer: "Id Software / Bethesda Softworks",
             },
             {
-              id: "goty4",
+              id: "likeadragonpirateyakuza",
               title: "Like a Dragon: Pirate Yakuza in Hawaii",
               imageUrl: "/like-a-dragon-pirate-yakusa.jpg?height=200&width=350",
               developer: "Ryu Ga Gotoku Studio, Sega",
             },
             {
-              id: "goty5",
+              id: "splitfiction",
               title: "Split Fiction",
               imageUrl: "/split-fiction.jpg?height=200&width=350",
               developer: "Hazelight Studios",
             },
             {
-              id: "goty6",
+              id: "borderlands4",
               title: "Borderlands 4",
               imageUrl: "/borderlands-4.png?height=200&width=350",
               developer: "Gearbox Software",
             },
             {
-              id: "goty7",
+              id: "thefirstberserkerkhazan",
               title: "The First Berserker Khazan",
               imageUrl: "/berserker-khazan.jpg?height=200&width=350",
               developer: "Neople",
             },
             {
-              id: "goty8",
-              title: "Expedition 33",
+              id: "clairobscurexpedition33",
+              title: "Clair Obscur: Expedition 33",
               imageUrl: "/expedition-33.jpg?height=200&width=350",
               developer: "Sandfall Interactive",
             },
@@ -113,7 +115,7 @@ export default function VotingPage() {
           description: "Para os melhores jogos de corrida e esportes tradicionais e não tradicionais.",
           games: [
             {
-              id: "sportsracing1",
+              id: "wwe2k25",
               title: "WWE 2K25",
               imageUrl: "/wwe2k25.png?height=200&width=350",
               developer: "Visual Concepts",
@@ -126,7 +128,7 @@ export default function VotingPage() {
           description: "Melhor jogo focado em simulação em tempo real ou por turnos ou jogabilidade de estratégia, independentemente da plataforma.",
           games: [
             {
-              id: "simstrategy1",
+              id: "sidmeierscivilization7",
               title: "Sid Meier’s Civilization 7",
               imageUrl: "/sid-meiers-civilization-7.jpg?height=200&width=350",
               developer: "Firaxis Games",
@@ -139,7 +141,7 @@ export default function VotingPage() {
           description: "Para o melhor jogo projetado principalmente em torno do combate corpo a corpo.",
           games: [
             {
-              id: "fighting1",
+              id: "fatalfurycityofwolves",
               title: "Fatal Fury: City of Wolves",
               imageUrl: "/fatal-fury-city-of-wolves.jpg?height=200&width=350",
               developer: "SNK",
@@ -152,7 +154,7 @@ export default function VotingPage() {
           description: "O melhor jogo brasileiro de 2025",
           games: [
             {
-              id: "gotybr1",
+              id: "markofthedeep",
               title: "Mark of the Deep",
               imageUrl: "/mark-of-the-deep.jpg?height=200&width=350",
               developer: "Mad Mimic",
@@ -165,61 +167,61 @@ export default function VotingPage() {
           description: "Jogos com elementos de progressão, narrativa profunda e customização",
           games: [
             {
-              id: "rpg1",
+              id: "gosthofyotei",
               title: "Ghost of Yotei",
               imageUrl: "/ghost-of-yotei.jpg?height=200&width=350",
               developer: "Sucker Punch Productions",
             },
             {
-              id: "rpg2",
+              id: "likeadragonpirateyakuza",
               title: "Like a Dragon: Pirate Yakuza in Hawaii",
               imageUrl: "/like-a-dragon-pirate-yakusa.jpg?height=200&width=350",
               developer: "Ryu Ga Gotoku Studio, Sega",
             },
             {
-              id: "rpg3",
+              id: "borderlands4",
               title: "Borderlands 4",
               imageUrl: "/borderlands-4.png?height=200&width=350",
               developer: "Gearbox Software",
             },
             {
-              id: "rpg4",
+              id: "avowed",
               title: "Avowed",
               imageUrl: "/avowed.png?height=200&width=350",
               developer: "Obsidian",
             },
             {
-              id: "rpg5",
+              id: "assasinscreedshadows",
               title: "Assasin’s Creed Shadows",
               imageUrl: "/assassins-creed-shadows.png?height=200&width=350",
               developer: "Ubisoft",
             },
             {
-              id: "rpg6",
+              id: "monsterhunterwilds",
               title: "Monster Hunter Wilds",
               imageUrl: "/monster-hunter-wilds.png?height=200&width=350",
               developer: "Capcom",
             },
             {
-              id: "rpg7",
+              id: "kingdomcomedeliverance2",
               title: "Kingdom Come: Deliverance 2",
               imageUrl: "/kingdom-come-deliverance-2.jpg?height=200&width=350",
               developer: "Warhorse Studios",
             },
             {
-              id: "rpg8",
-              title: "Expedition 33",
+              id: "clairobscurexpedition33",
+              title: "Clair Obscur: Expedition 33",
               imageUrl: "/expedition-33.jpg?height=200&width=350",
               developer: "Sandfall Interactive",
             },
             {
-              id: "rpg9",
+              id: "thefirstberserkerkhazan",
               title: "The First Berserker Khazan",
               imageUrl: "/berserker-khazan.jpg?height=200&width=350",
               developer: "Neople",
             },
             {
-              id: "rpg10",
+              id: "dragonageveilguard",
               title: "Dragon Age The Veil Guard",
               imageUrl: "/dragon-age-the-veilguard.png?height=200&width=350",
               developer: "Bioware",
@@ -232,7 +234,7 @@ export default function VotingPage() {
           description: "Jogos desenvolvidos por estúdios independentes com ideias inovadoras",
           games: [
             {
-              id: "indie1",
+              id: "markofthedeep",
               title: "Mark of the Deep",
               imageUrl: "/mark-of-the-deep.jpg?height=200&width=350",
               developer: "Mad Mimic",
@@ -245,7 +247,7 @@ export default function VotingPage() {
           description: "Jogos com experiências multijogador excepcionais, cooperativas ou competitivas",
           games: [
             {
-              id: "multiplayer1",
+              id: "marvelrivals",
               title: "Marvel Rivals",
               imageUrl: "/marvel-rivals.png?height=200&width=350",
               developer: "NetEase",
@@ -258,115 +260,115 @@ export default function VotingPage() {
           description: "Jogos com foco em combate, reflexos rápidos e adrenalina",
           games: [
             {
-              id: "action1",
+              id: "gtavi",
               title: "GTA VI",
               imageUrl: "/gta-vi.jpg?height=200&width=350",
               developer: "RockStar",
             },
             {
-              id: "action2",
+              id: "gosthofyotei",
               title: "Ghost of Yotei",
               imageUrl: "/ghost-of-yotei.jpg?height=200&width=350",
               developer: "Sucker Punch Productions",
             },
             {
-              id: "action3",
+              id: "doomthedarkages",
               title: "Doom: The Dark Ages",
               imageUrl: "/doom-dark-ages.jpg?height=200&width=350",
               developer: "Id Software / Bethesda Softworks",
             },
             {
-              id: "action4",
+              id: "likeadragonpirateyakuza",
               title: "Like a Dragon: Pirate Yakuza in Hawaii",
               imageUrl: "/like-a-dragon-pirate-yakusa.jpg?height=200&width=350",
               developer: "Ryu Ga Gotoku Studio, Sega",
             },
             {
-              id: "action5",
+              id: "splitfiction",
               title: "Split Fiction",
               imageUrl: "/split-fiction.jpg?height=200&width=350",
               developer: "Hazelight Studios",
             },
             {
-              id: "action6",
+              id: "borderlands4",
               title: "Borderlands 4",
               imageUrl: "/borderlands-4.png?height=200&width=350",
               developer: "Gearbox Software",
             },
             {
-              id: "action9",
+              id: "riseoftheronin",
               title: "Rise Of The Ronin",
               imageUrl: "/rise-of-the-ronin.jpg?height=200&width=350",
               developer: "Team Ninja, Koei Tecmo Games",
             },
             {
-              id: "action10",
+              id: "avowed",
               title: "Avowed",
               imageUrl: "/avowed.png?height=200&width=350",
               developer: "Obsidian",
             },
             {
-              id: "action11",
+              id: "assasinscreedshadows",
               title: "Assasin’s Creed Shadows",
               imageUrl: "/assassins-creed-shadows.png?height=200&width=350",
               developer: "Ubisoft",
             },
             {
-              id: "action12",
+              id: "hades2",
               title: "Hades II",
               imageUrl: "/hades-2.png?height=200&width=350",
               developer: "Supergiant Games",
             },
             {
-              id: "action13",
+              id: "monsterhunterwilds",
               title: "Monster Hunter Wilds",
               imageUrl: "/monster-hunter-wilds.png?height=200&width=350",
               developer: "Capcom",
             },
             {
-              id: "action14",
+              id: "indianajonesgreatcircle",
               title: "Indiana Jones and the Great Circle",
               imageUrl: "/indiana-jones.jpg?height=200&width=350",
               developer: "MachineGames",
             },
             {
-              id: "action16",
+              id: "kingdomcomedeliverance2",
               title: "Kingdom Come: Deliverance 2",
               imageUrl: "/kingdom-come-deliverance-2.jpg?height=200&width=350",
               developer: "Warhorse Studios",
             },
             {
-              id: "action17",
-              title: "Expedition 33",
+              id: "clairobscurexpedition33",
+              title: "Clair Obscur: Expedition 33",
               imageUrl: "/expedition-33.jpg?height=200&width=350",
               developer: "Sandfall Interactive",
             },
             {
-              id: "action18",
+              id: "citizensleeper2",
               title: "Citizen Sleeper 2: Starward Vector",
               imageUrl: "/citizen-sleeper-2.jpg?height=200&width=350",
               developer: "Jump Over The Age",
             },
             {
-              id: "action19",
+              id: "endermagnolia",
               title: "Ender Magnolia: Bloom in the Mist",
               imageUrl: "/ender-magnolia.jpg?height=200&width=350",
               developer: "Adglobe, Live Wire Inc.",
             },
             {
-              id: "action20",
+              id: "littlenightmares3",
               title: "Little Nightmares 3",
               imageUrl: "/little-nightmares-3.jpg?height=200&width=350",
               developer: "Supermassive Games",
             },
             {
-              id: "action21",
+              id: "metroidprime4",
               title: "Metroid Prime 4: Beyond",
               imageUrl: "/metroid-prime-4.png?height=200&width=350",
               developer: "Retro Studios, Nintendo",
             },
             {
-              id: "action22",
+              id: "mafiaoldcountry",
               title: "Mafia: The Old Country",
               imageUrl: "/mafia-the-old-country.png?height=200&width=350",
               developer: "Hangar 13",
@@ -379,7 +381,7 @@ export default function VotingPage() {
           description: "Para o melhor jogo apropriado para jogar em família, independentemente do gênero ou plataforma.",
           games: [
             {
-              id: "family1",
+              id: "gtavi",
               title: "GTA VI",
               imageUrl: "/gta-vi.jpg?height=200&width=350",
               developer: "RockStar",
@@ -398,7 +400,7 @@ export default function VotingPage() {
           description: "O melhor jogo de 2024",
           games: [
             {
-              id: "goty1_2024",
+              id: "finalfantasyviirebirth",
               title: "Final Fantasy VII Rebirth",
               imageUrl: "/ffvii-rebirth.png?height=200&width=350",
               developer: "Square Enix",
@@ -411,7 +413,7 @@ export default function VotingPage() {
           description: "Para o melhor jogo focado em combate, superação de desafios e reflexos.",
           games: [
             {
-              id: "action1_2024",
+              id: "finalfantasyviirebirth",
               title: "Final Fantasy VII Rebirth",
               imageUrl: "/ffvii-rebirth.png?height=200&width=350",
               developer: "Square Enix",
@@ -423,9 +425,11 @@ export default function VotingPage() {
 
   ]
 
+
   useEffect(() => {
-    if (years.length > 0 && !selectedYear) {
-      setSelectedYear(years[0].id)
+    // Set the default year to 2025 if not selected already
+    if (!selectedYear) {
+      setSelectedYear("2025")
     }
   }, [])
 
@@ -477,6 +481,19 @@ export default function VotingPage() {
       setActiveCategory("")
     }
   }
+
+  const handleScroll = (direction: 'left' | 'right') => {
+    if (tabsContainerRef.current) {
+      const container = tabsContainerRef.current;
+      const scrollAmount = 150; // Adjust this value as needed for scroll distance
+      
+      if (direction === 'left') {
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      } else {
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    }
+  };
 
   const handleVote = (categoryId: string, gameId: string) => {
     setVotes((prev) => ({
@@ -615,31 +632,66 @@ export default function VotingPage() {
 
           <Card className="mb-6 border border-muted/30 bg-background/50 shadow-sm">
             <CardContent className="pt-6 pb-4">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <p className="text-muted-foreground">
-                  Vote no seu jogo favorito em cada categoria. Você só pode escolher um jogo por categoria. Após
-                  selecionar seus favoritos em todas as categorias, clique em "Enviar Votos" para registrar sua
-                  participação.
-                </p>
-
-                <div className="flex items-center gap-2 min-w-[180px]">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <Select value={selectedYear} onValueChange={handleYearChange}>
-                    <SelectTrigger className="w-[140px]">
-                      <SelectValue placeholder="Selecione o ano" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {years.map((year) => (
-                        <SelectItem key={year.id} value={year.id}>
-                          {year.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+              <p className="text-muted-foreground">
+                Vote no seu jogo favorito em cada categoria. Você só pode escolher um jogo por categoria. Após
+                selecionar seus favoritos em todas as categorias, clique em "Enviar Votos" para registrar sua
+                participação.
+              </p>
             </CardContent>
           </Card>
+
+          {/* Year Tabs with Horizontal Scrolling */}
+          <div className="relative mb-6">
+            <div className="flex items-center">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="absolute left-0 z-10 bg-background/80"
+                onClick={() => handleScroll('left')}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              
+              <div className="w-full overflow-hidden px-10">
+                <div 
+                  ref={tabsContainerRef}
+                  className="flex overflow-x-auto scrollbar-hide space-x-2 py-2"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                  {years.map((year) => (
+                    <Button
+                      key={year.id}
+                      variant={selectedYear === year.id ? "default" : "outline"}
+                      className={`flex-shrink-0 ${
+                        selectedYear === year.id 
+                          ? "bg-gradient-to-r from-chart-2 to-green-500" 
+                          : votes[year.id] && Object.keys(votes[year.id]).length > 0 
+                            ? "text-green-500 border-green-500/30" 
+                            : ""
+                      }`}
+                      onClick={() => handleYearChange(year.id)}
+                    >
+                      {year.name}
+                      {votes[year.id] && 
+                       getCurrentYearCategories().length > 0 && 
+                       Object.keys(votes[year.id]).length === getCurrentYearCategories().length && (
+                        <CheckCircle2 className="ml-2 h-4 w-4" />
+                      )}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="absolute right-0 z-10 bg-background/80"
+                onClick={() => handleScroll('right')}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
 
           {selectedYear && (
             <>

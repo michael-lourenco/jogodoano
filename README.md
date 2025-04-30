@@ -1,122 +1,79 @@
-# 🏆 Game of the Year Voting App
 
-Aplicação web para votação dos melhores jogos do ano em diferentes categorias.  
-Usuários podem votar após fazer login, e seus votos são registrados em um banco de dados Firestore.
+# 🏆 Votação: Jogo do Ano
 
----
+Aplicação web para votação dos melhores jogos do ano, permitindo que usuários escolham seus favoritos em diversas categorias.
+
+## 📸 Demonstração
+
+![Demonstração da aplicação](./public/demo.gif)
 
 ## 🚀 Funcionalidades
 
-- Listagem de categorias de votação (ex: Jogo do Ano, Melhor Jogo de Luta).
-- Exibição de jogos indicados em cada categoria.
-- Usuário pode selecionar **um jogo por categoria**.
-- Sistema de autenticação/login para permitir envio de votos.
-- Feedback visual com animações após a conclusão da votação.
-- Registro de votos no banco de dados Firestore.
-- Acesso responsivo: funciona bem em dispositivos mobile e desktop.
-
----
-
-## 📂 Estrutura de Componentes Principais
-
-| Componente         | Descrição |
-|--------------------|-----------|
-| `VotingPage`        | Página principal da votação. Gerencia autenticação, categorias, votos e envio. |
-| `CategorySection`   | Renderiza uma categoria com seus jogos indicados. |
-| `GameCard`          | Cartão de cada jogo individual, permitindo seleção para voto. |
-| `UserInfo`          | Exibe informações do usuário logado, além de opções para login/logout. |
-| `Footer`            | Rodapé da página. |
-
----
+- Autenticação de usuários (login/logout)
+- Seleção de ano para votação
+- Votação por categoria
+- Envio e persistência dos votos no Firebase
+- Interface responsiva e interativa
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Next.js** (Frontend framework)
-- **React Hooks** (`useState`, `useEffect`)
-- **Firebase Firestore** (Banco de dados para armazenar votos)
-- **Framer Motion** (Animações)
-- **Sonner** (Toast notifications)
-- **Lucide React Icons** (/cones SVG)
-- **TailwindCSS** (Estilização)
-- **Shadcn/ui** (Componentes UI prontos)
+- [React](https://reactjs.org/) com Next.js
+- [TypeScript](https://www.typescriptlang.org/)
+- [Firebase](https://firebase.google.com/) (Firestore)
+- [Framer Motion](https://www.framer.com/motion/)
+- [Lucide Icons](https://lucide.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
 
----
+## 📦 Instalação
 
-## 📋 Fluxo de Funcionamento
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/seu-usuario/votacao-jogo-do-ano.git
+   cd votacao-jogo-do-ano
+   ```
+2. Instale as dependências:
+   ```bash
+   npm install
+   ```
+3. Configure as variáveis de ambiente no arquivo `.env.local`:
+   ```env
+   NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+   ```
+4. Inicie o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
 
-1. **Login do Usuário**  
-   Se o usuário não estiver logado, ele será incentivado a fazer login.
+## 📁 Estrutura do Projeto
 
-2. **Seleção dos Jogos**  
-   - Para cada categoria disponível, o usuário escolhe **um jogo**.
-   - É possível navegar entre as categorias em mobile usando **abas** (`Tabs`).
-
-3. **Envio dos Votos**  
-   - O botão "Enviar Votos" somente é habilitado se todas as categorias tiverem sido votadas.
-   - Ao enviar:
-     - Se o usuário não estiver logado, é exibido um erro.
-     - Se estiver logado, os votos são enviados para o Firestore.
-
-4. **Confirmação**  
-   Após o envio bem-sucedido, o usuário vê uma tela de confirmação com animação.
-
----
-
-## ⚙️ Como Rodar Localmente
-
-```bash
-# Clone o repositório
-git clone https://github.com/seu-usuario/game-voting-app.git
-
-# Acesse a pasta do projeto
-cd game-voting-app
-
-# Instale as dependências
-npm install
-
-# Inicie o servidor de desenvolvimento
-npm run dev
+```
+├── components/
+│   ├── ui/
+│   ├── Footer.tsx
+│   └── UserInfo.tsx
+├── hooks/
+│   ├── useAuth.ts
+│   └── useNavigation.ts
+├── pages/
+│   └── voting.tsx
+├── repositories/
+│   └── games.ts
+├── services/
+│   └── firebase/
+│       └── FirebaseService.ts
+├── public/
+│   └── demo.gif
+├── .env.local
+├── package.json
+└── README.md
 ```
 
-Acesse em: [http://localhost:3000](http://localhost:3000)
+## 🧑‍💻 Contribuindo
 
----
-
-## 📦 Configurações Necessárias
-
-- Configurar o Firebase Firestore:
-  - Criar o projeto no [Firebase Console](https://console.firebase.google.com/).
-  - Definir regras de leitura/gravação no Firestore.
-  - Configurar a autenticação via Email/Senha ou outro provedor.
-- Adicionar as variáveis de ambiente `.env.local`:
-
-```env
-NEXT_PUBLIC_FIREBASE_API_KEY=your_key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_domain
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_bucket
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
-```
-
----
-
-## 🎨 Imagens e Estilos
-
-- As imagens dos jogos são carregadas a partir dos arquivos `public/`.
-- Caso não haja imagem, um `placeholder` padrão é exibido.
-
----
-
-## 📜 Observações
-
-- Um mesmo usuário **não pode** votar múltiplas vezes (controlado via e-mail no Firestore).
-- Cada categoria precisa obrigatoriamente ser votada para liberar o envio.
-- Animações deixam a experiência mais fluida e agradável.
-
----
+Contribuições são bem-vindas! Por favor, abra uma issue para discutir o que você gostaria de mudar.
 
 ## 📄 Licença
 
-Este projeto está licenciado sob a licença **MIT**.
-
+Este projeto está licenciado sob a Licença MIT. Consulte o arquivo [LICENSE](./LICENSE) para obter mais informações.

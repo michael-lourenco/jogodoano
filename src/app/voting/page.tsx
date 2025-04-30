@@ -22,20 +22,18 @@ export default function VotingPage() {
   const navigationService = useNavigation()
   const { user, loading, status, handleLogin, handleLogout } = useAuth()
 
-  const [selectedYear, setSelectedYear] = useState<string>("2025") // Default year is now 2025
+  const [selectedYear, setSelectedYear] = useState<string>("2025")
   const [votes, setVotes] = useState<Record<string, Record<string, string>>>({})
   const [activeCategory, setActiveCategory] = useState<string>("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [hasVoted, setHasVoted] = useState(false)
   const [votedYear, setVotedYear] = useState<string>("")
   
-  // References for tab scrolling
   const tabsContainerRef = useRef<HTMLDivElement>(null)
 
  
 
   useEffect(() => {
-    // Set the default year to 2025 if not selected already
     if (!selectedYear) {
       setSelectedYear("2025")
     }
@@ -52,19 +50,14 @@ export default function VotingPage() {
 
   useEffect(() => {
     if (user && user.votes) {
-      // Adaptar a estrutura de votos existente para a nova estrutura por ano
       const votesData = user.votes
 
-      // Verificar se já está no formato por ano
       if (votesData && typeof votesData === "object") {
         const isYearFormat = Object.keys(votesData).some((key) => votesData[key] && typeof votesData[key] === "object")
 
         if (isYearFormat) {
-          // Já está no formato por ano
           setVotes(votesData as Record<string, Record<string, string>>)
         } else {
-          // Está no formato antigo (sem ano), converter para o novo formato
-          // Assumimos que os votos existentes são do ano atual (2025)
           setVotes({
             "2025": votesData as unknown as Record<string, string>,
           })
@@ -81,7 +74,6 @@ export default function VotingPage() {
   const handleYearChange = (year: string) => {
     setSelectedYear(year)
 
-    // Reset active category when changing year
     const currentYear = years.find((y) => y.id === year)
     if (currentYear && currentYear.categories.length > 0) {
       setActiveCategory(currentYear.categories[0].id)
@@ -93,8 +85,7 @@ export default function VotingPage() {
   const handleScroll = (direction: 'left' | 'right') => {
     if (tabsContainerRef.current) {
       const container = tabsContainerRef.current;
-      const scrollAmount = 150; // Adjust this value as needed for scroll distance
-      
+      const scrollAmount = 150;
       if (direction === 'left') {
         container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
       } else {
@@ -140,7 +131,6 @@ export default function VotingPage() {
     setIsSubmitting(true)
 
     try {
-      // Estrutura de votos por ano
       const updatedVotes = {
         ...votes,
       }

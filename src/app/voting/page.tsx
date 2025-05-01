@@ -14,39 +14,44 @@ import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
 import { dbFirestore, updateUserVotes } from "@/services/firebase/FirebaseService"
 import { UserInfo } from "@/components/UserInfo"
-import { Game, Category, years } from "@/repositories/games"
-
-
+import { votingEditions } from "@/repositories/votingEditions"
+import { Game, Category, VotingEdition } from "@/types/types"
+import { rehydrateVotingEditions } from "@/utils/utils"
 
 export default function VotingPage() {
   const navigationService = useNavigation()
   const { user, loading, status, handleLogin, handleLogout } = useAuth()
 
-  const [selectedYear, setSelectedYear] = useState<string>("2025")
+  const [editions, setEditions] = useState<VotingEdition[]>([])
+  const [selectedEditionId, setSelectedEditionId] = useState<string>("2025")
   const [votes, setVotes] = useState<Record<string, Record<string, string>>>({})
   const [activeCategory, setActiveCategory] = useState<string>("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [hasVoted, setHasVoted] = useState(false)
-  const [votedYear, setVotedYear] = useState<string>("")
+  const [votedEditionId, setVotedEditionId] = useState<string>("")
   
   const tabsContainerRef = useRef<HTMLDivElement>(null)
 
- 
-
   useEffect(() => {
-    if (!selectedYear) {
-      setSelectedYear("2025")
-    }
+    // Rehydrate voting editions with game data
+    const hydratedEditions = rehydrateVotingEditions(votingEditions)
+    setEditions(hydratedEditions)
   }, [])
 
   useEffect(() => {
-    if (selectedYear) {
-      const currentYear = years.find((year) => year.id === selectedYear)
-      if (currentYear && currentYear.categories.length > 0 && !activeCategory) {
-        setActiveCategory(currentYear.categories[0].id)
+    if (!selectedEditionId && editions.length > 0) {
+      setSelectedEditionId("2025")
+    }
+  }, [editions])
+
+  useEffect(() => {
+    if (selectedEditionId) {
+      const currentEdition = editions.find((edition) => edition.id === selectedEditionId)
+      if (currentEdition && currentEdition.categories.length > 0 && !activeCategory) {
+        setActiveCategory(currentEdition.categories[0].id)
       }
     }
-  }, [selectedYear, activeCategory])
+  }, [selectedEditionId, activeCategory, editions])
 
   useEffect(() => {
     if (user && user.votes) {
@@ -61,7 +66,6 @@ export default function VotingPage() {
           setVotes({
             "2025": votesData as unknown as Record<string, string>,
           })
-          
         }
       } else {
         setVotes({})
@@ -71,12 +75,12 @@ export default function VotingPage() {
     }
   }, [user])
 
-  const handleYearChange = (year: string) => {
-    setSelectedYear(year)
+  const handleEditionChange = (editionId: string) => {
+    setSelectedEditionId(editionId)
 
-    const currentYear = years.find((y) => y.id === year)
-    if (currentYear && currentYear.categories.length > 0) {
-      setActiveCategory(currentYear.categories[0].id)
+    const currentEdition = editions.find((edition) => edition.id === editionId)
+    if (currentEdition && currentEdition.categories.length > 0) {
+      setActiveCategory(currentEdition.categories[0].id)
     } else {
       setActiveCategory("")
     }
@@ -97,22 +101,22 @@ export default function VotingPage() {
   const handleVote = (categoryId: string, gameId: string) => {
     setVotes((prev) => ({
       ...prev,
-      [selectedYear]: {
-        ...(prev[selectedYear] || {}),
+      [selectedEditionId]: {
+        ...(prev[selectedEditionId] || {}),
         [categoryId]: gameId,
       },
     }))
   }
 
-  const getCurrentYearCategories = () => {
-    return years.find((year) => year.id === selectedYear)?.categories || []
+  const getCurrentEditionCategories = () => {
+    return editions.find((edition) => edition.id === selectedEditionId)?.categories || []
   }
 
   const handleSubmitVotes = async () => {
-    const currentYearCategories = getCurrentYearCategories()
-    const currentYearVotes = votes[selectedYear] || {}
+    const currentEditionCategories = getCurrentEditionCategories()
+    const currentEditionVotes = votes[selectedEditionId] || {}
 
-    const allCategoriesVoted = currentYearCategories.every((category) => currentYearVotes[category.id])
+    const allCategoriesVoted = currentEditionCategories.every((category) => currentEditionVotes[category.id])
 
     if (!allCategoriesVoted) {
       toast.error("Votação incompleta", {
@@ -138,9 +142,9 @@ export default function VotingPage() {
       await updateUserVotes(user.email, updatedVotes, dbFirestore)
 
       setHasVoted(true)
-      setVotedYear(selectedYear)
+      setVotedEditionId(selectedEditionId)
       toast.success("Votação enviada com sucesso!", {
-        description: `Obrigado por participar da votação do Jogo do Ano de ${selectedYear}!`,
+        description: `Obrigado por participar da votação do Jogo do Ano de ${selectedEditionId}!`,
       })
     } catch (error) {
       console.error("Erro ao enviar votos:", error)
@@ -158,7 +162,7 @@ export default function VotingPage() {
 
   const handleBackToVoting = () => {
     setHasVoted(false)
-    setVotedYear("")
+    setVotedEditionId("")
   }
 
   if (loading) {
@@ -189,7 +193,7 @@ export default function VotingPage() {
               </CardTitle>
 
               <p className="text-center text-muted-foreground">
-                Obrigado por participar da votação do Jogo do Ano de {votedYear}. Seus votos foram registrados com
+                Obrigado por participar da votação do Jogo do Ano de {votedEditionId}. Seus votos foram registrados com
                 sucesso!
               </p>
 
@@ -256,23 +260,23 @@ export default function VotingPage() {
                   className="flex overflow-x-auto scrollbar-hide space-x-2 py-2"
                   style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
-                  {years.map((year) => (
+                  {editions.map((edition) => (
                     <Button
-                      key={year.id}
-                      variant={selectedYear === year.id ? "default" : "outline"}
+                      key={edition.id}
+                      variant={selectedEditionId === edition.id ? "default" : "outline"}
                       className={`flex-shrink-0 ${
-                        selectedYear === year.id 
+                        selectedEditionId === edition.id 
                           ? "bg-gradient-to-r from-chart-2 to-green-500" 
-                          : votes[year.id] && Object.keys(votes[year.id]).length > 0 
+                          : votes[edition.id] && Object.keys(votes[edition.id]).length > 0 
                             ? "text-green-500 border-green-500/30" 
                             : ""
                       }`}
-                      onClick={() => handleYearChange(year.id)}
+                      onClick={() => handleEditionChange(edition.id)}
                     >
-                      {year.name}
-                      {votes[year.id] && 
-                       getCurrentYearCategories().length > 0 && 
-                       Object.keys(votes[year.id]).length === getCurrentYearCategories().length && (
+                      {edition.name}
+                      {votes[edition.id] && 
+                       getCurrentEditionCategories().length > 0 && 
+                       Object.keys(votes[edition.id]).length === getCurrentEditionCategories().length && (
                         <CheckCircle2 className="ml-2 h-4 w-4" />
                       )}
                     </Button>
@@ -291,28 +295,28 @@ export default function VotingPage() {
             </div>
           </div>
 
-          {selectedYear && (
+          {selectedEditionId && editions.length > 0 && (
             <>
               <div className="block md:hidden mb-6">
                 <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
                   <TabsList className="w-full overflow-x-auto flex-wrap justify-start h-auto p-1 bg-muted/20">
-                    {getCurrentYearCategories().map((category) => (
+                    {getCurrentEditionCategories().map((category) => (
                       <TabsTrigger
                         key={category.id}
                         value={category.id}
-                        className={`flex-shrink-0 ${votes[selectedYear]?.[category.id] ? "text-green-500" : ""}`}
+                        className={`flex-shrink-0 ${votes[selectedEditionId]?.[category.id] ? "text-green-500" : ""}`}
                       >
                         {category.name.split(" ").pop()}
-                        {votes[selectedYear]?.[category.id] && <CheckCircle2 className="ml-1 h-3 w-3" />}
+                        {votes[selectedEditionId]?.[category.id] && <CheckCircle2 className="ml-1 h-3 w-3" />}
                       </TabsTrigger>
                     ))}
                   </TabsList>
 
-                  {getCurrentYearCategories().map((category) => (
+                  {getCurrentEditionCategories().map((category) => (
                     <TabsContent key={category.id} value={category.id} className="mt-4">
                       <CategorySection
                         category={category}
-                        selectedGameId={votes[selectedYear]?.[category.id]}
+                        selectedGameId={votes[selectedEditionId]?.[category.id]}
                         onVote={handleVote}
                       />
                     </TabsContent>
@@ -322,11 +326,11 @@ export default function VotingPage() {
 
               <div className="hidden md:block">
                 <div className="space-y-10">
-                  {getCurrentYearCategories().map((category) => (
+                  {getCurrentEditionCategories().map((category) => (
                     <CategorySection
                       key={category.id}
                       category={category}
-                      selectedGameId={votes[selectedYear]?.[category.id]}
+                      selectedGameId={votes[selectedEditionId]?.[category.id]}
                       onVote={handleVote}
                     />
                   ))}
@@ -336,7 +340,7 @@ export default function VotingPage() {
               <div className="sticky bottom-4 mt-8 mb-4 flex justify-center">
                 <Button
                   onClick={handleSubmitVotes}
-                  disabled={isSubmitting || getCurrentYearCategories().some((cat) => !votes[selectedYear]?.[cat.id])}
+                  disabled={isSubmitting || getCurrentEditionCategories().some((cat) => !votes[selectedEditionId]?.[cat.id])}
                   className="w-full max-w-md h-12 text-primary bg-gradient-to-r from-chart-2 to-green-500 hover:from-chart-2 hover:to-green-400 shadow-lg hover:shadow-green-500/25 hover:text-secondary transition-all duration-300"
                   size="lg"
                 >
@@ -346,7 +350,7 @@ export default function VotingPage() {
                       Processando...
                     </div>
                   ) : (
-                    <>Enviar Votos de {selectedYear}</>
+                    <>Enviar Votos de {selectedEditionId}</>
                   )}
                 </Button>
               </div>
@@ -379,7 +383,7 @@ function CategorySection({
       <CardContent className="p-4">
         <ScrollArea className="w-full">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
-            {category.games.map((game) => (
+            {category.games?.map((game) => (
               <GameCard
                 key={game.id}
                 game={game}

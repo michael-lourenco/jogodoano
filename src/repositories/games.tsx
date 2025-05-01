@@ -1,9 +1,4 @@
-export interface Game {
-  id: string
-  title: string
-  imageUrl: string
-  developer: string
-}
+import { Game } from "@/types/types";
   
 export const games: Game[] = [
   { id: "gtavi", title: "GTA VI", imageUrl: "/gta-vi.jpg?height=200&width=350", developer: "RockStar" },

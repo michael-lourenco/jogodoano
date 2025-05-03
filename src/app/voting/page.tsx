@@ -1,22 +1,17 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent,CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Trophy, ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useAuth } from "@/hooks/useAuth"
 import { useVotes } from "@/hooks/useVotes"
 import { Footer } from "@/components/Footer"
-import { toast } from "sonner"
-import Image from "next/image"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
-import { dbFirestore, updateUserVotes } from "@/services/firebase/FirebaseService"
 import { UserInfo } from "@/components/UserInfo"
 import { votingEditions } from "@/repositories/votingEditions"
-import { Game, Category, VotingEdition } from "@/types/types"
+import { VotingEdition } from "@/types/types"
 import { rehydrateVotingEditions } from "@/utils/utils"
 import { ShareResultsDialog } from "@/components/voting/ShareResults";
 import { CategorySection } from "@/components/voting/CategorySection"
@@ -38,13 +33,11 @@ export default function VotingPage() {
     handleSubmitVotes,
     setHasVoted,
     setVotedEditionId,
-    areAllCategoriesVoted
   } = useVotes({ user, editions })
 
   const tabsContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Rehydrate voting editions with game data
     const hydratedEditions = rehydrateVotingEditions(votingEditions)
     setEditions(hydratedEditions)
   }, [])

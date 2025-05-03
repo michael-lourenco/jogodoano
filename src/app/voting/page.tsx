@@ -2,9 +2,10 @@
 import { useState, useEffect, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Trophy, ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, Share2, Twitter, Facebook, Linkedin, Copy, Image as ImageIcon } from "lucide-react"
+import { Trophy, ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useAuth } from "@/hooks/useAuth"
+import { useVotes } from "@/hooks/useVotes"
 import { Footer } from "@/components/Footer"
 import { toast } from "sonner"
 import Image from "next/image"
@@ -12,37 +13,34 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
-import { dbFirestore, updateUserVotes, UserData } from "@/services/firebase/FirebaseService"
+import { dbFirestore, updateUserVotes } from "@/services/firebase/FirebaseService"
 import { UserInfo } from "@/components/UserInfo"
 import { votingEditions } from "@/repositories/votingEditions"
 import { Game, Category, VotingEdition } from "@/types/types"
 import { rehydrateVotingEditions } from "@/utils/utils"
-import html2canvas from 'html2canvas'
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
 import { ShareResultsDialog } from "@/components/voting/ShareResults";
+import { CategorySection } from "@/components/voting/CategorySection"
 
 export default function VotingPage() {
   const navigationService = useNavigation()
-  const { user, loading, status, handleLogin, handleLogout } = useAuth()
+  const { user, loading, handleLogin, handleLogout } = useAuth()
 
   const [editions, setEditions] = useState<VotingEdition[]>([])
   const [selectedEditionId, setSelectedEditionId] = useState<string>("2025")
-  const [votes, setVotes] = useState<Record<string, Record<string, string>>>({})
   const [activeCategory, setActiveCategory] = useState<string>("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [hasVoted, setHasVoted] = useState(false)
-  const [votedEditionId, setVotedEditionId] = useState<string>("")
   
+  const {
+    votes,
+    hasVoted,
+    votedEditionId,
+    isSubmitting,
+    handleVote,
+    handleSubmitVotes,
+    setHasVoted,
+    setVotedEditionId,
+    areAllCategoriesVoted
+  } = useVotes({ user, editions })
+
   const tabsContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -66,27 +64,6 @@ export default function VotingPage() {
     }
   }, [selectedEditionId, activeCategory, editions])
 
-  useEffect(() => {
-    if (user && user.votes) {
-      const votesData = user.votes
-
-      if (votesData && typeof votesData === "object") {
-        const isYearFormat = Object.keys(votesData).some((key) => votesData[key] && typeof votesData[key] === "object")
-
-        if (isYearFormat) {
-          setVotes(votesData as Record<string, Record<string, string>>)
-        } else {
-          setVotes({
-            "2025": votesData as unknown as Record<string, string>,
-          })
-        }
-      } else {
-        setVotes({})
-      }
-    } else {
-      setVotes({})
-    }
-  }, [user])
 
   const handleEditionChange = (editionId: string) => {
     setSelectedEditionId(editionId)
@@ -111,68 +88,20 @@ export default function VotingPage() {
     }
   };
 
-  const handleVote = (categoryId: string, gameId: string) => {
-    setVotes((prev) => ({
-      ...prev,
-      [selectedEditionId]: {
-        ...(prev[selectedEditionId] || {}),
-        [categoryId]: gameId,
-      },
-    }))
-  }
-
   const getCurrentEditionCategories = () => {
     return editions.find((edition) => edition.id === selectedEditionId)?.categories || []
-  }
-
-  const handleSubmitVotes = async () => {
-    const currentEditionCategories = getCurrentEditionCategories()
-    const currentEditionVotes = votes[selectedEditionId] || {}
-
-    const allCategoriesVoted = currentEditionCategories.every((category) => currentEditionVotes[category.id])
-
-    if (!allCategoriesVoted) {
-      toast.error("Votação incompleta", {
-        description: "Por favor, vote em todas as categorias antes de enviar.",
-      })
-      return
-    }
-
-    if (!user || !user.email) {
-      toast.error("Login necessário", {
-        description: "Você precisa estar logado para votar.",
-      })
-      return
-    }
-
-    setIsSubmitting(true)
-
-    try {
-      const updatedVotes = {
-        ...votes,
-      }
-
-      await updateUserVotes(user.email, updatedVotes, dbFirestore)
-
-      setHasVoted(true)
-      setVotedEditionId(selectedEditionId)
-      toast.success("Votação enviada com sucesso!", {
-        description: `Obrigado por participar da votação do Jogo do Ano de ${selectedEditionId}!`,
-      })
-    } catch (error) {
-      console.error("Erro ao enviar votos:", error)
-      toast.error("Erro ao enviar votos", {
-        description: "Ocorreu um erro ao processar sua votação. Tente novamente.",
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
   }
 
   const handleBackToHome = () => {
     navigationService.navigateTo("/")
   }
+  const handleVoteInUI = (categoryId: string, gameId: string) => {
+    handleVote(selectedEditionId, categoryId, gameId)
+  }
 
+  const handleSubmitVotesInUI = async () => {
+    await handleSubmitVotes(selectedEditionId)
+  }
   const handleBackToVoting = () => {
     setHasVoted(false)
     setVotedEditionId("")
@@ -340,7 +269,7 @@ export default function VotingPage() {
                       <CategorySection
                         category={category}
                         selectedGameId={votes[selectedEditionId]?.[category.id]}
-                        onVote={handleVote}
+                        onVote={handleVoteInUI}
                       />
                     </TabsContent>
                   ))}
@@ -354,7 +283,7 @@ export default function VotingPage() {
                       key={category.id}
                       category={category}
                       selectedGameId={votes[selectedEditionId]?.[category.id]}
-                      onVote={handleVote}
+                      onVote={handleVoteInUI}
                     />
                   ))}
                 </div>
@@ -362,7 +291,7 @@ export default function VotingPage() {
 
               <div className="sticky bottom-4 mt-8 mb-4 flex justify-center">
                 <Button
-                  onClick={handleSubmitVotes}
+                  onClick={handleSubmitVotesInUI}
                   disabled={isSubmitting || getCurrentEditionCategories().some((cat) => !votes[selectedEditionId]?.[cat.id])}
                   className="w-full max-w-md h-12 text-primary bg-gradient-to-r from-chart-2 to-green-500 hover:from-chart-2 hover:to-green-400 shadow-lg hover:shadow-green-500/25 hover:text-secondary transition-all duration-300"
                   size="lg"
@@ -385,95 +314,3 @@ export default function VotingPage() {
     </div>
   )
 }
-
-function CategorySection({
-  category,
-  selectedGameId,
-  onVote,
-}: {
-  category: Category
-  selectedGameId?: string
-  onVote: (categoryId: string, gameId: string) => void
-}) {
-  return (
-    <Card className="border border-muted/30 bg-background/50 shadow-sm overflow-hidden">
-      <CardHeader className="bg-muted/10 border-b border-muted/20">
-        <div className="flex flex-col space-y-1">
-          <CardTitle className="text-xl font-bold text-primary">{category.name}</CardTitle>
-          <p className="text-sm text-muted-foreground">{category.description}</p>
-        </div>
-      </CardHeader>
-      <CardContent className="p-4">
-        <ScrollArea className="w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
-            {category.games?.map((game) => (
-              <GameCard
-                key={game.id}
-                game={game}
-                isSelected={selectedGameId === game.id}
-                onSelect={() => onVote(category.id, game.id)}
-              />
-            ))}
-          </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
-  )
-}
-
-
-function GameCard({
-  game,
-  isSelected,
-  onSelect,
-}: {
-  game: Game
-  isSelected: boolean
-  onSelect: () => void
-}) {
-  const imageUrl = game.imageUrl ? game.imageUrl.split("?")[0] : "/placeholder.svg"
-
-  return (
-    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-      <Card
-        className={`cursor-pointer overflow-hidden transition-all duration-200 h-full ${
-          isSelected ? "ring-2 ring-green-500 shadow-lg shadow-green-500/10" : "hover:border-muted/50"
-        }`}
-        onClick={onSelect}
-      >
-        <div className="relative aspect-video">
-          {game.imageUrl ? (
-            <Image
-              src={game.imageUrl || "/placeholder.svg"}
-              alt={game.title}
-              fill
-              className="object-cover"
-              unoptimized
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
-              <span className="text-white/70 text-sm font-medium">{game.title}</span>
-            </div>
-          )}
-          {isSelected && (
-            <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center">
-              <CheckCircle2 className="h-12 w-12 text-green-500" />
-            </div>
-          )}
-        </div>
-        <CardContent className="p-3">
-          <h3 className="font-semibold line-clamp-1">{game.title}</h3>
-          <div className="flex items-center justify-between mt-1">
-            <p className="text-xs text-muted-foreground">{game.developer}</p>
-            {isSelected && (
-              <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">
-                Selecionado
-              </Badge>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  )
-}
-

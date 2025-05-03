@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Trophy, ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useAuth } from "@/hooks/useAuth"
+import { useVotes } from "@/hooks/useVotes"
 import { Footer } from "@/components/Footer"
 import { toast } from "sonner"
 import Image from "next/image"
@@ -26,12 +27,20 @@ export default function VotingPage() {
 
   const [editions, setEditions] = useState<VotingEdition[]>([])
   const [selectedEditionId, setSelectedEditionId] = useState<string>("2025")
-  const [votes, setVotes] = useState<Record<string, Record<string, string>>>({})
   const [activeCategory, setActiveCategory] = useState<string>("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [hasVoted, setHasVoted] = useState(false)
-  const [votedEditionId, setVotedEditionId] = useState<string>("")
   
+  const {
+    votes,
+    hasVoted,
+    votedEditionId,
+    isSubmitting,
+    handleVote,
+    handleSubmitVotes,
+    setHasVoted,
+    setVotedEditionId,
+    areAllCategoriesVoted
+  } = useVotes({ user, editions })
+
   const tabsContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -55,27 +64,6 @@ export default function VotingPage() {
     }
   }, [selectedEditionId, activeCategory, editions])
 
-  useEffect(() => {
-    if (user && user.votes) {
-      const votesData = user.votes
-
-      if (votesData && typeof votesData === "object") {
-        const isYearFormat = Object.keys(votesData).some((key) => votesData[key] && typeof votesData[key] === "object")
-
-        if (isYearFormat) {
-          setVotes(votesData as Record<string, Record<string, string>>)
-        } else {
-          setVotes({
-            "2025": votesData as unknown as Record<string, string>,
-          })
-        }
-      } else {
-        setVotes({})
-      }
-    } else {
-      setVotes({})
-    }
-  }, [user])
 
   const handleEditionChange = (editionId: string) => {
     setSelectedEditionId(editionId)
@@ -100,68 +88,20 @@ export default function VotingPage() {
     }
   };
 
-  const handleVote = (categoryId: string, gameId: string) => {
-    setVotes((prev) => ({
-      ...prev,
-      [selectedEditionId]: {
-        ...(prev[selectedEditionId] || {}),
-        [categoryId]: gameId,
-      },
-    }))
-  }
-
   const getCurrentEditionCategories = () => {
     return editions.find((edition) => edition.id === selectedEditionId)?.categories || []
-  }
-
-  const handleSubmitVotes = async () => {
-    const currentEditionCategories = getCurrentEditionCategories()
-    const currentEditionVotes = votes[selectedEditionId] || {}
-
-    const allCategoriesVoted = currentEditionCategories.every((category) => currentEditionVotes[category.id])
-
-    if (!allCategoriesVoted) {
-      toast.error("Votação incompleta", {
-        description: "Por favor, vote em todas as categorias antes de enviar.",
-      })
-      return
-    }
-
-    if (!user || !user.email) {
-      toast.error("Login necessário", {
-        description: "Você precisa estar logado para votar.",
-      })
-      return
-    }
-
-    setIsSubmitting(true)
-
-    try {
-      const updatedVotes = {
-        ...votes,
-      }
-
-      await updateUserVotes(user.email, updatedVotes, dbFirestore)
-
-      setHasVoted(true)
-      setVotedEditionId(selectedEditionId)
-      toast.success("Votação enviada com sucesso!", {
-        description: `Obrigado por participar da votação do Jogo do Ano de ${selectedEditionId}!`,
-      })
-    } catch (error) {
-      console.error("Erro ao enviar votos:", error)
-      toast.error("Erro ao enviar votos", {
-        description: "Ocorreu um erro ao processar sua votação. Tente novamente.",
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
   }
 
   const handleBackToHome = () => {
     navigationService.navigateTo("/")
   }
+  const handleVoteInUI = (categoryId: string, gameId: string) => {
+    handleVote(selectedEditionId, categoryId, gameId)
+  }
 
+  const handleSubmitVotesInUI = async () => {
+    await handleSubmitVotes(selectedEditionId)
+  }
   const handleBackToVoting = () => {
     setHasVoted(false)
     setVotedEditionId("")
@@ -329,7 +269,7 @@ export default function VotingPage() {
                       <CategorySection
                         category={category}
                         selectedGameId={votes[selectedEditionId]?.[category.id]}
-                        onVote={handleVote}
+                        onVote={handleVoteInUI}
                       />
                     </TabsContent>
                   ))}
@@ -343,7 +283,7 @@ export default function VotingPage() {
                       key={category.id}
                       category={category}
                       selectedGameId={votes[selectedEditionId]?.[category.id]}
-                      onVote={handleVote}
+                      onVote={handleVoteInUI}
                     />
                   ))}
                 </div>
@@ -351,7 +291,7 @@ export default function VotingPage() {
 
               <div className="sticky bottom-4 mt-8 mb-4 flex justify-center">
                 <Button
-                  onClick={handleSubmitVotes}
+                  onClick={handleSubmitVotesInUI}
                   disabled={isSubmitting || getCurrentEditionCategories().some((cat) => !votes[selectedEditionId]?.[cat.id])}
                   className="w-full max-w-md h-12 text-primary bg-gradient-to-r from-chart-2 to-green-500 hover:from-chart-2 hover:to-green-400 shadow-lg hover:shadow-green-500/25 hover:text-secondary transition-all duration-300"
                   size="lg"

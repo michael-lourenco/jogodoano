@@ -9,7 +9,8 @@ export const votingEditions: VotingEdition[] = [
         name: "Jogo do Ano",
         description: "O melhor jogo de 2025",
         gameIds: [
-          "gtavi",
+          "the-talos-principle-reawakened",
+          "despelote",
           "gosthofyotei",
           "doomthedarkages",
           "likeadragonpirateyakuza",
@@ -17,6 +18,17 @@ export const votingEditions: VotingEdition[] = [
           "borderlands4",
           "thefirstberserkerkhazan",
           "clairobscurexpedition33",
+          "kingdomcomedeliverance2",
+          "monsterhunterwilds",
+          "the-roottrees-are-dead",
+          "lonely-mountains-snow-riders",
+          "citizensleeper2",
+          "bionic-bay",
+          "starvaders",
+          "the-hundred-line-last-defense-academy",
+          "two-point-museum",
+          "keep-driving",
+          "endermagnolia",
         ],
       },
       {
@@ -85,7 +97,6 @@ export const votingEditions: VotingEdition[] = [
         name: "Melhor Jogo de Ação",
         description: "Jogos com foco em combate, reflexos rápidos e adrenalina",
         gameIds: [
-          "gtavi",
           "gosthofyotei",
           "doomthedarkages",
           "likeadragonpirateyakuza",
@@ -111,7 +122,7 @@ export const votingEditions: VotingEdition[] = [
         name: "Melhor jogo para Família",
         description:
           "Para o melhor jogo apropriado para jogar em família, independentemente do gênero ou plataforma.",
-        gameIds: ["gtavi"],
+        gameIds: ["gosthofyotei"],
       },
     ],
   },
@@ -143,7 +154,6 @@ export const votingEditions: VotingEdition[] = [
         name: "O Melhor",
         description: "O melhor jogo de todos os tempos",
         gameIds: [
-          "gtavi",
           "gosthofyotei",
           "doomthedarkages",
           "likeadragonpirateyakuza",
@@ -219,7 +229,6 @@ export const votingEditions: VotingEdition[] = [
         name: "Melhor Jogo de Ação",
         description: "Jogos com foco em combate, reflexos rápidos e adrenalina",
         gameIds: [
-          "gtavi",
           "gosthofyotei",
           "doomthedarkages",
           "likeadragonpirateyakuza",
@@ -245,7 +254,7 @@ export const votingEditions: VotingEdition[] = [
         name: "Melhor jogo para Família",
         description:
           "Para o melhor jogo apropriado para jogar em família, independentemente do gênero ou plataforma.",
-        gameIds: ["gtavi"],
+        gameIds: ["gosthofyotei",]
       },
     ],
   },

@@ -18,6 +18,7 @@ import { votingEditions } from "@/repositories/votingEditions"
 import { Game, Category, VotingEdition } from "@/types/types"
 import { rehydrateVotingEditions } from "@/utils/utils"
 import { ShareResultsDialog } from "@/components/voting/ShareResults";
+import { CategorySection } from "@/components/voting/CategorySection"
 
 export default function VotingPage() {
   const navigationService = useNavigation()
@@ -371,96 +372,5 @@ export default function VotingPage() {
       </main>
       <Footer />
     </div>
-  )
-}
-
-function CategorySection({
-  category,
-  selectedGameId,
-  onVote,
-}: {
-  category: Category
-  selectedGameId?: string
-  onVote: (categoryId: string, gameId: string) => void
-}) {
-  return (
-    <Card className="border border-muted/30 bg-background/50 shadow-sm overflow-hidden">
-      <CardHeader className="bg-muted/10 border-b border-muted/20">
-        <div className="flex flex-col space-y-1">
-          <CardTitle className="text-xl font-bold text-primary">{category.name}</CardTitle>
-          <p className="text-sm text-muted-foreground">{category.description}</p>
-        </div>
-      </CardHeader>
-      <CardContent className="p-4">
-        <ScrollArea className="w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
-            {category.games?.map((game) => (
-              <GameCard
-                key={game.id}
-                game={game}
-                isSelected={selectedGameId === game.id}
-                onSelect={() => onVote(category.id, game.id)}
-              />
-            ))}
-          </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
-  )
-}
-
-
-function GameCard({
-  game,
-  isSelected,
-  onSelect,
-}: {
-  game: Game
-  isSelected: boolean
-  onSelect: () => void
-}) {
-  const imageUrl = game.imageUrl ? game.imageUrl.split("?")[0] : "/placeholder.svg"
-
-  return (
-    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-      <Card
-        className={`cursor-pointer overflow-hidden transition-all duration-200 h-full ${
-          isSelected ? "ring-2 ring-green-500 shadow-lg shadow-green-500/10" : "hover:border-muted/50"
-        }`}
-        onClick={onSelect}
-      >
-        <div className="relative aspect-video">
-          {game.imageUrl ? (
-            <Image
-              src={game.imageUrl || "/placeholder.svg"}
-              alt={game.title}
-              fill
-              className="object-cover"
-              unoptimized
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
-              <span className="text-white/70 text-sm font-medium">{game.title}</span>
-            </div>
-          )}
-          {isSelected && (
-            <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center">
-              <CheckCircle2 className="h-12 w-12 text-green-500" />
-            </div>
-          )}
-        </div>
-        <CardContent className="p-3">
-          <h3 className="font-semibold line-clamp-1">{game.title}</h3>
-          <div className="flex items-center justify-between mt-1">
-            <p className="text-xs text-muted-foreground">{game.developer}</p>
-            {isSelected && (
-              <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">
-                Selecionado
-              </Badge>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
   )
 }

@@ -36,7 +36,7 @@ export const votingEditions: VotingEdition[] = [
         name: "Melhores Esportes/Corridas",
         description:
           "Para os melhores jogos de corrida e esportes tradicionais e não tradicionais.",
-        gameIds: ["wwe2k25"],
+        gameIds: ["wwe2k25", "mlb-the-show-25", "nba-2k25","pga-tour-2k25"],
       },
       {
         id: "simstrategy",
@@ -109,8 +109,6 @@ export const votingEditions: VotingEdition[] = [
           "monsterhunterwilds",
           "indianajonesgreatcircle",
           "kingdomcomedeliverance2",
-          "clairobscurexpedition33",
-          "citizensleeper2",
           "endermagnolia",
           "littlenightmares3",
           "metroidprime4",
@@ -126,25 +124,25 @@ export const votingEditions: VotingEdition[] = [
       },
     ],
   },
-  {
-    id: "2024",
-    name: "2024",
-    categories: [
-      {
-        id: "goty_2024",
-        name: "Jogo do Ano",
-        description: "O melhor jogo de 2024",
-        gameIds: ["finalfantasyviirebirth"],
-      },
-      {
-        id: "action_2024",
-        name: "Melhor Jogo de Ação",
-        description:
-          "Para o melhor jogo focado em combate, superação de desafios e reflexos.",
-        gameIds: ["finalfantasyviirebirth"],
-      },
-    ],
-  },
+  // {
+  //   id: "2024",
+  //   name: "2024",
+  //   categories: [
+  //     {
+  //       id: "goty_2024",
+  //       name: "Jogo do Ano",
+  //       description: "O melhor jogo de 2024",
+  //       gameIds: ["finalfantasyviirebirth"],
+  //     },
+  //     {
+  //       id: "action_2024",
+  //       name: "Melhor Jogo de Ação",
+  //       description:
+  //         "Para o melhor jogo focado em combate, superação de desafios e reflexos.",
+  //       gameIds: ["finalfantasyviirebirth"],
+  //     },
+  //   ],
+  // },
   {
     id: "all_time",
     name: "Melhor de Todos",

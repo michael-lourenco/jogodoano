@@ -428,6 +428,9 @@ export const games: Game[] = [
   { id: "the-talos-principle-reawakened", title: "The Talos Principle: Reawakened", imageUrl: "/the-talos-principle-reawakened.jpg?height=200&width=350", developer: "Croteam" },
   { id: "the-roottrees-are-dead", title: "The Roottrees are Dead", imageUrl: "/the-roottrees-are-dead.jpg?height=200&width=350", developer: "Robin Ward" },
   { id: "age-of-mythology-retold-immortal-pillars", title: "Age of Mythology: Retold - Immortal Pillars", imageUrl: "/age-of-mythology-retold-immortal-pillars.jpg?height=200&width=350", developer: "World's Edge, Virtuos Games, Forgotten Empires, Tantalus Media" },
+  { id: "nba-2k25", title: "NBA 2K25", imageUrl: "/nba-2k25.jpg?height=200&width=350", developer: "Visual Concepts" },
+  { id: "ea-sports-fc-25", title: "EA SPORTS FC™ 25", imageUrl: "/ea-sports-fc-25.jg?height=200&width=350", developer: "EA" },
+  { id: "pga-tour-2k25", title: "PGA TOUR 2K25", imageUrl: "/pga-tour-2k25.png?height=200&width=350", developer: "HB Studios" },
   
 ]
   

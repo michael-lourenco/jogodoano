@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Trophy, ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, Share2, Twitter, Facebook, Linkedin, Copy, Image as ImageIcon } from "lucide-react"
+import { Trophy, ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useAuth } from "@/hooks/useAuth"
 import { Footer } from "@/components/Footer"
@@ -12,28 +12,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
-import { dbFirestore, updateUserVotes, UserData } from "@/services/firebase/FirebaseService"
+import { dbFirestore, updateUserVotes } from "@/services/firebase/FirebaseService"
 import { UserInfo } from "@/components/UserInfo"
 import { votingEditions } from "@/repositories/votingEditions"
 import { Game, Category, VotingEdition } from "@/types/types"
 import { rehydrateVotingEditions } from "@/utils/utils"
-import html2canvas from 'html2canvas'
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
 import { ShareResultsDialog } from "@/components/voting/ShareResults";
 
 export default function VotingPage() {
   const navigationService = useNavigation()
-  const { user, loading, status, handleLogin, handleLogout } = useAuth()
+  const { user, loading, handleLogin, handleLogout } = useAuth()
 
   const [editions, setEditions] = useState<VotingEdition[]>([])
   const [selectedEditionId, setSelectedEditionId] = useState<string>("2025")
@@ -476,4 +464,3 @@ function GameCard({
     </motion.div>
   )
 }
-

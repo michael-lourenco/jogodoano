@@ -377,7 +377,7 @@ function ImageShareTab({ votes, editionId, categories, user }: ImageShareTabProp
 
               <div className="flex justify-center items-center pt-2">
                 <div className="text-center">
-                  <p className="text-muted-foreground text-xs">votinggames.app</p>
+                  <p className="text-muted-foreground text-xs">jogodoano.com.br</p>
                 </div>
               </div>
             </div>

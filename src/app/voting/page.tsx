@@ -1,25 +1,21 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent,CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Trophy, ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useAuth } from "@/hooks/useAuth"
 import { useVotes } from "@/hooks/useVotes"
 import { Footer } from "@/components/Footer"
-import { toast } from "sonner"
-import Image from "next/image"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
-import { dbFirestore, updateUserVotes } from "@/services/firebase/FirebaseService"
 import { UserInfo } from "@/components/UserInfo"
 import { votingEditions } from "@/repositories/votingEditions"
-import { Game, Category, VotingEdition } from "@/types/types"
+import { VotingEdition } from "@/types/types"
 import { rehydrateVotingEditions } from "@/utils/utils"
 import { ShareResultsDialog } from "@/components/voting/ShareResults";
 import { CategorySection } from "@/components/voting/CategorySection"
+import { VotingCompletePage } from "@/components/voting/VotingCompletePage"
 
 export default function VotingPage() {
   const navigationService = useNavigation()
@@ -38,13 +34,11 @@ export default function VotingPage() {
     handleSubmitVotes,
     setHasVoted,
     setVotedEditionId,
-    areAllCategoriesVoted
   } = useVotes({ user, editions })
 
   const tabsContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Rehydrate voting editions with game data
     const hydratedEditions = rehydrateVotingEditions(votingEditions)
     setEditions(hydratedEditions)
   }, [])
@@ -117,55 +111,14 @@ export default function VotingPage() {
 
   if (hasVoted) {
     return (
-      <div className="flex flex-col min-h-screen bg-background text-primary">
-        <main className="flex-grow flex flex-col items-center justify-center p-4">
-          <Card className="w-full max-w-2xl bg-background border-none shadow-lg">
-            <CardContent className="flex flex-col items-center justify-center p-8 space-y-6">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="w-24 h-24 rounded-full bg-green-500/20 flex items-center justify-center"
-              >
-                <CheckCircle2 className="w-12 h-12 text-green-500" />
-              </motion.div>
-
-              <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-chart-2 to-green-500 text-transparent bg-clip-text">
-                Votação Concluída!
-              </CardTitle>
-
-              <p className="text-center text-muted-foreground">
-                Obrigado por participar da votação do Jogo do Ano de {votedEditionId}. Seus votos foram registrados com
-                sucesso!
-              </p>
-
-              {/* Componente de compartilhamento integrado */}
-              <div className="w-full mt-2">
-                <ShareResultsDialog 
-                  votes={votes} 
-                  editionId={votedEditionId} 
-                  categories={editions.find(e => e.id === votedEditionId)?.categories || []}
-                  user={user}
-                />
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-                <Button onClick={handleBackToVoting} variant="outline" className="mt-2">
-                  Votar em outro ano
-                </Button>
-
-                <Button
-                  onClick={handleBackToHome}
-                  className="mt-2 bg-gradient-to-r from-chart-2 to-green-500 hover:from-chart-2 hover:to-green-400"
-                >
-                  Voltar para a Página Inicial
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </main>
-        <Footer />
-      </div>
+      <VotingCompletePage
+        user={user}
+        votes={votes}
+        votedEditionId={votedEditionId}
+        categories={editions.find(e => e.id === votedEditionId)?.categories || []}
+        onBackToVoting={handleBackToVoting}
+        onBackToHome={handleBackToHome}
+      />
     )
   }
 

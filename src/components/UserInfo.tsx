@@ -32,7 +32,7 @@ export const UserInfo: React.FC<UserInfoProps> = ({
     typeof window !== "undefined" && localStorage.getItem("user") !== null
       ? JSON.parse(localStorage.getItem("user") || "{}")
       : null;
-  
+
   const handleDonation = () => {
     window.open("https://buy.stripe.com/00g02GeSnaJC12g5kk", "_blank");
   };
@@ -44,26 +44,26 @@ export const UserInfo: React.FC<UserInfoProps> = ({
   return (
     <>
       {user || (localStorageUser && localStorage.getItem("user") != null)  ? (
-        <div className="flex flex-col text-primary mb-4 p-4 bg-background rounded-sm">
+        <div className="flex flex-col text-foreground mb-4 p-4 bg-card rounded-sm">
           <div className="grid grid-cols-[1fr,auto,auto,auto] items-center gap-2">
             <div className="flex items-center text-lg font-semibold truncate">
               <Icon
                 name="PiTarget"
-                className="w-6 h-6 text-green-500 mx-2 flex-shrink-0"
+                className="w-6 h-6 text-success mx-2 flex-shrink-0"
               />
-              <span className="text-primary">
+              <span className="text-foreground">
                 {user?.best_score?.value ?? 0}
               </span>
               <Icon
                 name="PiCoin"
-                className="w-6 h-6 text-green-500 mx-2 flex-shrink-0"
+                className="w-6 h-6 text-warning mx-2 flex-shrink-0"
               />
-              <span className="text-primary">{user?.currency?.value ?? 0}</span>
+              <span className="text-foreground">{user?.currency?.value ?? 0}</span>
               <Icon
                 name="PiStar"
-                className="w-6 h-6 text-green-500 mx-2 flex-shrink-0"
+                className="w-6 h-6 text-info mx-2 flex-shrink-0"
               />
-              <span className="text-primary">
+              <span className="text-foreground">
                 {user?.credits?.value ?? 0}
               </span>
             </div>
@@ -84,7 +84,7 @@ export const UserInfo: React.FC<UserInfoProps> = ({
             <Button
               onClick={handleDonation}
               variant="outline"
-              className="border-chart-4 text-chart-4 hover:bg-chart-4 hover:text-slate-900 flex items-center gap-2 whitespace-nowrap"
+              className="border-chart-4 text-chart-4 hover:bg-chart-4 hover:text-card-foreground flex items-center gap-2 whitespace-nowrap"
               size="sm"
             >
               <Heart className="w-4 h-4" />
@@ -93,7 +93,7 @@ export const UserInfo: React.FC<UserInfoProps> = ({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col text-primary mb-4 p-4 bg-background rounded-lg">
+        <div className="flex flex-col text-foreground mb-4 p-4 bg-card rounded-lg">
           <div className="grid grid-cols-[1fr,auto,auto] items-center gap-2">
             <Button onClick={handleLogin} variant="default">
               Sign in with Google

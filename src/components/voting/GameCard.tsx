@@ -15,10 +15,10 @@ export function GameCard({ game, isSelected, onSelect }: GameCardProps) {
   const imageUrl = game.imageUrl ? game.imageUrl.split("?")[0] : "/placeholder.svg"
 
   return (
-    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+    <motion.div className="game-card" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
       <Card
-        className={`cursor-pointer overflow-hidden transition-all duration-200 h-full ${
-          isSelected ? "ring-2 ring-green-500 shadow-lg shadow-green-500/10" : "hover:border-muted/50"
+        className={`overflow-hidden h-full ${
+          isSelected ? "ring-2 ring-primary shadow-lg shadow-primary/10" : "hover:border-muted"
         }`}
         onClick={onSelect}
       >
@@ -37,17 +37,17 @@ export function GameCard({ game, isSelected, onSelect }: GameCardProps) {
             </div>
           )}
           {isSelected && (
-            <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center">
-              <CheckCircle2 className="h-12 w-12 text-green-500" />
+            <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+              <CheckCircle2 className="h-12 w-12 text-primary" />
             </div>
           )}
         </div>
         <CardContent className="p-3">
-          <h3 className="font-semibold line-clamp-1">{game.title}</h3>
+          <h3 className="font-semibold line-clamp-1 text-foreground">{game.title}</h3>
           <div className="flex items-center justify-between mt-1">
             <p className="text-xs text-muted-foreground">{game.developer}</p>
             {isSelected && (
-              <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">
+              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
                 Selecionado
               </Badge>
             )}

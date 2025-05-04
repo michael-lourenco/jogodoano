@@ -4,22 +4,9 @@ import React from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { UserInfo } from "@/components/UserInfo";
 import { PlayerStatistics } from "@/components/player/PlayerStatistics";
-import { useNavigation } from "@/hooks/useNavigation";
-import { MatchHistory } from "@/components/player/MatchHistory";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/Footer";
 import { UserLogout } from "@/components/UserLogout";
-
-const formatDate = (date: Date): string => {
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
 
 export default function PlayerDashboard() {
 

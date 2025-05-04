@@ -32,7 +32,7 @@ export function ShareResultsDialog({ votes, editionId, categories, user }: Share
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="w-full bg-gradient-to-r from-chart-2 to-green-500 hover:from-chart-2 hover:to-green-400">
+        <Button className="w-full bg-gradient-to-r from-chart-2 to-success hover:from-chart-2 hover:to-success/90">
           <Share2 className="mr-2 h-5 w-5" />
           Compartilhar Resultados
         </Button>
@@ -229,7 +229,7 @@ function ImageShareTab({ votes, editionId, categories, user }: ImageShareTabProp
       // Configure html2canvas with settings that work better for this use case
       const canvas = await html2canvas(element, {
         scale: 2, // Higher scale for better quality
-        backgroundColor: "#0F121A",
+        backgroundColor: "hsl(var(--background))",
         logging: true, // Enable logging for debugging
         useCORS: true, // Enable CORS for images
         allowTaint: true,
@@ -294,7 +294,7 @@ function ImageShareTab({ votes, editionId, categories, user }: ImageShareTabProp
       <Button
         onClick={generateImage}
         disabled={generatingImage}
-        className="w-full bg-gradient-to-r from-chart-2 to-green-500"
+        className="w-full bg-gradient-to-r from-chart-2 to-success"
       >
         {generatingImage ? (
           <>
@@ -315,11 +315,11 @@ function ImageShareTab({ votes, editionId, categories, user }: ImageShareTabProp
           {/* Remove the scaling wrapper and make the preview directly visible */}
           <div
             ref={resultsRef}
-            className="w-full max-w-[600px] mx-auto p-6 bg-[#0F121A] text-white border border-muted/20 rounded-lg"
+            className="w-full max-w-[600px] mx-auto p-6 bg-background text-foreground border border-muted/20 rounded-lg"
           >
             <div className="flex flex-col space-y-4">
               <div className="flex flex-col items-center mb-4">
-                <h1 className="text-xl font-bold text-green-500 mb-1 flex items-center">
+                <h1 className="text-xl font-bold text-success mb-1 flex items-center">
                   <Trophy className="mr-2 h-5 w-5" />
                   Jogo do Ano {editionId}
                 </h1>
@@ -341,10 +341,7 @@ function ImageShareTab({ votes, editionId, categories, user }: ImageShareTabProp
                       <div key={category.id} className="border border-muted/20 rounded-lg p-3">
                         <div className="flex justify-between items-center">
                           <h3 className="font-semibold text-sm">{category.name}</h3>
-                          <Badge
-                            variant="outline"
-                            className="bg-green-500/10 text-green-500 border-green-500/30 text-xs"
-                          >
+                          <Badge className="status-success text-xs">
                             meu voto
                           </Badge>
                         </div>
@@ -360,8 +357,8 @@ function ImageShareTab({ votes, editionId, categories, user }: ImageShareTabProp
                               />
                             </div>
                           ) : (
-                            <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900 rounded-md">
-                              <span className="text-white/70 text-xs font-medium">{game.title.substring(0, 2)}</span>
+                            <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-secondary to-card rounded-md">
+                              <span className="text-secondary-foreground text-xs font-medium">{game.title.substring(0, 2)}</span>
                             </div>
                           )}
 

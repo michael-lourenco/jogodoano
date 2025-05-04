@@ -25,16 +25,16 @@ export default function CookieConsent() {
   if (consent !== null) return null; // Oculta o banner se o usuário já escolheu
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-gray-900 text-white p-4 flex flex-col md:flex-row items-center justify-between shadow-md">
-      <p className="text-sm">
+    <div className="fixed bottom-0 left-0 w-full bg-secondary text-secondary-foreground p-4 flex flex-col md:flex-row items-center justify-between shadow-md border-t">
+      <p className="text-sm text-muted-foreground">
         Usamos cookies para melhorar sua experiência. Ao continuar, você concorda com nossa{" "}
-        <a href="/politica-de-cookies" className="underline text-blue-400">Política de Cookies</a>.
+        <a href="/politica-de-cookies" className="underline text-primary">Política de Cookies</a>.
       </p>
       <div className="flex space-x-2 mt-2 md:mt-0">
-        <Button onClick={handleAccept} className="bg-green-500 hover:bg-green-600">
+        <Button onClick={handleAccept} className="bg-success hover:bg-success/90 text-success-foreground">
           Aceitar
         </Button>
-        <Button onClick={handleReject} variant="outline" className="border-gray-400 text-gray-300 hover:text-white">
+        <Button onClick={handleReject} variant="outline" className="border-muted-foreground text-muted-foreground hover:bg-muted hover:text-muted-foreground">
           Recusar
         </Button>
       </div>

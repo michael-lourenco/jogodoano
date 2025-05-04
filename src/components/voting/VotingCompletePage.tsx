@@ -25,20 +25,20 @@ export const VotingCompletePage = ({
   onBackToHome,
 }: VotingCompletePageProps) => {
   return (
-    <div className="flex flex-col min-h-screen bg-background text-primary">
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
       <main className="flex-grow flex flex-col items-center justify-center p-4">
-        <Card className="w-full max-w-2xl bg-background border-none shadow-lg">
+        <Card className="w-full max-w-2xl bg-card border-none shadow-lg">
           <CardContent className="flex flex-col items-center justify-center p-8 space-y-6">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 260, damping: 20 }}
-              className="w-24 h-24 rounded-full bg-green-500/20 flex items-center justify-center"
+              className="w-24 h-24 rounded-full bg-success/20 flex items-center justify-center"
             >
-              <CheckCircle2 className="w-12 h-12 text-green-500" />
+              <CheckCircle2 className="w-12 h-12 text-success" />
             </motion.div>
 
-            <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-chart-2 to-green-500 text-transparent bg-clip-text">
+            <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-chart-2 to-chart-5 text-transparent bg-clip-text">
               Votação Concluída!
             </CardTitle>
 
@@ -48,9 +48,9 @@ export const VotingCompletePage = ({
             </p>
 
             <div className="w-full mt-2">
-              <ShareResultsDialog 
-                votes={votes} 
-                editionId={votedEditionId} 
+              <ShareResultsDialog
+                votes={votes}
+                editionId={votedEditionId}
                 categories={categories}
                 user={user}
               />
@@ -63,7 +63,7 @@ export const VotingCompletePage = ({
 
               <Button
                 onClick={onBackToHome}
-                className="mt-2 bg-gradient-to-r from-chart-2 to-green-500 hover:from-chart-2 hover:to-green-400"
+                className="mt-2 bg-gradient-to-r from-chart-2 to-chart-5 hover:from-chart-2 hover:to-chart-4 text-primary-foreground"
               >
                 Voltar para a Página Inicial
               </Button>

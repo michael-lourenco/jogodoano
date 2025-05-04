@@ -59,9 +59,9 @@ export function EditionsSelector({
                 variant={selectedEditionId === edition.id ? "default" : "outline"}
                 className={`flex-shrink-0 ${
                   selectedEditionId === edition.id
-                    ? "bg-gradient-to-r from-chart-2 to-green-500"
+                    ? "bg-gradient-to-r from-chart-2 to-chart-5 text-primary-foreground"
                     : votes[edition.id] && Object.keys(votes[edition.id]).length > 0
-                      ? "text-green-500 border-green-500/30"
+                      ? "text-success border-success/30"
                       : ""
                 }`}
                 onClick={() => onEditionChange(edition.id)}

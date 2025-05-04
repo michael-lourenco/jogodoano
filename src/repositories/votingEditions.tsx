@@ -247,13 +247,6 @@ export const votingEditions: VotingEdition[] = [
           "mafiaoldcountry",
         ],
       },
-      {
-        id: "all_time_family",
-        name: "Melhor jogo para Família",
-        description:
-          "Para o melhor jogo apropriado para jogar em família, independentemente do gênero ou plataforma.",
-        gameIds: ["gosthofyotei",]
-      },
     ],
   },
 ];

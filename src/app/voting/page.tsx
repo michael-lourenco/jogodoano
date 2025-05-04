@@ -1,16 +1,17 @@
 "use client"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Trophy, ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react"
+import { Trophy, ArrowLeft, CheckCircle2 } from "lucide-react"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useAuth } from "@/hooks/useAuth"
 import { useVotes } from "@/hooks/useVotes"
+import { useEditionManager } from "@/hooks/useEditionManager" // Novo hook importado
 import { Footer } from "@/components/Footer"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { UserInfo } from "@/components/UserInfo"
 import { votingEditions } from "@/repositories/votingEditions"
-import { VotingEdition } from "@/types/types"
+import type { VotingEdition } from "@/types/types"
 import { rehydrateVotingEditions } from "@/utils/utils"
 import { CategorySection } from "@/components/voting/CategorySection"
 import { VotingCompletePage } from "@/components/voting/VotingCompletePage"
@@ -21,9 +22,11 @@ export default function VotingPage() {
   const { user, loading, handleLogin, handleLogout } = useAuth()
 
   const [editions, setEditions] = useState<VotingEdition[]>([])
-  const [selectedEditionId, setSelectedEditionId] = useState<string>("2025")
-  const [activeCategory, setActiveCategory] = useState<string>("")
-  
+
+  // Usando o novo hook para gerenciar a edição e categorias
+  const { selectedEditionId, activeCategory, setActiveCategory, handleEditionChange, getCurrentEditionCategories } =
+    useEditionManager({ editions })
+
   const {
     votes,
     hasVoted,
@@ -40,40 +43,10 @@ export default function VotingPage() {
     setEditions(hydratedEditions)
   }, [])
 
-  useEffect(() => {
-    if (!selectedEditionId && editions.length > 0) {
-      setSelectedEditionId("2025")
-    }
-  }, [editions])
-
-  useEffect(() => {
-    if (selectedEditionId) {
-      const currentEdition = editions.find((edition) => edition.id === selectedEditionId)
-      if (currentEdition && currentEdition.categories.length > 0 && !activeCategory) {
-        setActiveCategory(currentEdition.categories[0].id)
-      }
-    }
-  }, [selectedEditionId, activeCategory, editions])
-
-
-  const handleEditionChange = (editionId: string) => {
-    setSelectedEditionId(editionId)
-
-    const currentEdition = editions.find((edition) => edition.id === editionId)
-    if (currentEdition && currentEdition.categories.length > 0) {
-      setActiveCategory(currentEdition.categories[0].id)
-    } else {
-      setActiveCategory("")
-    }
-  }
-
-  const getCurrentEditionCategories = () => {
-    return editions.find((edition) => edition.id === selectedEditionId)?.categories || []
-  }
-
   const handleBackToHome = () => {
     navigationService.navigateTo("/")
   }
+
   const handleVoteInUI = (categoryId: string, gameId: string) => {
     handleVote(selectedEditionId, categoryId, gameId)
   }
@@ -81,6 +54,7 @@ export default function VotingPage() {
   const handleSubmitVotesInUI = async () => {
     await handleSubmitVotes(selectedEditionId)
   }
+
   const handleBackToVoting = () => {
     setHasVoted(false)
     setVotedEditionId("")
@@ -100,7 +74,7 @@ export default function VotingPage() {
         user={user}
         votes={votes}
         votedEditionId={votedEditionId}
-        categories={editions.find(e => e.id === votedEditionId)?.categories || []}
+        categories={editions.find((e) => e.id === votedEditionId)?.categories || []}
         onBackToVoting={handleBackToVoting}
         onBackToHome={handleBackToHome}
       />
@@ -185,7 +159,9 @@ export default function VotingPage() {
               <div className="sticky bottom-4 mt-8 mb-4 flex justify-center">
                 <Button
                   onClick={handleSubmitVotesInUI}
-                  disabled={isSubmitting || getCurrentEditionCategories().some((cat) => !votes[selectedEditionId]?.[cat.id])}
+                  disabled={
+                    isSubmitting || getCurrentEditionCategories().some((cat) => !votes[selectedEditionId]?.[cat.id])
+                  }
                   className="w-full max-w-md h-12 text-primary bg-gradient-to-r from-chart-2 to-green-500 hover:from-chart-2 hover:to-green-400 shadow-lg hover:shadow-green-500/25 hover:text-secondary transition-all duration-300"
                   size="lg"
                 >

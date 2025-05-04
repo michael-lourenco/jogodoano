@@ -67,8 +67,13 @@ export function VotingInterface({
   handleSubmitVotesInUI,
 }: VotingInterfaceProps) {
   const tabsListRef = useRef<HTMLDivElement>(null);
-  const categoryRefs = useRef({});
+  const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const isMobile = useIsMobile();
+  const [localActiveCategory, setLocalActiveCategory] = useState<string>(activeCategory);
+
+  useEffect(() => {
+    setLocalActiveCategory(activeCategory);
+  }, [activeCategory]);
 
   useEffect(() => {
     if (tabsListRef.current) {
@@ -121,13 +126,19 @@ export function VotingInterface({
                       .map((category) => (
                         <div
                           key={category.id}
-                          ref={(el) => (categoryRefs.current[category.id] = el)}
+                          ref={(el) => {
+                            if (el) {
+                              categoryRefs.current[category.id] = el;
+                            } else {
+                              delete categoryRefs.current[category.id]; // Limpa a ref se o elemento for desmontado
+                            }
+                          }}
                           className="border border-muted rounded-md shadow-sm"
                         >
                           <button
                             className="flex items-center justify-between w-full p-3 text-sm"
                             onClick={() => {
-                              setActiveCategory((prevActiveCategory) =>
+                              setLocalActiveCategory((prevActiveCategory) =>
                                 prevActiveCategory === category.id ? "" : category.id
                               );
                               setTimeout(() => {
@@ -140,7 +151,7 @@ export function VotingInterface({
                             </span>
                             {votes[selectedEditionId]?.[category.id] && <CheckCircle2 className="ml-2 h-4 w-4" />}
                             <svg
-                              className={`h-4 w-4 transition-transform ${activeCategory === category.id ? "rotate-180" : ""}`}
+                              className={`h-4 w-4 transition-transform ${localActiveCategory === category.id ? "rotate-180" : ""}`}
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -148,7 +159,7 @@ export function VotingInterface({
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
                           </button>
-                          {activeCategory === category.id && (
+                          {localActiveCategory === category.id && (
                             <div className="p-4">
                               <CategorySection
                                 category={category}
@@ -163,7 +174,7 @@ export function VotingInterface({
                 </div>
               ) : (
                 <div className="hidden md:block mb-6">
-                  <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
+                  <Tabs value={localActiveCategory} onValueChange={setLocalActiveCategory} className="w-full">
                     <TabsList className="w-full overflow-x-auto flex-nowrap scroll-smooth p-1 bg-muted/20">
                       {getCurrentEditionCategories()
                         .slice()

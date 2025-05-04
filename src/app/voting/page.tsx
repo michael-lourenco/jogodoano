@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
-import { Card, CardContent,CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Trophy, ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react"
 import { useNavigation } from "@/hooks/useNavigation"
@@ -8,14 +8,13 @@ import { useAuth } from "@/hooks/useAuth"
 import { useVotes } from "@/hooks/useVotes"
 import { Footer } from "@/components/Footer"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { motion } from "framer-motion"
 import { UserInfo } from "@/components/UserInfo"
 import { votingEditions } from "@/repositories/votingEditions"
 import { VotingEdition } from "@/types/types"
 import { rehydrateVotingEditions } from "@/utils/utils"
-import { ShareResultsDialog } from "@/components/voting/ShareResults";
 import { CategorySection } from "@/components/voting/CategorySection"
 import { VotingCompletePage } from "@/components/voting/VotingCompletePage"
+import { EditionsSelector } from "@/components/voting/EditionsSelector"
 
 export default function VotingPage() {
   const navigationService = useNavigation()
@@ -35,8 +34,6 @@ export default function VotingPage() {
     setHasVoted,
     setVotedEditionId,
   } = useVotes({ user, editions })
-
-  const tabsContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const hydratedEditions = rehydrateVotingEditions(votingEditions)
@@ -69,18 +66,6 @@ export default function VotingPage() {
       setActiveCategory("")
     }
   }
-
-  const handleScroll = (direction: 'left' | 'right') => {
-    if (tabsContainerRef.current) {
-      const container = tabsContainerRef.current;
-      const scrollAmount = 150;
-      if (direction === 'left') {
-        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-      } else {
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
-    }
-  };
 
   const getCurrentEditionCategories = () => {
     return editions.find((edition) => edition.id === selectedEditionId)?.categories || []
@@ -147,58 +132,13 @@ export default function VotingPage() {
             </CardContent>
           </Card>
 
-          {/* Year Tabs with Horizontal Scrolling */}
-          <div className="relative mb-6">
-            <div className="flex items-center">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="absolute left-0 z-10 bg-background/80"
-                onClick={() => handleScroll('left')}
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-              
-              <div className="w-full overflow-hidden px-10">
-                <div 
-                  ref={tabsContainerRef}
-                  className="flex overflow-x-auto scrollbar-hide space-x-2 py-2"
-                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                >
-                  {editions.map((edition) => (
-                    <Button
-                      key={edition.id}
-                      variant={selectedEditionId === edition.id ? "default" : "outline"}
-                      className={`flex-shrink-0 ${
-                        selectedEditionId === edition.id 
-                          ? "bg-gradient-to-r from-chart-2 to-green-500" 
-                          : votes[edition.id] && Object.keys(votes[edition.id]).length > 0 
-                            ? "text-green-500 border-green-500/30" 
-                            : ""
-                      }`}
-                      onClick={() => handleEditionChange(edition.id)}
-                    >
-                      {edition.name}
-                      {votes[edition.id] && 
-                       getCurrentEditionCategories().length > 0 && 
-                       Object.keys(votes[edition.id]).length === getCurrentEditionCategories().length && (
-                        <CheckCircle2 className="ml-2 h-4 w-4" />
-                      )}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="absolute right-0 z-10 bg-background/80"
-                onClick={() => handleScroll('right')}
-              >
-                <ChevronRight className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
+          <EditionsSelector
+            editions={editions}
+            selectedEditionId={selectedEditionId}
+            votes={votes}
+            getCurrentEditionCategories={getCurrentEditionCategories}
+            onEditionChange={handleEditionChange}
+          />
 
           {selectedEditionId && editions.length > 0 && (
             <>

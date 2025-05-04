@@ -5,7 +5,9 @@ import {
   UserData,
 } from "@/services/firebase/FirebaseService";
 import { Icon } from "./icons";
-import { Heart } from "lucide-react";
+import { Heart, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 interface UserInfoProps {
   user: UserData | null;
@@ -18,19 +20,32 @@ export const UserInfo: React.FC<UserInfoProps> = ({
   handleLogin,
   handleLogout,
 }) => {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Evita problema de hidratação
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const localStorageUser =
     typeof window !== "undefined" && localStorage.getItem("user") !== null
       ? JSON.parse(localStorage.getItem("user") || "{}")
       : null;
+  
   const handleDonation = () => {
     window.open("https://buy.stripe.com/00g02GeSnaJC12g5kk", "_blank");
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   return (
     <>
       {user || (localStorageUser && localStorage.getItem("user") != null)  ? (
         <div className="flex flex-col text-primary mb-4 p-4 bg-background rounded-sm">
-          <div className="grid grid-cols-[1fr,auto,auto] items-center gap-2">
+          <div className="grid grid-cols-[1fr,auto,auto,auto] items-center gap-2">
             <div className="flex items-center text-lg font-semibold truncate">
               <Icon
                 name="PiTarget"
@@ -52,6 +67,20 @@ export const UserInfo: React.FC<UserInfoProps> = ({
                 {user?.credits?.value ?? 0}
               </span>
             </div>
+            {mounted && (
+              <Button
+                onClick={toggleTheme}
+                variant="outline"
+                size="icon"
+                className="border-accent text-accent-foreground hover:bg-accent"
+              >
+                {theme === "dark" ? (
+                  <Sun className="w-4 h-4" />
+                ) : (
+                  <Moon className="w-4 h-4" />
+                )}
+              </Button>
+            )}
             <Button
               onClick={handleDonation}
               variant="outline"
@@ -64,14 +93,28 @@ export const UserInfo: React.FC<UserInfoProps> = ({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col text-primary mb-4 p-4 bg-baclkground rounded-lg">
-          <div className="grid grid-cols-[1fr,auto] items-center gap-2">
+        <div className="flex flex-col text-primary mb-4 p-4 bg-background rounded-lg">
+          <div className="grid grid-cols-[1fr,auto,auto] items-center gap-2">
             <Button onClick={handleLogin} variant="default">
               Sign in with Google
             </Button>
+            {mounted && (
+              <Button
+                onClick={toggleTheme}
+                variant="outline"
+                size="icon"
+                className="border-accent text-accent-foreground hover:bg-accent"
+              >
+                {theme === "dark" ? (
+                  <Sun className="w-4 h-4" />
+                ) : (
+                  <Moon className="w-4 h-4" />
+                )}
+              </Button>
+            )}
           </div>
         </div>
       )}
-      </>
+    </>
   );
 };

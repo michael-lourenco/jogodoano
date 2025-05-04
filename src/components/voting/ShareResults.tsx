@@ -345,7 +345,7 @@ function ImageShareTab({ votes, editionId, categories, user }: ImageShareTabProp
                             variant="outline"
                             className="bg-green-500/10 text-green-500 border-green-500/30 text-xs"
                           >
-                            Vencedor
+                            meu voto
                           </Badge>
                         </div>
 

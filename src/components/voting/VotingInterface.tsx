@@ -117,7 +117,7 @@ export function VotingInterface({
                           className="border border-muted rounded-md shadow-sm"
                         >
                           <button
-                            className="flex items-center justify-between w-full p-3 text-sm"
+                            className="flex items-center w-full p-3 text-sm" // Removi justify-between
                             onClick={() => {
                               setLocalActiveCategory((prevActiveCategory) =>
                                 prevActiveCategory === category.id ? "" : category.id
@@ -127,18 +127,20 @@ export function VotingInterface({
                               }, 100);
                             }}
                           >
-                            <span className={`${votes[selectedEditionId]?.[category.id] ? "text-success" : ""}`}>
+                            <span className={`${votes[selectedEditionId]?.[category.id] ? "text-success" : ""} flex-grow`}>
                               {category.name}
                             </span>
-                            {votes[selectedEditionId]?.[category.id] && <CheckCircle2 className="ml-2 h-4 w-4" />}
-                            <svg
-                              className={`h-4 w-4 transition-transform ${localActiveCategory === category.id ? "rotate-180" : ""}`}
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
+                            <div className="flex items-center ml-2"> {/* Container para o ícone de check e a seta */}
+                              {votes[selectedEditionId]?.[category.id] && <CheckCircle2 className="mr-2 h-4 w-4" />}
+                              <svg
+                                className={`h-4 w-4 transition-transform ${localActiveCategory === category.id ? "rotate-180" : ""}`}
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </div>
                           </button>
                           {localActiveCategory === category.id && (
                             <div className="p-4">

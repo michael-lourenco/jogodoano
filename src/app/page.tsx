@@ -37,13 +37,23 @@ export default function Home() {
                 handleLogout={handleLogout}
               />
             )}
-
             <Card className="bg-card border-none shadow-none">
               <CardHeader className="space-y-2">
                 <CardTitle className="text-4xl font-bold text-center bg-gradient-to-r from-chart-2 to-chart-5 text-transparent bg-clip-text">
                   JOGO DO ANO
                 </CardTitle>
               </CardHeader>
+            </Card>
+            <Card className="mb-6 border border-muted bg-card shadow-sm">
+              <CardContent className="pt-6 pb-4">
+                <p className="text-muted-foreground">
+                  Vote no seu jogo favorito em cada categoria. Você só pode escolher um jogo por categoria. Após
+                  selecionar seus favoritos em todas as categorias, clique em "Enviar Votos" para registrar sua
+                  participação.
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="bg-card border-none shadow-none">
 
               <CardContent className="space-y-8">
                 <div className="flex justify-center">

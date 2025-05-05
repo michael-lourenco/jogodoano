@@ -86,26 +86,7 @@ export function VotingInterface({
       <main className="flex-grow flex flex-col items-center justify-start pt-4 px-4">
         <div className="w-full max-w-4xl mx-auto">
           <UserInfo user={user} handleLogin={handleLogin} handleLogout={handleLogout} />
-          <div className="flex items-center mb-6">
-            {/* <Button variant="ghost" size="icon" onClick={handleBackToHome} className="mr-2">
-              <ArrowLeft className="h-5 w-5" />
-            </Button> */}
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-chart-1 to-success text-transparent bg-clip-text flex items-center">
-              <Trophy className="mr-2 h-6 w-6 text-chart-1" />
-              JOGO DO ANO
-            </h1>
-          </div>
-
-          <Card className="mb-6 border border-muted bg-card shadow-sm">
-            <CardContent className="pt-6 pb-4">
-              <p className="text-muted-foreground">
-                Vote no seu jogo favorito em cada categoria. Você só pode escolher um jogo por categoria. Após
-                selecionar seus favoritos em todas as categorias, clique em "Enviar Votos" para registrar sua
-                participação.
-              </p>
-            </CardContent>
-          </Card>
-
+ 
           <EditionsSelector
             editions={editions}
             selectedEditionId={selectedEditionId}

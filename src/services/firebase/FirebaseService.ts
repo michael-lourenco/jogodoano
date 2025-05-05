@@ -107,6 +107,7 @@ interface UserData {
   match_history?: MatchHistoryEntry[]
   photoURL: string
   votes?: Votes
+  role?: string
 }
 
 interface VotesData {

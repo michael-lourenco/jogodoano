@@ -52,7 +52,7 @@ export function AdminSidebar() {
   ]
 
   return (
-    <SidebarProvider>
+    <SidebarProvider className="min-w-[240px] max-w-[240px] border-r">
       <Sidebar className="min-w-[240px] max-w-[240px] border-r">
         <SidebarHeader className="border-b p-4">
           <Link href="/admin" className="flex items-center gap-2">

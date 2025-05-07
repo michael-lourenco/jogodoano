@@ -229,7 +229,7 @@ function ImageShareTab({ votes, editionId, categories, user }: ImageShareTabProp
       // Configure html2canvas with settings that work better for this use case
       const canvas = await html2canvas(element, {
         scale: 2, // Higher scale for better quality
-        backgroundColor: "hsl(var(--background))",
+        backgroundColor: "#ffffff",
         logging: true, // Enable logging for debugging
         useCORS: true, // Enable CORS for images
         allowTaint: true,

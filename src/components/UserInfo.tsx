@@ -93,9 +93,9 @@ export const UserInfo: React.FC<UserInfoProps> = ({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col text-foreground mb-4 p-4 bg-card rounded-lg">
+        <div className="flex flex-col text-foreground mb-4 p-4 rounded-lg">
           <div className="grid grid-cols-[1fr,auto,auto] items-center gap-2">
-            <Button onClick={handleLogin} variant="default">
+            <Button onClick={handleLogin} className="text-accent-foreground">
               Sign in with Google
             </Button>
             {mounted && (

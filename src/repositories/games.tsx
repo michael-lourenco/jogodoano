@@ -86,7 +86,7 @@ export const games: Game[] = [
   { id: "sibels-journey", title: "Sibel’s Journey", imageUrl: "/sibels-journey.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "tails-of-iron-2-whiskers-of-winter", title: "Tails of Iron 2: Whiskers of Winter", imageUrl: "/tails-of-iron-2-whiskers-of-winter.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "the-stone-of-madness", title: "The Stone of Madness", imageUrl: "/the-stone-of-madness.jpg?height=200&width=350", developer: "DEVELOPER" },
-  { id: "warside", title: "Warside", imageUrl: "/warside.jpg?height=200&width=350", developer: "DEVELOPER" },
+  { id: "warside", title: "Warside", imageUrl: "/warside.jpg?height=200&width=350", developer: "LAVABIRD" },
   { id: "agent-fall", title: "Agent Fall", imageUrl: "/agent-fall.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "coridden", title: "Coridden", imageUrl: "/coridden.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "cryptical-path", title: "Cryptical Path", imageUrl: "/cryptical-path.jpg?height=200&width=350", developer: "DEVELOPER" },
@@ -342,7 +342,6 @@ export const games: Game[] = [
   { id: "greedfall-2-the-dying-world", title: "GreedFall 2: The Dying World", imageUrl: "/greedfall-2-the-dying-world.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "haunted-lands", title: "Haunted Lands", imageUrl: "/haunted-lands.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "homura-hime", title: "Homura Hime", imageUrl: "/homura-hime.jpg?height=200&width=350", developer: "DEVELOPER" },
-  { id: "hunter-x-hunter-nen-x-impact", title: "Hunter x Hunter Nen x Impact", imageUrl: "/hunter-x-hunter-nen-x-impact.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "icebound", title: "Icebound", imageUrl: "/icebound.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "infinity-knights-xross", title: "Infinity Knights: Xross", imageUrl: "/infinity-knights-xross.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "inkonbini-one-store-many-stories", title: "InKONBINI: One Store. Many Stories", imageUrl: "/inkonbini-one-store-many-stories.jpg?height=200&width=350", developer: "DEVELOPER" },
@@ -402,7 +401,7 @@ export const games: Game[] = [
   { id: "star-of-providence", title: "Star of Providence", imageUrl: "/star-of-providence.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "starsand-island", title: "Starsand Island", imageUrl: "/starsand-island.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "starship", title: "Starship", imageUrl: "/starship.jpg?height=200&width=350", developer: "DEVELOPER" },
-  { id: "stellar-settlers-space-base-builder", title: "Stellar Settlers: Space Base Builder", imageUrl: "/stellar-settlers-space-base-builder.jpg?height=200&width=350", developer: "DEVELOPER" },
+  { id: "stellar-settlers-space-base-builder", title: "Stellar Settlers: Space Base Builder", imageUrl: "/stellar-settlers-space-base-builder.jpg?height=200&width=350", developer: "Tinymice Entertainment" },
   { id: "sulfur", title: "Sulfur", imageUrl: "/sulfur.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "sultans-game", title: "Sultan’s Game", imageUrl: "/sultans-game.jpg?height=200& width=350", developer: "DEVELOPER" },
   { id: "tales-of-seikyu", title: "Tales of Seikyu", imageUrl: "/tales-of-seikyu.jpg?height=200&width=350", developer: "DEVELOPER" },
@@ -431,6 +430,10 @@ export const games: Game[] = [
   { id: "nba-2k25", title: "NBA 2K25", imageUrl: "/nba-2k25.jpg?height=200&width=350", developer: "Visual Concepts" },
   { id: "ea-sports-fc-25", title: "EA SPORTS FC™ 25", imageUrl: "/ea-sports-fc-25.jg?height=200&width=350", developer: "EA" },
   { id: "pga-tour-2k25", title: "PGA TOUR 2K25", imageUrl: "/pga-tour-2k25.png?height=200&width=350", developer: "HB Studios" },
-  
+  { id: "tempest-rising", title: "Tempest Rising", imageUrl: "/tempest-rising.jpg?height=200&width=350", developer: "Slipgate Ironworks™" },
+  { id: "iron-saga-vs", title: "Iron Saga VS", imageUrl: "/iron-saga-vs.jpg?height=200&width=350", developer: "Gameduchy" },
+  { id: "cyber-city-clash", title: "Cyber City Clash", imageUrl: "/cyber-city-clash.jpg?height=200&width=350", developer: "Apple Juice Interactive" },
+  { id: "knock-off", title: "Knock Off", imageUrl: "/knock-off.jpg?height=200&width=350", developer: "Mechaghidora" },
+  { id: "hunter-x-hunter-nen-x-impact", title: "Hunter x Hunter Nen x Impact", imageUrl: "/hunter-x-hunter-nen-x-impact.jpg?height=200&width=350", developer: "Bushiroad Games" },
 ]
   

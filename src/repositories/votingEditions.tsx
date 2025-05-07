@@ -32,14 +32,14 @@ export const votingEditions: VotingEdition[] = [
         name: "Melhor Simulador/Estratégia",
         description:
           "Melhor jogo focado em simulação em tempo real ou por turnos ou jogabilidade de estratégia, independentemente da plataforma.",
-        gameIds: ["sidmeierscivilization7"],
+        gameIds: ["sidmeierscivilization7", "stellar-settlers-space-base-builder","citizensleeper2","tempest-rising","warside","age-of-mythology-retold-immortal-pillars"],
       },
       {
         id: "fighting",
         name: "Melhor jogo de Luta",
         description:
           "Para o melhor jogo projetado principalmente em torno do combate corpo a corpo.",
-        gameIds: ["fatalfurycityofwolves"],
+        gameIds: ["fatalfurycityofwolves", "iron-saga-vs","cyber-city-clash","knock-off","hunter-x-hunter-nen-x-impact"],
       },
       {
         id: "gotybr",

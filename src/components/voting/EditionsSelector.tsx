@@ -4,7 +4,7 @@ import { useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react"
 import type { VotingEdition, Category } from "@/types/types"
-import type { CategoryVotes } from "./VotingInterface"
+import type { CategoryVotes } from "@/types/voting/interfaces"
 
 interface EditionsSelectorProps {
   editions: VotingEdition[]

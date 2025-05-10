@@ -6,49 +6,12 @@ import { CheckCircle2 } from "lucide-react"
 import { UserInfo } from "@/components/UserInfo"
 import { CategorySection } from "@/components/voting/CategorySection"
 import { EditionsSelector } from "@/components/voting/EditionsSelector"
-import type { UserData } from "@/services/FirebaseService"
-import type { VotingEdition, Category } from "@/types/types"
-import { useRef, useEffect, useState } from "react"
-import type { TouchEvent } from "react"
-// Definindo o tipo para os votos por categoria
-export type CategoryVotes = Record<string, string>
-
-interface VotingInterfaceProps {
-  user: UserData | null
-  editions: VotingEdition[]
-  selectedEditionId: string
-  activeCategory: string
-  votes: Record<string, CategoryVotes>
-  isSubmitting: boolean
-  getCurrentEditionCategories: () => Category[]
-  handleLogin: () => void
-  handleLogout: () => void
-  handleBackToHome: () => void
-  handleEditionChange: (editionId: string) => void
-  setActiveCategory: (categoryId: string) => void
-  handleVoteInUI: (categoryId: string, gameId: string) => void
-  handleSubmitVotesInUI: () => Promise<void>
-}
-
-const MD_BREAKPOINT = 768 // Corresponde ao breakpoint 'md' do Tailwind
-
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < MD_BREAKPOINT)
-
-  useEffect(() => {
-    function handleResize() {
-      setIsMobile(window.innerWidth < MD_BREAKPOINT)
-    }
-
-    window.addEventListener("resize", handleResize)
-
-    return () => {
-      window.removeEventListener("resize", handleResize)
-    }
-  }, [])
-
-  return isMobile
-}
+import { useVotingInterface } from "@/hooks/useVotingInterface"
+import { useCategoryNavigation } from "@/hooks/useCategoryNavigation"
+import { useSwipeNavigation } from "@/hooks/useSwipeNavigation"
+import { useStickyHeader } from "@/hooks/useStickyHeader"
+import { useIsMobile } from "@/hooks/use-mobile"
+import type { VotingInterfaceProps } from "@/types/voting/interfaces"
 
 export function VotingInterface({
   user,
@@ -66,117 +29,28 @@ export function VotingInterface({
   handleVoteInUI,
   handleSubmitVotesInUI,
 }: VotingInterfaceProps) {
-  const tabsListRef = useRef<HTMLDivElement>(null)
-  const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const isMobile = useIsMobile()
-  const [isSticky, setIsSticky] = useState(false)
-  const editionsSelectorRef = useRef<HTMLDivElement>(null)
-  const editionsSelectorHeight = useRef<number>(0)
-  const originalTopOffset = useRef<number | null>(null)
-  const [localActiveCategory, setLocalActiveCategory] = useState<string>(activeCategory)
 
-  // Add a new ref for the category tabs container
-  const categoryTabsRef = useRef<HTMLDivElement>(null)
-  const categoryTabsHeight = useRef<number>(0)
+  const { tabsListRef, localActiveCategory, setLocalActiveCategory } = useVotingInterface({
+    activeCategory,
+    setActiveCategory,
+    getCurrentEditionCategories,
+    votes,
+    selectedEditionId,
+  })
 
-  useEffect(() => {
-    setLocalActiveCategory(activeCategory)
-  }, [activeCategory])
+  const { categoryRefs } = useCategoryNavigation()
 
-  useEffect(() => {
-    if (tabsListRef.current) {
-      tabsListRef.current.scrollLeft = 0
-    }
-  }, [getCurrentEditionCategories, votes, selectedEditionId])
+  const { handleTouchStart, handleTouchMove, handleTouchEnd } = useSwipeNavigation({
+    getCurrentEditionCategories,
+    localActiveCategory,
+    setLocalActiveCategory,
+    setActiveCategory,
+    categoryRefs,
+  })
 
-  // Modify the useEffect for scroll handling to also handle the category tabs
-  useEffect(() => {
-    const handleScroll = () => {
-      if (editionsSelectorRef.current) {
-        const scrollPosition = window.scrollY
-        const selectorRect = editionsSelectorRef.current.getBoundingClientRect()
-
-        if (!originalTopOffset.current && selectorRect.top >= 0) {
-          originalTopOffset.current = selectorRect.top + scrollPosition
-          editionsSelectorHeight.current = selectorRect.height
-        }
-
-        if (originalTopOffset.current) {
-          setIsSticky(scrollPosition > originalTopOffset.current)
-        }
-      }
-    }
-
-    window.addEventListener("scroll", handleScroll)
-
-    // Initial calculation after render
-    queueMicrotask(() => {
-      if (editionsSelectorRef.current) {
-        const selectorRect = editionsSelectorRef.current.getBoundingClientRect()
-        originalTopOffset.current = selectorRect.top + window.scrollY
-        editionsSelectorHeight.current = selectorRect.height
-      }
-
-      if (categoryTabsRef.current) {
-        const tabsRect = categoryTabsRef.current.getBoundingClientRect()
-        categoryTabsHeight.current = tabsRect.height
-      }
-    })
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll)
-    }
-  }, [])
-
-  // Swipe handling logic
-  const [touchStart, setTouchStart] = useState<number | null>(null)
-  const [touchEnd, setTouchEnd] = useState<number | null>(null)
-  const swipeThreshold = 50 // Minimum distance required for a swipe
-
-  const handleTouchStart = (e: TouchEvent) => {
-    setTouchEnd(null)
-    setTouchStart(e.targetTouches[0].clientX)
-  }
-
-  const handleTouchMove = (e: TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX)
-  }
-
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return
-
-    const distance = touchStart - touchEnd
-    const isLeftSwipe = distance > swipeThreshold
-    const isRightSwipe = distance < -swipeThreshold
-
-    if (isLeftSwipe || isRightSwipe) {
-      const categories = getCurrentEditionCategories()
-      const currentIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
-
-      if (currentIndex !== -1) {
-        let newIndex
-
-        if (isLeftSwipe && currentIndex < categories.length - 1) {
-          // Swipe left to go to next category
-          newIndex = currentIndex + 1
-        } else if (isRightSwipe && currentIndex > 0) {
-          // Swipe right to go to previous category
-          newIndex = currentIndex - 1
-        }
-
-        if (newIndex !== undefined) {
-          const newCategory = categories[newIndex]
-          setLocalActiveCategory(newCategory.id)
-          setActiveCategory(newCategory.id)
-
-          // Scroll the category into view
-          setTimeout(() => {
-            categoryRefs.current[newCategory.id]?.scrollIntoView({ behavior: "smooth", block: "start" })
-          }, 100)
-        }
-      }
-    }
-  }
+  const { isSticky, editionsSelectorRef, editionsSelectorHeight, categoryTabsRef, categoryTabsHeight } =
+    useStickyHeader()
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">

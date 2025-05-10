@@ -75,6 +75,10 @@ export function VotingInterface({
   const originalTopOffset = useRef<number | null>(null)
   const [localActiveCategory, setLocalActiveCategory] = useState<string>(activeCategory)
 
+  // Add a new ref for the category tabs container
+  const categoryTabsRef = useRef<HTMLDivElement>(null)
+  const categoryTabsHeight = useRef<number>(0)
+
   useEffect(() => {
     setLocalActiveCategory(activeCategory)
   }, [activeCategory])
@@ -85,6 +89,7 @@ export function VotingInterface({
     }
   }, [getCurrentEditionCategories, votes, selectedEditionId])
 
+  // Modify the useEffect for scroll handling to also handle the category tabs
   useEffect(() => {
     const handleScroll = () => {
       if (editionsSelectorRef.current) {
@@ -110,6 +115,11 @@ export function VotingInterface({
         const selectorRect = editionsSelectorRef.current.getBoundingClientRect()
         originalTopOffset.current = selectorRect.top + window.scrollY
         editionsSelectorHeight.current = selectorRect.height
+      }
+
+      if (categoryTabsRef.current) {
+        const tabsRect = categoryTabsRef.current.getBoundingClientRect()
+        categoryTabsHeight.current = tabsRect.height
       }
     })
 
@@ -201,8 +211,13 @@ export function VotingInterface({
                   </p>
 
                   {/* Category selector tabs */}
-                  <div className="overflow-x-auto mb-4">
-                    <div className="flex space-x-2 p-1">
+                  <div
+                    ref={categoryTabsRef}
+                    className={`overflow-x-auto mb-4 ${
+                      isSticky ? "fixed top-0 left-0 right-0 z-10 bg-background px-4 py-2 shadow-md mt-12" : ""
+                    }`}
+                  >
+                    <div className={`flex space-x-2 p-1 ${isSticky ? "max-w-4xl mx-auto" : ""}`}>
                       {getCurrentEditionCategories().map((category) => (
                         <button
                           key={category.id}
@@ -222,6 +237,10 @@ export function VotingInterface({
                       ))}
                     </div>
                   </div>
+
+                  {isSticky && categoryTabsRef.current && (
+                    <div style={{ height: categoryTabsHeight.current, marginBottom: "1rem" }}></div>
+                  )}
 
                   {/* Swipeable content area */}
                   <div
@@ -264,7 +283,11 @@ export function VotingInterface({
                   <Tabs value={localActiveCategory} onValueChange={setLocalActiveCategory} className="w-full">
                     <TabsList
                       ref={tabsListRef}
-                      className="w-full overflow-x-auto flex-nowrap scroll-smooth p-1 bg-muted/20"
+                      className={`w-full overflow-x-auto flex-nowrap scroll-smooth p-1 bg-muted/20 ${
+                        isSticky
+                          ? "fixed top-0 left-0 right-0 z-10 bg-background px-4 py-2 shadow-md mt-12 max-w-4xl mx-auto"
+                          : ""
+                      }`}
                     >
                       {getCurrentEditionCategories()
                         .slice()
@@ -291,6 +314,8 @@ export function VotingInterface({
                           </TabsTrigger>
                         ))}
                     </TabsList>
+
+                    {isSticky && <div style={{ height: "3rem", marginBottom: "1rem" }}></div>}
 
                     {getCurrentEditionCategories().map((category) => (
                       <TabsContent key={category.id} value={category.id} className="mt-4">
@@ -332,4 +357,3 @@ export function VotingInterface({
     </div>
   )
 }
-//ux

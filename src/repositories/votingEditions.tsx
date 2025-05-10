@@ -21,6 +21,12 @@ export const votingEditions: VotingEdition[] = [
         ],
       },
       {
+        id: "gotybr",
+        name: "Jogo do Ano BR",
+        description: "O melhor jogo brasileiro de 2025",
+        gameIds: ["markofthedeep","enigma-do-medo"],
+      },
+      {
         id: "sportsracing",
         name: "Melhores Esportes/Corridas",
         description:
@@ -40,12 +46,6 @@ export const votingEditions: VotingEdition[] = [
         description:
           "Para o melhor jogo projetado principalmente em torno do combate corpo a corpo.",
         gameIds: ["fatalfurycityofwolves", "iron-saga-vs","cyber-city-clash","knock-off","hunter-x-hunter-nen-x-impact"],
-      },
-      {
-        id: "gotybr",
-        name: "Jogo do Ano BR",
-        description: "O melhor jogo brasileiro de 2025",
-        gameIds: ["markofthedeep"],
       },
       {
         id: "rpg",
@@ -83,7 +83,7 @@ export const votingEditions: VotingEdition[] = [
       },
       {
         id: "action",
-        name: "Melhor Jogo de Ação",
+        name: "Melhor Jogo de Ação/Aventura",
         description: "Jogos com foco em combate, reflexos rápidos e adrenalina",
         gameIds: [
           "gosthofyotei",
@@ -103,14 +103,7 @@ export const votingEditions: VotingEdition[] = [
           "metroidprime4",
           "mafiaoldcountry",
         ],
-      },
-      {
-        id: "family",
-        name: "Melhor jogo para Família",
-        description:
-          "Para o melhor jogo apropriado para jogar em família, independentemente do gênero ou plataforma.",
-        gameIds: ["gosthofyotei"],
-      },
+      }
     ],
   },
   // {

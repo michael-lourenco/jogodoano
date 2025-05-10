@@ -435,5 +435,7 @@ export const games: Game[] = [
   { id: "cyber-city-clash", title: "Cyber City Clash", imageUrl: "/cyber-city-clash.jpg?height=200&width=350", developer: "Apple Juice Interactive" },
   { id: "knock-off", title: "Knock Off", imageUrl: "/knock-off.jpg?height=200&width=350", developer: "Mechaghidora" },
   { id: "hunter-x-hunter-nen-x-impact", title: "Hunter x Hunter Nen x Impact", imageUrl: "/hunter-x-hunter-nen-x-impact.jpg?height=200&width=350", developer: "Bushiroad Games" },
+  { id: "enigma-do-medo", title: "Enigma do Medo", imageUrl: "/enigma-do-medo.jpg?height=200&width=350", developer: "Dumativa, Cellbit" },
+
 ]
   

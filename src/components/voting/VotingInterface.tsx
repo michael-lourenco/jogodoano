@@ -9,6 +9,7 @@ import { EditionsSelector } from "@/components/voting/EditionsSelector"
 import type { UserData } from "@/services/FirebaseService"
 import type { VotingEdition, Category } from "@/types/types"
 import { useRef, useEffect, useState } from "react"
+import type { TouchEvent } from "react"
 // Definindo o tipo para os votos por categoria
 export type CategoryVotes = Record<string, string>
 
@@ -117,6 +118,56 @@ export function VotingInterface({
     }
   }, [])
 
+  // Swipe handling logic
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
+  const swipeThreshold = 50 // Minimum distance required for a swipe
+
+  const handleTouchStart = (e: TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchMove = (e: TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > swipeThreshold
+    const isRightSwipe = distance < -swipeThreshold
+
+    if (isLeftSwipe || isRightSwipe) {
+      const categories = getCurrentEditionCategories()
+      const currentIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
+
+      if (currentIndex !== -1) {
+        let newIndex
+
+        if (isLeftSwipe && currentIndex < categories.length - 1) {
+          // Swipe left to go to next category
+          newIndex = currentIndex + 1
+        } else if (isRightSwipe && currentIndex > 0) {
+          // Swipe right to go to previous category
+          newIndex = currentIndex - 1
+        }
+
+        if (newIndex !== undefined) {
+          const newCategory = categories[newIndex]
+          setLocalActiveCategory(newCategory.id)
+          setActiveCategory(newCategory.id)
+
+          // Scroll the category into view
+          setTimeout(() => {
+            categoryRefs.current[newCategory.id]?.scrollIntoView({ behavior: "smooth", block: "start" })
+          }, 100)
+        }
+      }
+    }
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <main className="flex-grow flex flex-col items-center justify-start pt-4 px-4">
@@ -148,7 +199,37 @@ export function VotingInterface({
                     {Object.keys(votes[selectedEditionId] || {}).length} de {getCurrentEditionCategories().length}{" "}
                     categorias votadas
                   </p>
-                  <div className="space-y-2">
+
+                  {/* Category selector tabs */}
+                  <div className="overflow-x-auto mb-4">
+                    <div className="flex space-x-2 p-1">
+                      {getCurrentEditionCategories().map((category) => (
+                        <button
+                          key={category.id}
+                          onClick={() => {
+                            setLocalActiveCategory(category.id)
+                            setActiveCategory(category.id)
+                          }}
+                          className={`px-3 py-2 text-sm whitespace-nowrap rounded-md flex items-center ${
+                            localActiveCategory === category.id ? "bg-primary text-primary-foreground" : "bg-muted/30"
+                          } ${votes[selectedEditionId]?.[category.id] ? "text-success" : ""}`}
+                        >
+                          {category.name.split(" ").pop()}
+                          {votes[selectedEditionId]?.[category.id] && (
+                            <CheckCircle2 className="ml-1 h-3 w-3 inline-block" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Swipeable content area */}
+                  <div
+                    className="border border-muted rounded-md shadow-sm"
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                  >
                     {getCurrentEditionCategories().map((category) => (
                       <div
                         key={category.id}
@@ -156,57 +237,29 @@ export function VotingInterface({
                           if (el) {
                             categoryRefs.current[category.id] = el
                           } else {
-                            delete categoryRefs.current[category.id] // Limpa a ref se o elemento for desmontado
+                            delete categoryRefs.current[category.id]
                           }
                         }}
-                        className="border border-muted rounded-md shadow-sm"
+                        className={`${localActiveCategory === category.id ? "block" : "hidden"}`}
                       >
-                        <button
-                          className="flex items-center w-full p-3 text-sm" // Removi justify-between
-                          onClick={() => {
-                            setLocalActiveCategory((prevActiveCategory) =>
-                              prevActiveCategory === category.id ? "" : category.id,
-                            )
-                            setTimeout(() => {
-                              categoryRefs.current[category.id]?.scrollIntoView({ behavior: "smooth", block: "start" })
-                            }, 100)
-                          }}
-                        >
-                          <span
-                            className={`${votes[selectedEditionId]?.[category.id] ? "text-success" : ""} flex-grow`}
-                          >
-                            {category.name}
-                          </span>
-                          <div className="flex items-center ml-2">
-                            {" "}
-                            {/* Container para o ícone de check e a seta */}
-                            {votes[selectedEditionId]?.[category.id] && <CheckCircle2 className="mr-2 h-4 w-4" />}
-                            <svg
-                              className={`h-4 w-4 transition-transform ${
-                                localActiveCategory === category.id ? "rotate-180" : ""
-                              }`}
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </div>
-                        </button>
-                        {localActiveCategory === category.id && (
-                          <div className="p-4">
-                            <CategorySection
-                              category={category}
-                              selectedGameId={votes[selectedEditionId]?.[category.id]}
-                              onVote={handleVoteInUI}
-                            />
-                          </div>
-                        )}
+                        <div className="p-4">
+                          <CategorySection
+                            category={category}
+                            selectedGameId={votes[selectedEditionId]?.[category.id]}
+                            onVote={handleVoteInUI}
+                          />
+                        </div>
                       </div>
                     ))}
+
+                    {/* Swipe indicator */}
+                    <div className="flex justify-center items-center p-2 text-xs text-muted-foreground">
+                      <span>← Deslize para navegar entre categorias →</span>
+                    </div>
                   </div>
                 </div>
               ) : (
+                // Desktop view remains unchanged
                 <div className="hidden md:block mb-6">
                   <Tabs value={localActiveCategory} onValueChange={setLocalActiveCategory} className="w-full">
                     <TabsList

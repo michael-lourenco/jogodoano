@@ -132,8 +132,13 @@ export function VotingInterface({
                         <button
                           key={category.id}
                           onClick={() => {
-                            setLocalActiveCategory(category.id)
-                            setActiveCategory(category.id)
+                            if (category.id !== localActiveCategory) {
+                              handleCategoryTransition(localActiveCategory, category.id)
+                              setTimeout(() => {
+                                setLocalActiveCategory(category.id)
+                                setActiveCategory(category.id)
+                              }, 50)
+                            }
                           }}
                           className={`px-3 py-2 text-sm whitespace-nowrap rounded-md flex items-center ${
                             localActiveCategory === category.id ? "bg-primary text-primary-foreground" : "bg-muted/30"
@@ -203,7 +208,15 @@ export function VotingInterface({
               ) : (
                 // Desktop view with improved accessibility
                 <div className="hidden md:block mb-6">
-                  <Tabs value={localActiveCategory} onValueChange={setLocalActiveCategory} className="w-full">
+                  <Tabs value={localActiveCategory} onValueChange={(newValue) => {
+                    if (newValue !== localActiveCategory) {
+                      handleCategoryTransition(localActiveCategory, newValue)
+                      setTimeout(() => {
+                        setLocalActiveCategory(newValue)
+                        setActiveCategory(newValue)
+                      }, 50)
+                    }
+                  }} className="w-full">
                     <TabsList
                       ref={tabsListRef}
                       className={`w-full overflow-x-auto flex-nowrap scroll-smooth p-1 bg-muted/20 ${

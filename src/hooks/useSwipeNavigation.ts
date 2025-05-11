@@ -65,10 +65,21 @@ export function useSwipeNavigation({
 
     // Clean up after transition
     setTimeout(() => {
-      fromElement.style.display = "none"
-      fromElement.style.transition = ""
-      fromElement.style.transform = ""
-      toElement.style.transition = ""
+      // Restaura todos os elementos para garantir que o swipe continue funcionando
+      Object.values(categoryRefs.current).forEach(element => {
+        if (element) {
+          if (element === toElement) {
+            element.style.display = "block"
+            element.style.opacity = "1"
+            element.style.transform = "translateX(0)"
+          } else {
+            element.style.display = "none"
+            element.style.opacity = "0"
+            element.style.transform = ""
+          }
+          element.style.transition = ""
+        }
+      });
     }, 300)
   }
 

@@ -6,9 +6,12 @@ import { CheckCircle2 } from "lucide-react"
 import { UserInfo } from "@/components/UserInfo"
 import { CategorySection } from "@/components/voting/CategorySection"
 import { EditionsSelector } from "@/components/voting/EditionsSelector"
+import { VotingProgress } from "@/components/voting/VotingProgress"
+import { CategoryNavigation } from "@/components/voting/CategoryNavigation"
 import { useVotingInterface } from "@/hooks/useVotingInterface"
 import { useCategoryNavigation } from "@/hooks/useCategoryNavigation"
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation"
+import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation"
 import { useStickyHeader } from "@/hooks/useStickyHeader"
 import { useIsMobile } from "@/hooks/use-mobile"
 import type { VotingInterfaceProps } from "@/types/voting/interfaces"
@@ -41,7 +44,7 @@ export function VotingInterface({
 
   const { categoryRefs } = useCategoryNavigation()
 
-  const { handleTouchStart, handleTouchMove, handleTouchEnd } = useSwipeNavigation({
+  const { handleTouchStart, handleTouchMove, handleTouchEnd, handleCategoryTransition } = useSwipeNavigation({
     getCurrentEditionCategories,
     localActiveCategory,
     setLocalActiveCategory,
@@ -49,8 +52,39 @@ export function VotingInterface({
     categoryRefs,
   })
 
+  // Add keyboard navigation
+  useKeyboardNavigation({
+    localActiveCategory,
+    setLocalActiveCategory,
+    setActiveCategory,
+    getCurrentEditionCategories,
+    handleCategoryTransition,
+  })
+
   const { isSticky, editionsSelectorRef, editionsSelectorHeight, categoryTabsRef, categoryTabsHeight } =
     useStickyHeader()
+
+  const categories = getCurrentEditionCategories()
+
+  const navigateToCategory = (direction: "prev" | "next") => {
+    const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
+
+    if (direction === "prev" && currentCategoryIndex > 0) {
+      const prevCategory = categories[currentCategoryIndex - 1]
+      handleCategoryTransition(localActiveCategory, prevCategory.id)
+      setTimeout(() => {
+        setLocalActiveCategory(prevCategory.id)
+        setActiveCategory(prevCategory.id)
+      }, 50)
+    } else if (direction === "next" && currentCategoryIndex < categories.length - 1) {
+      const nextCategory = categories[currentCategoryIndex + 1]
+      handleCategoryTransition(localActiveCategory, nextCategory.id)
+      setTimeout(() => {
+        setLocalActiveCategory(nextCategory.id)
+        setActiveCategory(nextCategory.id)
+      }, 50)
+    }
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
@@ -77,13 +111,15 @@ export function VotingInterface({
 
           {selectedEditionId && editions.length > 0 && (
             <>
+              {/* Add voting progress component */}
+              <VotingProgress
+                categories={categories}
+                votes={votes[selectedEditionId] || {}}
+                editionId={selectedEditionId}
+              />
+
               {isMobile ? (
                 <div className="mb-6">
-                  <p className="mb-2 text-sm text-muted-foreground">
-                    {Object.keys(votes[selectedEditionId] || {}).length} de {getCurrentEditionCategories().length}{" "}
-                    categorias votadas
-                  </p>
-
                   {/* Category selector tabs */}
                   <div
                     ref={categoryTabsRef}
@@ -102,10 +138,12 @@ export function VotingInterface({
                           className={`px-3 py-2 text-sm whitespace-nowrap rounded-md flex items-center ${
                             localActiveCategory === category.id ? "bg-primary text-primary-foreground" : "bg-muted/30"
                           } ${votes[selectedEditionId]?.[category.id] ? "text-success" : ""}`}
+                          aria-pressed={localActiveCategory === category.id}
+                          aria-label={`Categoria ${category.name} ${votes[selectedEditionId]?.[category.id] ? "(votada)" : ""}`}
                         >
                           {category.name.split(" ").pop()}
                           {votes[selectedEditionId]?.[category.id] && (
-                            <CheckCircle2 className="ml-1 h-3 w-3 inline-block" />
+                            <CheckCircle2 className="ml-1 h-3 w-3 inline-block" aria-hidden="true" />
                           )}
                         </button>
                       ))}
@@ -122,6 +160,8 @@ export function VotingInterface({
                     onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
+                    role="region"
+                    aria-label="Área de votação"
                   >
                     <div className="relative overflow-hidden">
                       {getCurrentEditionCategories().map((category) => (
@@ -137,6 +177,9 @@ export function VotingInterface({
                           className={`transition-all duration-300 ease-in-out ${
                             localActiveCategory === category.id ? "block opacity-100" : "hidden opacity-0"
                           }`}
+                          role="tabpanel"
+                          aria-labelledby={`tab-${category.id}`}
+                          tabIndex={localActiveCategory === category.id ? 0 : -1}
                         >
                           <div className="p-4">
                             <CategorySection
@@ -149,14 +192,16 @@ export function VotingInterface({
                       ))}
                     </div>
 
-                    {/* Swipe indicator */}
-                    <div className="flex justify-center items-center p-2 text-xs text-muted-foreground">
-                      <span>← Deslize para navegar entre categorias →</span>
-                    </div>
+                    {/* Navigation buttons */}
+                    <CategoryNavigation
+                      categories={categories}
+                      currentCategoryId={localActiveCategory}
+                      navigateToCategory={navigateToCategory}
+                    />
                   </div>
                 </div>
               ) : (
-                // Desktop view remains unchanged
+                // Desktop view with improved accessibility
                 <div className="hidden md:block mb-6">
                   <Tabs value={localActiveCategory} onValueChange={setLocalActiveCategory} className="w-full">
                     <TabsList
@@ -180,14 +225,16 @@ export function VotingInterface({
                         .map((category) => (
                           <TabsTrigger
                             key={category.id}
+                            id={`tab-${category.id}`}
                             value={category.id}
                             className={`flex-shrink-0 ${
                               votes[selectedEditionId]?.[category.id] ? "text-success" : ""
                             } px-2 py-1 rounded-md text-sm whitespace-nowrap`}
+                            aria-label={`Categoria ${category.name} ${votes[selectedEditionId]?.[category.id] ? "(votada)" : ""}`}
                           >
                             {category.name.split(" ").pop()}
                             {votes[selectedEditionId]?.[category.id] && (
-                              <CheckCircle2 className="ml-1 h-3 w-3 inline-block" />
+                              <CheckCircle2 className="ml-1 h-3 w-3 inline-block" aria-hidden="true" />
                             )}
                           </TabsTrigger>
                         ))}
@@ -196,12 +243,27 @@ export function VotingInterface({
                     {isSticky && <div style={{ height: "3rem", marginBottom: "1rem" }}></div>}
 
                     {getCurrentEditionCategories().map((category) => (
-                      <TabsContent key={category.id} value={category.id} className="mt-4">
+                      <TabsContent
+                        key={category.id}
+                        value={category.id}
+                        className="mt-4"
+                        role="tabpanel"
+                        aria-labelledby={`tab-${category.id}`}
+                      >
                         <CategorySection
                           category={category}
                           selectedGameId={votes[selectedEditionId]?.[category.id]}
                           onVote={handleVoteInUI}
                         />
+
+                        {/* Add navigation to desktop view as well */}
+                        <div className="mt-6">
+                          <CategoryNavigation
+                            categories={categories}
+                            currentCategoryId={localActiveCategory}
+                            navigateToCategory={navigateToCategory}
+                          />
+                        </div>
                       </TabsContent>
                     ))}
                   </Tabs>
@@ -216,10 +278,14 @@ export function VotingInterface({
                   }
                   className="w-full max-w-md h-12 text-primary-foreground bg-gradient-to-r from-chart-1 to-success hover:from-chart-1 hover:to-success-foreground shadow-lg hover:shadow-success/25 hover:text-secondary-foreground transition-all duration-300"
                   size="lg"
+                  aria-live="polite"
                 >
                   {isSubmitting ? (
                     <div className="flex items-center">
-                      <div className="w-5 h-5 border-2 border-t-transparent border-primary-foreground rounded-full animate-spin mr-2"></div>
+                      <div
+                        className="w-5 h-5 border-2 border-t-transparent border-primary-foreground rounded-full animate-spin mr-2"
+                        aria-hidden="true"
+                      ></div>
                       Processando...
                     </div>
                   ) : (

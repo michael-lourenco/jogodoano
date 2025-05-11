@@ -1,9 +1,10 @@
+"use client"
+
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { CheckCircle2 } from "lucide-react"
-import { motion } from "framer-motion"
+import { cn } from "@/lib/utils"
 import Image from "next/image"
-import { Game } from "@/types/types"
+import { CheckCircle2 } from "lucide-react"
+import type { Game } from "@/types/types"
 
 interface GameCardProps {
   game: Game
@@ -12,48 +13,42 @@ interface GameCardProps {
 }
 
 export function GameCard({ game, isSelected, onSelect }: GameCardProps) {
-  const imageUrl = game.imageUrl ? game.imageUrl.split("?")[0] : "/placeholder.svg"
-
   return (
-    <motion.div className="game-card" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-      <Card
-        className={`overflow-hidden h-full ${
-          isSelected ? "ring-2 ring-primary shadow-lg shadow-primary/10" : "hover:border-muted"
-        }`}
-        onClick={onSelect}
-      >
-        <div className="relative aspect-video">
-          {game.imageUrl ? (
-            <Image
-              src={game.imageUrl || "/placeholder.svg"}
-              alt={game.title}
-              fill
-              className="object-cover"
-              unoptimized
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
-              <span className="text-white/70 text-sm font-medium">{game.title}</span>
-            </div>
-          )}
+    <Card
+      className={cn(
+        "cursor-pointer transition-all duration-200 hover:shadow-md border-2",
+        isSelected ? "border-success bg-success/5 shadow-success/20" : "border-transparent hover:border-primary/20",
+      )}
+      onClick={onSelect}
+    >
+      <CardContent className="p-3 flex flex-col gap-2">
+        <div className="relative aspect-video w-full overflow-hidden rounded-md">
+          <Image
+            src={game.imageUrl || `/placeholder.svg?height=200&width=350`}
+            alt={game.title}
+            className="object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, 300px"
+            priority={isSelected}
+          />
           {isSelected && (
-            <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-              <CheckCircle2 className="h-12 w-12 text-primary" />
+            <div className="absolute inset-0 bg-success/20 flex items-center justify-center">
+              <div className="bg-success text-success-foreground rounded-full p-2 animate-in zoom-in-50 duration-200">
+                <CheckCircle2 className="h-8 w-8" />
+              </div>
             </div>
           )}
         </div>
-        <CardContent className="p-3">
-          <h3 className="font-semibold line-clamp-1 text-foreground">{game.title}</h3>
-          <div className="flex items-center justify-between mt-1">
-            <p className="text-xs text-muted-foreground">{game.developer}</p>
-            {isSelected && (
-              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                Selecionado
-              </Badge>
-            )}
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="font-medium line-clamp-2">{game.title}</h3>
+            <p className="text-sm text-muted-foreground">{game.developer}</p>
           </div>
-        </CardContent>
-      </Card>
-    </motion.div>
+          {isSelected && (
+            <span className="text-xs bg-success/10 text-success px-2 py-1 rounded-full font-medium">Selecionado</span>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   )
 }

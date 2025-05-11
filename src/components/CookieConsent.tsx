@@ -3,26 +3,31 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 export default function CookieConsent() {
+  const [showBanner, setShowBanner] = useState<boolean>(true);
   const [consent, setConsent] = useState<boolean | null>(null);
 
   useEffect(() => {
+    // Verificar se há um consentimento armazenado
     const storedConsent = localStorage.getItem("cookieConsent");
     if (storedConsent !== null) {
       setConsent(storedConsent === "true");
+      setShowBanner(false); // Oculta o banner se já tiver uma escolha armazenada
     }
   }, []);
 
   const handleAccept = () => {
     localStorage.setItem("cookieConsent", "true");
     setConsent(true);
+    setShowBanner(false);
   };
 
   const handleReject = () => {
     localStorage.setItem("cookieConsent", "false");
     setConsent(false);
+    setShowBanner(false);
   };
 
-  if (consent !== null) return null; // Oculta o banner se o usuário já escolheu
+  if (!showBanner) return null; // Oculta o banner baseado no estado showBanner
 
   return (
     <div className="fixed bottom-0 left-0 w-full bg-secondary text-secondary-foreground p-4 flex flex-col md:flex-row items-center justify-between shadow-md border-t">

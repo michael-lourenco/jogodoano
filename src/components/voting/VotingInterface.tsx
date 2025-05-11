@@ -123,27 +123,31 @@ export function VotingInterface({
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
                   >
-                    {getCurrentEditionCategories().map((category) => (
-                      <div
-                        key={category.id}
-                        ref={(el) => {
-                          if (el) {
-                            categoryRefs.current[category.id] = el
-                          } else {
-                            delete categoryRefs.current[category.id]
-                          }
-                        }}
-                        className={`${localActiveCategory === category.id ? "block" : "hidden"}`}
-                      >
-                        <div className="p-4">
-                          <CategorySection
-                            category={category}
-                            selectedGameId={votes[selectedEditionId]?.[category.id]}
-                            onVote={handleVoteInUI}
-                          />
+                    <div className="relative overflow-hidden">
+                      {getCurrentEditionCategories().map((category) => (
+                        <div
+                          key={category.id}
+                          ref={(el) => {
+                            if (el) {
+                              categoryRefs.current[category.id] = el
+                            } else {
+                              delete categoryRefs.current[category.id]
+                            }
+                          }}
+                          className={`transition-all duration-300 ease-in-out ${
+                            localActiveCategory === category.id ? "block opacity-100" : "hidden opacity-0"
+                          }`}
+                        >
+                          <div className="p-4">
+                            <CategorySection
+                              category={category}
+                              selectedGameId={votes[selectedEditionId]?.[category.id]}
+                              onVote={handleVoteInUI}
+                            />
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
 
                     {/* Swipe indicator */}
                     <div className="flex justify-center items-center p-2 text-xs text-muted-foreground">

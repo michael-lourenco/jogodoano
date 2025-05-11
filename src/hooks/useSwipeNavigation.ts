@@ -23,6 +23,55 @@ export function useSwipeNavigation({
     setTouchEnd(e.targetTouches[0].clientX)
   }
 
+  const handleCategoryTransition = (fromCategoryId: string, toCategoryId: string) => {
+    // Get the elements
+    const fromElement = categoryRefs.current[fromCategoryId]
+    const toElement = categoryRefs.current[toCategoryId]
+
+    if (!fromElement || !toElement) return
+
+    // Get the categories
+    const categories = getCurrentEditionCategories()
+    const fromIndex = categories.findIndex((cat) => cat.id === fromCategoryId)
+    const toIndex = categories.findIndex((cat) => cat.id === toCategoryId)
+
+    // Determine direction
+    const isNext = toIndex > fromIndex
+
+    // Set initial states
+    fromElement.style.transition = "none"
+    toElement.style.transition = "none"
+    fromElement.style.opacity = "1"
+    toElement.style.opacity = "0"
+    fromElement.style.transform = "translateX(0)"
+    toElement.style.transform = isNext ? "translateX(100%)" : "translateX(-100%)"
+
+    // Show both elements during transition
+    fromElement.style.display = "block"
+    toElement.style.display = "block"
+
+    // Force reflow
+    void fromElement.offsetWidth
+
+    // Add transitions back
+    fromElement.style.transition = "transform 300ms ease-in-out, opacity 300ms ease-in-out"
+    toElement.style.transition = "transform 300ms ease-in-out, opacity 300ms ease-in-out"
+
+    // Animate
+    fromElement.style.transform = isNext ? "translateX(-100%)" : "translateX(100%)"
+    fromElement.style.opacity = "0"
+    toElement.style.transform = "translateX(0)"
+    toElement.style.opacity = "1"
+
+    // Clean up after transition
+    setTimeout(() => {
+      fromElement.style.display = "none"
+      fromElement.style.transition = ""
+      fromElement.style.transform = ""
+      toElement.style.transition = ""
+    }, 300)
+  }
+
   const handleTouchEnd = () => {
     if (!touchStart || !touchEnd) return
 
@@ -47,21 +96,36 @@ export function useSwipeNavigation({
 
         if (newIndex !== undefined) {
           const newCategory = categories[newIndex]
-          setLocalActiveCategory(newCategory.id)
-          setActiveCategory(newCategory.id)
+          const currentCategory = categories[currentIndex]
 
-          // Scroll the category into view
+          // Apply the transition effect
+          handleCategoryTransition(currentCategory.id, newCategory.id)
+
+          // Update state after a small delay to allow the animation to start
           setTimeout(() => {
-            categoryRefs.current[newCategory.id]?.scrollIntoView({ behavior: "smooth", block: "start" })
-          }, 100)
+            setLocalActiveCategory(newCategory.id)
+            setActiveCategory(newCategory.id)
+          }, 50)
         }
       }
     }
+  }
+
+  const getCategoryPosition = (categoryId: string) => {
+    const categories = getCurrentEditionCategories()
+    const currentIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
+    const categoryIndex = categories.findIndex((cat) => cat.id === categoryId)
+
+    if (currentIndex === categoryIndex) return "current"
+    if (categoryIndex < currentIndex) return "previous"
+    return "next"
   }
 
   return {
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
+    handleCategoryTransition,
+    getCategoryPosition,
   }
 }

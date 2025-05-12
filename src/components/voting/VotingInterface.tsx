@@ -77,10 +77,29 @@ export function VotingInterface({
     setSelectedGame(votes[selectedEditionId]?.[localActiveCategory] || null)
   }, [localActiveCategory, votes, selectedEditionId])
 
+  // Estado para controlar a posição de rolagem do usuário
+  const [scrollPosition, setScrollPosition] = useState<'top' | 'middle' | 'bottom'>('top')
+  
   // Função para verificar a posição de scroll
   const checkScrollPosition = useCallback(() => {
     if (contentContainerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = contentContainerRef.current
+      const scrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100
+      
+      // Determinar a posição de rolagem
+      let position: 'top' | 'middle' | 'bottom' = 'top'
+      
+      if (scrollPercentage < 20) {
+        position = 'top'
+      } else if (scrollPercentage > 80) {
+        position = 'bottom'
+      } else {
+        position = 'middle'
+      }
+      
+      setScrollPosition(position)
+      
+      // Manter a verificação de scroll até o fim para compatibilidade
       const isBottom = scrollTop + clientHeight >= scrollHeight - 20 // 20px de tolerância
       setIsScrolledToBottom(isBottom)
     }
@@ -98,6 +117,40 @@ export function VotingInterface({
       }
     }
   }, [checkScrollPosition, localActiveCategory])
+
+  // Função para calcular a posição vertical ideal do botão com base no jogo selecionado
+  const calculateButtonPosition = useCallback(() => {
+    if (selectedGameElementId && scrollPosition !== 'bottom') {
+      const selectedElement = document.getElementById(selectedGameElementId);
+      if (selectedElement) {
+        // Calcular a posição do elemento selecionado em relação à viewport
+        const rect = selectedElement.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        
+        // Se o elemento estiver visível na tela
+        if (rect.top >= 0 && rect.bottom <= viewportHeight) {
+          // Posicionar o botão abaixo do jogo selecionado, mas não muito perto do fim da tela
+          const bottomSpace = viewportHeight - rect.bottom;
+          if (bottomSpace < 150) {
+            // Se não houver espaço suficiente abaixo, posicione no fim da tela
+            return { bottom: '10vh' };
+          } else {
+            // Posicione o botão 20px abaixo do jogo selecionado
+            return { top: `${rect.bottom + 20}px`, bottom: 'auto' };
+          }
+        } else if (rect.top < 0 && rect.bottom > 0) {
+          // O elemento está parcialmente visível no topo
+          return { bottom: '40vh' };
+        } else if (rect.top < viewportHeight && rect.bottom > viewportHeight) {
+          // O elemento está parcialmente visível na parte inferior
+          return { bottom: '10vh' };
+        }
+      }
+    }
+    
+    // Posição padrão com base na posição de rolagem
+    return { bottom: scrollPosition === 'top' ? '30vh' : '40vh' };
+  }, [selectedGameElementId, scrollPosition]);
 
   // Atualizar a referência ao jogo selecionado
   const updateSelectedGameRef = useCallback((categoryId: string, gameId: string) => {
@@ -119,6 +172,38 @@ export function VotingInterface({
       }, 100)
     }
   }, [selectedGameElementId, checkScrollPosition])
+
+  // Adicionar um listener para resize da janela para recalcular a posição do botão
+  useEffect(() => {
+    const handleResize = () => {
+      checkScrollPosition();
+    };
+
+    window.addEventListener('resize', handleResize);
+    
+    // Adicionar um observador de mutação para detectar mudanças no DOM que possam afetar o posicionamento
+    if (contentContainerRef.current) {
+      const observer = new MutationObserver(() => {
+        checkScrollPosition();
+      });
+      
+      observer.observe(contentContainerRef.current, { 
+        childList: true, 
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'style']
+      });
+      
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        observer.disconnect();
+      };
+    }
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [checkScrollPosition]);
 
   // Usar o callback no handleGameSelection
   const handleGameSelection = (categoryId: string, gameId: string) => {
@@ -310,18 +395,20 @@ export function VotingInterface({
                   {isNextButtonVisible(localActiveCategory) && !isLastCategory && (
                     <div 
                       className={`
-                        ${isScrolledToBottom 
+                        ${scrollPosition === 'bottom'
                           ? "mt-4 mb-2 flex justify-center animate-in fade-in slide-in-from-bottom" 
-                          : "fixed bottom-4 left-0 right-0 px-4 flex justify-center animate-in fade-in slide-in-from-bottom z-10"
-                        } duration-300
+                          : "fixed left-0 right-0 px-4 flex justify-center animate-in fade-in slide-in-from-bottom z-10"
+                        } transition-all duration-500 ease-in-out
                       `}
+                      style={calculateButtonPosition()}
                     >
                       <Button 
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 px-6 py-5 w-full max-w-sm shadow-lg"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 px-6 py-5 w-full max-w-sm 
+                        shadow-lg transition-all duration-300 ease-out animate-pulse"
                         onClick={() => navigateToCategory("next")}
                       >
                         Ir para Próxima Categoria
-                        <ArrowRight className="h-5 w-5" />
+                        <ArrowRight className="h-5 w-5 ml-1 animate-bounce" />
                       </Button>
                     </div>
                   )}

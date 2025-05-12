@@ -13,6 +13,7 @@ export function useSwipeNavigation({
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
   const swipeThreshold = 50 // Minimum distance required for a swipe
+  const transitionDuration = 400 // Duração da transição em ms (aumentada para ser mais suave)
 
   const handleTouchStart = (e: TouchEvent) => {
     setTouchEnd(null)
@@ -42,8 +43,8 @@ export function useSwipeNavigation({
     fromElement.style.transition = "none"
     toElement.style.transition = "none"
     fromElement.style.opacity = "1"
-    toElement.style.opacity = "0"
     fromElement.style.transform = "translateX(0)"
+    toElement.style.opacity = "1" // Manter ambos os elementos com opacidade total para uma transição mais suave
     toElement.style.transform = isNext ? "translateX(100%)" : "translateX(-100%)"
 
     // Show both elements during transition
@@ -53,15 +54,14 @@ export function useSwipeNavigation({
     // Force reflow
     void fromElement.offsetWidth
 
-    // Add transitions back
-    fromElement.style.transition = "transform 300ms ease-in-out, opacity 300ms ease-in-out"
-    toElement.style.transition = "transform 300ms ease-in-out, opacity 300ms ease-in-out"
+    // Add transitions back with easing
+    const transitionStyle = `transform ${transitionDuration}ms cubic-bezier(0.4, 0.0, 0.2, 1)`
+    fromElement.style.transition = transitionStyle
+    toElement.style.transition = transitionStyle
 
     // Animate
     fromElement.style.transform = isNext ? "translateX(-100%)" : "translateX(100%)"
-    fromElement.style.opacity = "0"
     toElement.style.transform = "translateX(0)"
-    toElement.style.opacity = "1"
 
     // Clean up after transition
     setTimeout(() => {
@@ -74,13 +74,12 @@ export function useSwipeNavigation({
             element.style.transform = "translateX(0)"
           } else {
             element.style.display = "none"
-            element.style.opacity = "0"
             element.style.transform = ""
           }
           element.style.transition = ""
         }
       });
-    }, 300)
+    }, transitionDuration + 50)
   }
 
   const handleTouchEnd = () => {
@@ -138,5 +137,6 @@ export function useSwipeNavigation({
     handleTouchEnd,
     handleCategoryTransition,
     getCategoryPosition,
+    transitionDuration,
   }
 }

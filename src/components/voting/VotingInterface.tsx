@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Footer } from "@/components/Footer"
-import { CheckCircle2 } from "lucide-react"
+import { CheckCircle2, ArrowRight, Trophy } from "lucide-react"
 import { UserInfo } from "@/components/UserInfo"
 import { CategorySection } from "@/components/voting/CategorySection"
 import { EditionsSelector } from "@/components/voting/EditionsSelector"
@@ -14,6 +14,7 @@ import { useSwipeNavigation } from "@/hooks/useSwipeNavigation"
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation"
 import { useStickyHeader } from "@/hooks/useStickyHeader"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { useState, useEffect } from "react"
 import type { VotingInterfaceProps } from "@/types/voting/interfaces"
 
 export function VotingInterface({
@@ -33,6 +34,8 @@ export function VotingInterface({
   handleSubmitVotesInUI,
 }: VotingInterfaceProps) {
   const isMobile = useIsMobile()
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [selectedGame, setSelectedGame] = useState<string | null>(null)
 
   const { tabsListRef, localActiveCategory, setLocalActiveCategory } = useVotingInterface({
     activeCategory,
@@ -44,7 +47,7 @@ export function VotingInterface({
 
   const { categoryRefs } = useCategoryNavigation()
 
-  const { handleTouchStart, handleTouchMove, handleTouchEnd, handleCategoryTransition } = useSwipeNavigation({
+  const { handleTouchStart, handleTouchMove, handleTouchEnd, handleCategoryTransition, transitionDuration } = useSwipeNavigation({
     getCurrentEditionCategories,
     localActiveCategory,
     setLocalActiveCategory,
@@ -66,6 +69,26 @@ export function VotingInterface({
 
   const categories = getCurrentEditionCategories()
 
+  // Atualiza o jogo selecionado quando a categoria muda
+  useEffect(() => {
+    setSelectedGame(votes[selectedEditionId]?.[localActiveCategory] || null)
+  }, [localActiveCategory, votes, selectedEditionId])
+
+  const handleGameSelection = (categoryId: string, gameId: string) => {
+    console.log("VotingInterface: handleGameSelection", categoryId, gameId);
+    
+    // Primeiro registramos o voto no sistema (importante fazer isto primeiro)
+    handleVoteInUI(categoryId, gameId)
+    
+    // Depois atualizamos o estado local para refletir a seleção
+    setSelectedGame(gameId)
+  }
+
+  // Debug: observar mudanças em votes
+  useEffect(() => {
+    console.log("VotingInterface: votes updated", votes);
+  }, [votes]);
+
   const navigateToCategory = (direction: "prev" | "next") => {
     const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
 
@@ -84,6 +107,25 @@ export function VotingInterface({
         setActiveCategory(nextCategory.id)
       }, 50)
     }
+  }
+
+  const navigateToNextCategory = () => {
+    const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
+    if (currentCategoryIndex < categories.length - 1) {
+      navigateToCategory("next")
+    }
+  }
+
+  const isAllCategoriesVoted = () => {
+    return categories.every(category => !!votes[selectedEditionId]?.[category.id])
+  }
+
+  const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
+  const currentCategory = categories[currentCategoryIndex]
+  const isLastCategory = currentCategoryIndex === categories.length - 1
+
+  const isNextButtonVisible = (categoryId: string) => {
+    return votes[selectedEditionId]?.[categoryId] && categoryId === localActiveCategory;
   }
 
   return (
@@ -111,7 +153,7 @@ export function VotingInterface({
 
           {selectedEditionId && editions.length > 0 && (
             <>
-              {/* Add voting progress component */}
+              {/* Progress bar showing voting completion */}
               <VotingProgress
                 categories={categories}
                 votes={votes[selectedEditionId] || {}}
@@ -119,7 +161,7 @@ export function VotingInterface({
               />
 
               {isMobile ? (
-                <div className="mb-6">
+                <div className="mb-6 relative">
                   {/* Category selector tabs */}
                   <div
                     ref={categoryTabsRef}
@@ -159,6 +201,12 @@ export function VotingInterface({
                     <div style={{ height: categoryTabsHeight.current, marginBottom: "1rem" }}></div>
                   )}
 
+                  {/* Category heading and description */}
+                  <div className="mb-3 text-center">
+                    <h2 className="text-xl font-bold text-primary mb-1">{currentCategory?.name}</h2>
+                    <p className="text-sm text-muted-foreground">{currentCategory?.description}</p>
+                  </div>
+
                   {/* Swipeable content area */}
                   <div
                     className="border border-muted rounded-md shadow-sm"
@@ -190,7 +238,7 @@ export function VotingInterface({
                             <CategorySection
                               category={category}
                               selectedGameId={votes[selectedEditionId]?.[category.id]}
-                              onVote={handleVoteInUI}
+                              onVote={(gameId) => handleGameSelection(category.id, gameId)}
                             />
                           </div>
                         </div>
@@ -204,6 +252,19 @@ export function VotingInterface({
                       navigateToCategory={navigateToCategory}
                     />
                   </div>
+
+                  {/* Botão de próxima categoria - versão móvel */}
+                  {isNextButtonVisible(localActiveCategory) && !isLastCategory && (
+                    <div className="fixed bottom-4 left-0 right-0 flex justify-center px-4 z-10 animate-in fade-in slide-in-from-bottom duration-300">
+                      <Button 
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 px-6 py-5 w-full max-w-sm shadow-lg"
+                        onClick={() => navigateToCategory("next")}
+                      >
+                        Ir para Próxima Categoria
+                        <ArrowRight className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 // Desktop view with improved accessibility
@@ -263,11 +324,29 @@ export function VotingInterface({
                         role="tabpanel"
                         aria-labelledby={`tab-${category.id}`}
                       >
+                        <div className="mb-3 text-center">
+                          <h2 className="text-xl font-bold text-primary mb-1">{category.name}</h2>
+                          <p className="text-sm text-muted-foreground">{category.description}</p>
+                        </div>
+                        
                         <CategorySection
                           category={category}
                           selectedGameId={votes[selectedEditionId]?.[category.id]}
-                          onVote={handleVoteInUI}
+                          onVote={(gameId) => handleGameSelection(category.id, gameId)}
                         />
+
+                        {/* Botão de próxima categoria - versão desktop */}
+                        {isNextButtonVisible(category.id) && !isLastCategory && (
+                          <div className="mt-4 flex justify-center animate-in fade-in slide-in-from-bottom duration-300">
+                            <Button 
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 px-6 py-5"
+                              onClick={() => navigateToCategory("next")}
+                            >
+                              Ir para Próxima Categoria
+                              <ArrowRight className="h-5 w-5" />
+                            </Button>
+                          </div>
+                        )}
 
                         {/* Add navigation to desktop view as well */}
                         <div className="mt-6">
@@ -283,11 +362,12 @@ export function VotingInterface({
                 </div>
               )}
 
-              <div className="sticky bottom-4 mt-8 mb-4 flex justify-center">
+              {/* Submit all votes button */}
+              <div className={`sticky bottom-4 mt-8 mb-4 flex justify-center ${showConfirmation ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
                 <Button
                   onClick={handleSubmitVotesInUI}
                   disabled={
-                    isSubmitting || getCurrentEditionCategories().some((cat) => !votes[selectedEditionId]?.[cat.id])
+                    isSubmitting || !isAllCategoriesVoted()
                   }
                   className="w-full max-w-md h-12 text-primary-foreground bg-gradient-to-r from-chart-1 to-success hover:from-chart-1 hover:to-success-foreground shadow-lg hover:shadow-success/25 hover:text-secondary-foreground transition-all duration-300"
                   size="lg"
@@ -302,7 +382,7 @@ export function VotingInterface({
                       Processando...
                     </div>
                   ) : (
-                    <>Enviar Votos de {selectedEditionId}</>
+                    <>Enviar Todos os Votos</>
                   )}
                 </Button>
               </div>

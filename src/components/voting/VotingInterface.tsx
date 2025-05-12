@@ -396,19 +396,18 @@ export function VotingInterface({
                     <div 
                       className={`
                         ${scrollPosition === 'bottom'
-                          ? "mt-4 mb-2 flex justify-center animate-in fade-in slide-in-from-bottom" 
-                          : "fixed left-0 right-0 px-4 flex justify-center animate-in fade-in slide-in-from-bottom z-10"
-                        } transition-all duration-500 ease-in-out
+                          ? "mt-4 mb-2 flex justify-center" 
+                          : "fixed left-0 right-0 px-4 flex justify-center z-10"
+                        } transition-all duration-300
                       `}
                       style={calculateButtonPosition()}
                     >
                       <Button 
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 px-6 py-5 w-full max-w-sm 
-                        shadow-lg transition-all duration-300 ease-out animate-pulse"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 px-6 py-5 w-full max-w-sm shadow-lg"
                         onClick={() => navigateToCategory("next")}
                       >
                         Ir para Próxima Categoria
-                        <ArrowRight className="h-5 w-5 ml-1 animate-bounce" />
+                        <ArrowRight className="h-5 w-5 ml-1" />
                       </Button>
                     </div>
                   )}
@@ -484,13 +483,13 @@ export function VotingInterface({
 
                         {/* Botão de próxima categoria - versão desktop */}
                         {isNextButtonVisible(category.id) && !isLastCategory && (
-                          <div className="mt-4 flex justify-center animate-in fade-in slide-in-from-bottom duration-300">
+                          <div className="mt-4 flex justify-center transition-all duration-300">
                             <Button 
-                              className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 px-6 py-5"
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 px-6 py-5 shadow-lg"
                               onClick={() => navigateToCategory("next")}
                             >
                               Ir para Próxima Categoria
-                              <ArrowRight className="h-5 w-5" />
+                              <ArrowRight className="h-5 w-5 ml-1" />
                             </Button>
                           </div>
                         )}

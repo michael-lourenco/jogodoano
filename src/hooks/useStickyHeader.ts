@@ -5,10 +5,24 @@ import type { StickyHeaderState } from "@/types/voting/interfaces"
 export function useStickyHeader(): StickyHeaderState {
   const [isSticky, setIsSticky] = useState(false)
   const editionsSelectorRef = useRef<HTMLDivElement>(null)
-  const editionsSelectorHeight = useRef<number>(0)
-  const originalTopOffset = useRef<number | null>(null)
+  const [editionsSelectorHeightValue, setEditionsSelectorHeightValue] = useState(0)
+  const [originalTopOffsetValue, setOriginalTopOffsetValue] = useState<number | null>(null)
   const categoryTabsRef = useRef<HTMLDivElement>(null)
-  const categoryTabsHeight = useRef<number>(0)
+  const [categoryTabsHeightValue, setCategoryTabsHeightValue] = useState(0)
+
+  // Criamos objetos que são compatíveis com a interface esperada,
+  // mas usando useState internamente
+  const editionsSelectorHeight = {
+    current: editionsSelectorHeightValue
+  }
+  
+  const originalTopOffset = {
+    current: originalTopOffsetValue
+  }
+  
+  const categoryTabsHeight = {
+    current: categoryTabsHeightValue
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,13 +30,13 @@ export function useStickyHeader(): StickyHeaderState {
         const scrollPosition = window.scrollY
         const selectorRect = editionsSelectorRef.current.getBoundingClientRect()
 
-        if (!originalTopOffset.current && selectorRect.top >= 0) {
-          originalTopOffset.current = selectorRect.top + scrollPosition
-          editionsSelectorHeight.current = selectorRect.height
+        if (!originalTopOffsetValue && selectorRect.top >= 0) {
+          setOriginalTopOffsetValue(selectorRect.top + scrollPosition)
+          setEditionsSelectorHeightValue(selectorRect.height)
         }
 
-        if (originalTopOffset.current) {
-          setIsSticky(scrollPosition > originalTopOffset.current)
+        if (originalTopOffsetValue) {
+          setIsSticky(scrollPosition > originalTopOffsetValue)
         }
       }
     }
@@ -33,20 +47,20 @@ export function useStickyHeader(): StickyHeaderState {
     queueMicrotask(() => {
       if (editionsSelectorRef.current) {
         const selectorRect = editionsSelectorRef.current.getBoundingClientRect()
-        originalTopOffset.current = selectorRect.top + window.scrollY
-        editionsSelectorHeight.current = selectorRect.height
+        setOriginalTopOffsetValue(selectorRect.top + window.scrollY)
+        setEditionsSelectorHeightValue(selectorRect.height)
       }
 
       if (categoryTabsRef.current) {
         const tabsRect = categoryTabsRef.current.getBoundingClientRect()
-        categoryTabsHeight.current = tabsRect.height
+        setCategoryTabsHeightValue(tabsRect.height)
       }
     })
 
     return () => {
       window.removeEventListener("scroll", handleScroll)
     }
-  }, [])
+  }, [originalTopOffsetValue])
 
   return {
     isSticky,

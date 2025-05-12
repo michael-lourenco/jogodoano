@@ -14,7 +14,7 @@ import { useSwipeNavigation } from "@/hooks/useSwipeNavigation"
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation"
 import { useStickyHeader } from "@/hooks/useStickyHeader"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import type { VotingInterfaceProps } from "@/types/voting/interfaces"
 
 export function VotingInterface({
@@ -36,6 +36,9 @@ export function VotingInterface({
   const isMobile = useIsMobile()
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [selectedGame, setSelectedGame] = useState<string | null>(null)
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false)
+  const contentContainerRef = useRef<HTMLDivElement>(null)
+  const [selectedGameElementId, setSelectedGameElementId] = useState<string | null>(null)
 
   const { tabsListRef, localActiveCategory, setLocalActiveCategory } = useVotingInterface({
     activeCategory,
@@ -74,20 +77,65 @@ export function VotingInterface({
     setSelectedGame(votes[selectedEditionId]?.[localActiveCategory] || null)
   }, [localActiveCategory, votes, selectedEditionId])
 
+  // Função para verificar a posição de scroll
+  const checkScrollPosition = useCallback(() => {
+    if (contentContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = contentContainerRef.current
+      const isBottom = scrollTop + clientHeight >= scrollHeight - 20 // 20px de tolerância
+      setIsScrolledToBottom(isBottom)
+    }
+  }, [])
+
+  // Configurar o listener de scroll
+  useEffect(() => {
+    const container = contentContainerRef.current
+    if (container) {
+      container.addEventListener('scroll', checkScrollPosition)
+      checkScrollPosition() // Verificar posição inicial
+      
+      return () => {
+        container.removeEventListener('scroll', checkScrollPosition)
+      }
+    }
+  }, [checkScrollPosition, localActiveCategory])
+
+  // Atualizar a referência ao jogo selecionado
+  const updateSelectedGameRef = useCallback((categoryId: string, gameId: string) => {
+    // Apenas armazenar o ID do elemento para ser processado pelo effect
+    setSelectedGameElementId(`game-${gameId}`)
+  }, [])
+
+  // Efeito para atualizar a referência quando o ID do elemento mudar
+  useEffect(() => {
+    if (selectedGameElementId) {
+      // Dar tempo para a DOM atualizar
+      setTimeout(() => {
+        const selectedGameElement = document.getElementById(selectedGameElementId)
+        if (selectedGameElement) {
+          // Não atribuímos diretamente à propriedade current
+          // Em vez disso, usamos o elemento para realizar as ações necessárias
+          checkScrollPosition()
+        }
+      }, 100)
+    }
+  }, [selectedGameElementId, checkScrollPosition])
+
+  // Usar o callback no handleGameSelection
   const handleGameSelection = (categoryId: string, gameId: string) => {
-    console.log("VotingInterface: handleGameSelection", categoryId, gameId);
+    console.log("VotingInterface: handleGameSelection", categoryId, gameId)
     
-    // Primeiro registramos o voto no sistema (importante fazer isto primeiro)
+    // Primeiro registramos o voto no sistema
     handleVoteInUI(categoryId, gameId)
     
-    // Depois atualizamos o estado local para refletir a seleção
+    // Atualizar o estado local e a referência
     setSelectedGame(gameId)
+    updateSelectedGameRef(categoryId, gameId)
   }
 
   // Debug: observar mudanças em votes
   useEffect(() => {
-    console.log("VotingInterface: votes updated", votes);
-  }, [votes]);
+    console.log("VotingInterface: votes updated", votes)
+  }, [votes])
 
   const navigateToCategory = (direction: "prev" | "next") => {
     const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
@@ -125,7 +173,7 @@ export function VotingInterface({
   const isLastCategory = currentCategoryIndex === categories.length - 1
 
   const isNextButtonVisible = (categoryId: string) => {
-    return votes[selectedEditionId]?.[categoryId] && categoryId === localActiveCategory;
+    return votes[selectedEditionId]?.[categoryId] && categoryId === localActiveCategory
   }
 
   return (
@@ -215,6 +263,7 @@ export function VotingInterface({
                     onTouchEnd={handleTouchEnd}
                     role="region"
                     aria-label="Área de votação"
+                    ref={contentContainerRef}
                   >
                     <div className="relative overflow-hidden">
                       {getCurrentEditionCategories().map((category) => (
@@ -222,9 +271,13 @@ export function VotingInterface({
                           key={category.id}
                           ref={(el) => {
                             if (el) {
-                              categoryRefs.current[category.id] = el
-                            } else {
-                              delete categoryRefs.current[category.id]
+                              categoryRefs.current = {
+                                ...categoryRefs.current,
+                                [category.id]: el
+                              }
+                            } else if (categoryRefs.current[category.id]) {
+                              const { [category.id]: _, ...rest } = categoryRefs.current
+                              categoryRefs.current = rest
                             }
                           }}
                           className={`transition-all duration-300 ease-in-out ${
@@ -255,7 +308,14 @@ export function VotingInterface({
 
                   {/* Botão de próxima categoria - versão móvel */}
                   {isNextButtonVisible(localActiveCategory) && !isLastCategory && (
-                    <div className="fixed bottom-4 left-0 right-0 flex justify-center px-4 z-10 animate-in fade-in slide-in-from-bottom duration-300">
+                    <div 
+                      className={`
+                        ${isScrolledToBottom 
+                          ? "mt-4 mb-2 flex justify-center animate-in fade-in slide-in-from-bottom" 
+                          : "fixed bottom-4 left-0 right-0 px-4 flex justify-center animate-in fade-in slide-in-from-bottom z-10"
+                        } duration-300
+                      `}
+                    >
                       <Button 
                         className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 px-6 py-5 w-full max-w-sm shadow-lg"
                         onClick={() => navigateToCategory("next")}

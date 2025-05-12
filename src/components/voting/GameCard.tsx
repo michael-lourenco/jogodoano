@@ -52,6 +52,7 @@ export function GameCard({ game, isSelected, onSelect }: GameCardProps) {
 
   return (
     <motion.div
+      id={`game-${game.id}`}
       initial="normal"
       animate={localSelected ? "selected" : "normal"}
       variants={cardVariants}

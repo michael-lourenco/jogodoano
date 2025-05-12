@@ -24,7 +24,7 @@ export const votingEditions: VotingEdition[] = [
         id: "gotybr",
         name: "Jogo do Ano BR",
         description: "O melhor jogo brasileiro de 2025",
-        gameIds: ["markofthedeep","enigma-do-medo"],
+        gameIds: ["markofthedeep","enigma-do-medo","aila","e-lich-corporate-souls","no-heroes-here-2","pipistrello-and-the-cursed-yoyo"],
       },
       {
         id: "sportsracing",
@@ -79,7 +79,7 @@ export const votingEditions: VotingEdition[] = [
         name: "Melhor Multiplayer",
         description:
           "Jogos com experiências multijogador excepcionais, cooperativas ou competitivas",
-        gameIds: ["marvelrivals"],
+        gameIds: ["marvelrivals","monsterhunterwilds", "splitfiction","killing-floor-3"],
       },
       {
         id: "action",

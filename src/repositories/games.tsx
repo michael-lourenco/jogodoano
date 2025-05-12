@@ -348,7 +348,7 @@ export const games: Game[] = [
   { id: "john-carpenters-toxic-commando", title: "John Carpenter’s Toxic Commando", imageUrl: "/john-carpenters-toxic-commando.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "judas", title: "Judas", imageUrl: "/judas.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "junxions", title: "Junxions", imageUrl: "/junxions.jpg?height=200&width=350", developer: "DEVELOPER" },
-  { id: "killing-floor-3", title: "Killing Floor 3", imageUrl: "/killing-floor-3.jpg?height=200&width=350", developer: "DEVELOPER" },
+  { id: "killing-floor-3", title: "Killing Floor 3", imageUrl: "/killing-floor-3.jpg?height=200&width=350", developer: "Tripwire Interactive" },
   { id: "kristala", title: "Kristala", imageUrl: "/kristala.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "liegecraft", title: "Liegecraft", imageUrl: "/liegecraft.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "lost-in-random-the-eternal-die", title: "Lost in Random: The Eternal Die", imageUrl: "/lost-in-random-the-eternal-die.jpg?height=200&width=350", developer: "DEVELOPER" },
@@ -436,6 +436,9 @@ export const games: Game[] = [
   { id: "knock-off", title: "Knock Off", imageUrl: "/knock-off.jpg?height=200&width=350", developer: "Mechaghidora" },
   { id: "hunter-x-hunter-nen-x-impact", title: "Hunter x Hunter Nen x Impact", imageUrl: "/hunter-x-hunter-nen-x-impact.jpg?height=200&width=350", developer: "Bushiroad Games" },
   { id: "enigma-do-medo", title: "Enigma do Medo", imageUrl: "/enigma-do-medo.jpg?height=200&width=350", developer: "Dumativa, Cellbit" },
-
+  { id: "aila", title: "A.I.L.A", imageUrl: "/aila.jpg?height=200&width=350", developer: "Pulsatrix Studios" },
+  { id: "e-lich-corporate-souls", title: "E-Lich:Corporate Souls", imageUrl: "/e-lich-corporate-souls.jpg?height=200&width=350", developer: "JohnnyR Designs" },
+  { id: "no-heroes-here-2", title: "No Heroes Here 2", imageUrl: "/no-heroes-here-2.jpg?height=200&width=350", developer:"Mad Mimic"  },
+  { id: "pipistrello-and-the-cursed-yoyo", title: "Pipistrello and the Cursed Yoyo", imageUrl: "/pipistrello-and-the-cursed-yoyo.png?height=200&width=350", developer: "Pocket Trap" },
 ]
   

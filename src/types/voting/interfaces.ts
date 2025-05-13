@@ -33,9 +33,10 @@ export interface VotingInterfaceHookProps {
 export interface SwipeNavigationProps {
   getCurrentEditionCategories: () => Category[]
   localActiveCategory: string
-  setLocalActiveCategory: (categoryId: string) => void
-  setActiveCategory: (categoryId: string) => void
+  setLocalActiveCategory: (category: string) => void
+  setActiveCategory: (category: string) => void
   categoryRefs: React.MutableRefObject<Record<string, HTMLDivElement | null>>
+  onCategoryChange?: (categoryId: string) => void
 }
 
 export interface StickyHeaderState {

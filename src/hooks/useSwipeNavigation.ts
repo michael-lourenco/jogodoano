@@ -9,6 +9,7 @@ export function useSwipeNavigation({
   setLocalActiveCategory,
   setActiveCategory,
   categoryRefs,
+  onCategoryChange,
 }: SwipeNavigationProps) {
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
@@ -115,6 +116,11 @@ export function useSwipeNavigation({
           setTimeout(() => {
             setLocalActiveCategory(newCategory.id)
             setActiveCategory(newCategory.id)
+            
+            // Chamar o callback com o ID da nova categoria, se fornecido
+            if (onCategoryChange) {
+              setTimeout(() => onCategoryChange(newCategory.id), 100);
+            }
           }, 50)
         }
       }

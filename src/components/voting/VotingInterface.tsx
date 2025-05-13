@@ -50,13 +50,148 @@ export function VotingInterface({
   })
 
   const { categoryRefs } = useCategoryNavigation()
-
+  
+  // 1. Primeiro, declaramos a função applyHeaderHighlight que não depende de nada
+  const applyHeaderHighlight = useCallback((headerElement: HTMLElement) => {
+    headerElement.classList.add('bg-primary/20');
+    headerElement.style.transition = 'all 0.4s ease';
+    headerElement.style.transform = 'scale(1.05)';
+    
+    // Destacar o título dentro do cabeçalho
+    const titleElement = headerElement.querySelector('h2');
+    if (titleElement) {
+      titleElement.style.fontSize = '1.3em';
+      titleElement.style.color = 'var(--primary)';
+      titleElement.style.fontWeight = 'bold';
+    }
+    
+    // Remover os efeitos visuais após um tempo
+    setTimeout(() => {
+      headerElement.classList.remove('bg-primary/20');
+      headerElement.style.transform = '';
+      
+      if (titleElement) {
+        titleElement.style.fontSize = '';
+        titleElement.style.color = '';
+        titleElement.style.fontWeight = '';
+      }
+    }, 1200);
+  }, []);
+  
+  // 2. Em seguida, declaramos proceedWithNormalScrollMethods que depende de applyHeaderHighlight
+  const proceedWithNormalScrollMethods = useCallback((categoryId: string) => {
+    // Esperar um momento para garantir que a DOM está atualizada
+    setTimeout(() => {
+      // Primeiro, vamos garantir que o cabeçalho existe
+      const headerElement = document.getElementById(`category-header-${categoryId}`);
+      console.log("Elemento do cabeçalho encontrado:", !!headerElement);
+      
+      if (!headerElement) {
+        console.warn(`Cabeçalho da categoria ${categoryId} não encontrado!`);
+        return;
+      }
+      
+      if (headerElement && mobileMainContainerRef.current) {
+        // Obter a posição do cabeçalho em relação ao viewport
+        const headerRect = headerElement.getBoundingClientRect();
+        const containerRect = mobileMainContainerRef.current.getBoundingClientRect();
+        
+        console.log("Posições e dimensões:", {
+          header: {
+            top: headerRect.top,
+            bottom: headerRect.bottom,
+            height: headerRect.height,
+          },
+          container: {
+            top: containerRect.top,
+            scrollTop: mobileMainContainerRef.current.scrollTop,
+          },
+          window: {
+            scrollY: window.scrollY,
+            innerHeight: window.innerHeight,
+          }
+        });
+        
+        // Métodos diferentes para garantir que o cabeçalho seja visível
+        
+        // Método 1: ScrollIntoView direto
+        console.log("Aplicando scrollIntoView no cabeçalho");
+        headerElement.scrollIntoView({
+          behavior: 'auto',
+          block: 'start'
+        });
+        
+        // Método 2: Scroll para a posição calculada
+        const targetPosition = window.scrollY + headerRect.top - 100; // 100px de offset
+        console.log(`Aplicando window.scrollTo para posição ${targetPosition}`);
+        window.scrollTo({
+          top: targetPosition,
+          behavior: 'auto'
+        });
+        
+        // Método 3: Se os métodos anteriores não funcionarem, tentar usando o scroll do container
+        if (contentContainerRef.current) {
+          console.log("Resetando scrollTop do contentContainer para 0");
+          contentContainerRef.current.scrollTop = 0;
+        }
+        
+        // Destacar visualmente o cabeçalho com uma borda mais evidente para debug
+        headerElement.style.border = '2px solid var(--primary)';
+        
+        // Aplicar destaque visual normal
+        applyHeaderHighlight(headerElement);
+        
+        // Remover a borda de debug após um tempo
+        setTimeout(() => {
+          headerElement.style.border = '';
+        }, 1500);
+      }
+    }, 100);
+  }, [applyHeaderHighlight]);
+  
+  // 3. Por fim, declaramos ensureHeaderVisible que depende de proceedWithNormalScrollMethods
+  const ensureHeaderVisible = useCallback((categoryId: string) => {
+    // Esta função foca especificamente em garantir que o cabeçalho esteja visível na versão mobile
+    if (!isMobile) return; // Só precisamos disso no mobile
+    
+    console.log(`Tentando garantir que o cabeçalho da categoria ${categoryId} seja visível`);
+    
+    // Método alternativo: usar location.hash para forçar o scroll diretamente para o elemento
+    // Este é um método mais agressivo, mas pode funcionar quando outros falham
+    if (categoryId) {
+      const currentHash = window.location.hash;
+      
+      // Usar um setTimeout para permitir que a renderização ocorra primeiro
+      setTimeout(() => {
+        // Definir o hash para o ID do cabeçalho
+        window.location.hash = `category-header-${categoryId}`;
+        
+        // Usar um timeout adicional para garantir que o scroll aconteça
+        setTimeout(() => {
+          // Restaurar o hash original, se necessário
+          if (currentHash) {
+            history.replaceState(null, '', currentHash);
+          } else {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
+          
+          // Agora proceder com os métodos normais
+          proceedWithNormalScrollMethods(categoryId);
+        }, 50);
+      }, 50);
+    } else {
+      proceedWithNormalScrollMethods(categoryId);
+    }
+  }, [isMobile, proceedWithNormalScrollMethods]);
+  
+  // 4. Agora podemos usar a função no hook
   const { handleTouchStart, handleTouchMove, handleTouchEnd, handleCategoryTransition, transitionDuration } = useSwipeNavigation({
     getCurrentEditionCategories,
     localActiveCategory,
     setLocalActiveCategory,
     setActiveCategory,
     categoryRefs,
+    onCategoryChange: ensureHeaderVisible, // Agora a função já está declarada antes de ser usada
   })
 
   // Add keyboard navigation
@@ -427,152 +562,6 @@ export function VotingInterface({
       }
     }, 100);
   };
-
-  // Nova função para garantir que o cabeçalho da categoria esteja visível na versão mobile
-  const ensureHeaderVisible = useCallback((categoryId: string) => {
-    // Esta função foca especificamente em garantir que o cabeçalho esteja visível na versão mobile
-    if (!isMobile) return; // Só precisamos disso no mobile
-    
-    console.log(`Tentando garantir que o cabeçalho da categoria ${categoryId} seja visível`);
-    
-    // Método alternativo: usar location.hash para forçar o scroll diretamente para o elemento
-    // Este é um método mais agressivo, mas pode funcionar quando outros falham
-    if (categoryId) {
-      const currentHash = window.location.hash;
-      
-      // Usar um setTimeout para permitir que a renderização ocorra primeiro
-      setTimeout(() => {
-        // Definir o hash para o ID do cabeçalho
-        window.location.hash = `category-header-${categoryId}`;
-        
-        // Usar um timeout adicional para garantir que o scroll aconteça
-        setTimeout(() => {
-          // Restaurar o hash original, se necessário
-          if (currentHash) {
-            history.replaceState(null, '', currentHash);
-          } else {
-            history.replaceState(null, '', window.location.pathname + window.location.search);
-          }
-          
-          // Agora proceder com os métodos normais
-          proceedWithNormalScrollMethods(categoryId);
-        }, 50);
-      }, 50);
-    } else {
-      proceedWithNormalScrollMethods(categoryId);
-    }
-  }, [isMobile, isSticky]);
-  
-  // Função para aplicar o destaque visual ao cabeçalho
-  const applyHeaderHighlight = useCallback((headerElement: HTMLElement) => {
-    headerElement.classList.add('bg-primary/20');
-    headerElement.style.transition = 'all 0.4s ease';
-    headerElement.style.transform = 'scale(1.05)';
-    
-    // Destacar o título dentro do cabeçalho
-    const titleElement = headerElement.querySelector('h2');
-    if (titleElement) {
-      titleElement.style.fontSize = '1.3em';
-      titleElement.style.color = 'var(--primary)';
-      titleElement.style.fontWeight = 'bold';
-    }
-    
-    // Remover os efeitos visuais após um tempo
-    setTimeout(() => {
-      headerElement.classList.remove('bg-primary/20');
-      headerElement.style.transform = '';
-      
-      if (titleElement) {
-        titleElement.style.fontSize = '';
-        titleElement.style.color = '';
-        titleElement.style.fontWeight = '';
-      }
-    }, 1200);
-  }, []);
-  
-  // Função auxiliar para separar os métodos "normais" de scroll
-  const proceedWithNormalScrollMethods = useCallback((categoryId: string) => {
-    // Esperar um momento para garantir que a DOM está atualizada
-    setTimeout(() => {
-      // Primeiro, vamos garantir que o cabeçalho existe
-      const headerElement = document.getElementById(`category-header-${categoryId}`);
-      console.log("Elemento do cabeçalho encontrado:", !!headerElement);
-      
-      if (!headerElement) {
-        console.warn(`Cabeçalho da categoria ${categoryId} não encontrado!`);
-        return;
-      }
-      
-      if (headerElement && mobileMainContainerRef.current) {
-        // Obter a posição do cabeçalho em relação ao viewport
-        const headerRect = headerElement.getBoundingClientRect();
-        const containerRect = mobileMainContainerRef.current.getBoundingClientRect();
-        
-        console.log("Posições e dimensões:", {
-          header: {
-            top: headerRect.top,
-            bottom: headerRect.bottom,
-            height: headerRect.height,
-          },
-          container: {
-            top: containerRect.top,
-            scrollTop: mobileMainContainerRef.current.scrollTop,
-          },
-          window: {
-            scrollY: window.scrollY,
-            innerHeight: window.innerHeight,
-          }
-        });
-        
-        // Métodos diferentes para garantir que o cabeçalho seja visível
-        
-        // Método 1: ScrollIntoView direto
-        console.log("Aplicando scrollIntoView no cabeçalho");
-        headerElement.scrollIntoView({
-          behavior: 'auto',
-          block: 'start'
-        });
-        
-        // Método 2: Scroll para a posição calculada
-        const targetPosition = window.scrollY + headerRect.top - 100; // 100px de offset
-        console.log(`Aplicando window.scrollTo para posição ${targetPosition}`);
-        window.scrollTo({
-          top: targetPosition,
-          behavior: 'auto'
-        });
-        
-        // Método 3: Se os métodos anteriores não funcionarem, tentar usando o scroll do container
-        if (contentContainerRef.current) {
-          console.log("Resetando scrollTop do contentContainer para 0");
-          contentContainerRef.current.scrollTop = 0;
-        }
-        
-        // Destacar visualmente o cabeçalho com uma borda mais evidente para debug
-        headerElement.style.border = '2px solid var(--primary)';
-        
-        // Aplicar destaque visual normal
-        applyHeaderHighlight(headerElement);
-        
-        // Remover a borda de debug após um tempo
-        setTimeout(() => {
-          headerElement.style.border = '';
-        }, 1500);
-      }
-    }, 100);
-  }, [applyHeaderHighlight]);
-
-  // Atualizar a função focusCategoryHeader para usar ensureHeaderVisible
-  const focusCategoryHeader = useCallback((categoryId: string) => {
-    setTimeout(() => {
-      if (isMobile) {
-        // Para mobile, usamos nossa nova função que garante visibilidade do cabeçalho
-        ensureHeaderVisible(categoryId);
-      } else {
-        // Na versão desktop, continuamos usando scrollToCategoryTop
-        scrollToCategoryTop();
-      }
-    }, 20);
-  }, [isMobile, scrollToCategoryTop, ensureHeaderVisible]);
 
   const navigateToNextCategory = () => {
     const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)

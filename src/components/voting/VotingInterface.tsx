@@ -256,37 +256,9 @@ export function VotingInterface({
 
   // Função para calcular a posição vertical ideal do botão com base no jogo selecionado
   const calculateButtonPosition = useCallback(() => {
-    if (selectedGameElementId && scrollPosition !== 'bottom') {
-      const selectedElement = document.getElementById(selectedGameElementId);
-      if (selectedElement) {
-        // Calcular a posição do elemento selecionado em relação à viewport
-        const rect = selectedElement.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        
-        // Se o elemento estiver visível na tela
-        if (rect.top >= 0 && rect.bottom <= viewportHeight) {
-          // Posicionar o botão abaixo do jogo selecionado, mas não muito perto do fim da tela
-          const bottomSpace = viewportHeight - rect.bottom;
-          if (bottomSpace < 150) {
-            // Se não houver espaço suficiente abaixo, posicione no fim da tela
-            return { bottom: '10vh' };
-          } else {
-            // Posicione o botão 20px abaixo do jogo selecionado
-            return { top: `${rect.bottom + 20}px`, bottom: 'auto' };
-          }
-        } else if (rect.top < 0 && rect.bottom > 0) {
-          // O elemento está parcialmente visível no topo
-          return { bottom: '40vh' };
-        } else if (rect.top < viewportHeight && rect.bottom > viewportHeight) {
-          // O elemento está parcialmente visível na parte inferior
-          return { bottom: '10vh' };
-        }
-      }
-    }
-    
-    // Posição padrão com base na posição de rolagem
-    return { bottom: scrollPosition === 'top' ? '30vh' : '40vh' };
-  }, [selectedGameElementId, scrollPosition]);
+    // Posição fixa logo acima do Footer
+    return { bottom: '4rem' }; // 4rem corresponde à altura do Footer (h-16 = 4rem)
+  }, []);
 
   // Atualizar a referência ao jogo selecionado
   const updateSelectedGameRef = useCallback((categoryId: string, gameId: string) => {
@@ -491,7 +463,10 @@ export function VotingInterface({
     }
   }, [localActiveCategory]);
 
-  // Atualizar a forma como navegamos entre categorias para garantir consistência
+  // Adicionar estado para controlar a animação de saída do botão
+  const [isButtonExiting, setIsButtonExiting] = useState(false);
+
+  // Modificar a função navigateToCategory para incluir a animação de saída
   const navigateToCategory = (direction: "prev" | "next") => {
     const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
 
@@ -520,24 +495,45 @@ export function VotingInterface({
     } else if (direction === "next" && currentCategoryIndex < categories.length - 1) {
       const nextCategory = categories[currentCategoryIndex + 1]
       
-      // Começar a transição visual
-      handleCategoryTransition(localActiveCategory, nextCategory.id)
-      
-      // Atualizar estados logo em seguida
-      setLocalActiveCategory(nextCategory.id)
-      setActiveCategory(nextCategory.id)
-      
-      // Dar tempo para os estados serem atualizados antes de tentar rolar
-      console.log(`Navegando para próxima categoria: ${nextCategory.id}`);
-      setTimeout(() => {
-        if (isMobile) {
-          // Para mobile, tentar várias abordagens para garantir que o cabeçalho seja visível
-          ensureHeaderVisible(nextCategory.id);
-        } else {
-          // Para desktop, a abordagem atual já funciona bem
-          scrollToCategoryTop();
-        }
-      }, 100);
+      // Animar a saída do botão antes da transição
+      if (isMobile && isNextButtonVisible(localActiveCategory)) {
+        setIsButtonExiting(true);
+        
+        // Esperar a animação terminar antes de mudar de categoria
+        setTimeout(() => {
+          // Começar a transição visual
+          handleCategoryTransition(localActiveCategory, nextCategory.id);
+          
+          // Atualizar estados logo em seguida
+          setLocalActiveCategory(nextCategory.id);
+          setActiveCategory(nextCategory.id);
+          
+          // Resetar o estado do botão
+          setIsButtonExiting(false);
+          
+          // Dar tempo para os estados serem atualizados antes de tentar rolar
+          setTimeout(() => {
+            if (isMobile) {
+              ensureHeaderVisible(nextCategory.id);
+            } else {
+              scrollToCategoryTop();
+            }
+          }, 100);
+        }, 300); // Tempo igual à duração da animação slide-down
+      } else {
+        // Comportamento padrão (sem animação)
+        handleCategoryTransition(localActiveCategory, nextCategory.id);
+        setLocalActiveCategory(nextCategory.id);
+        setActiveCategory(nextCategory.id);
+        
+        setTimeout(() => {
+          if (isMobile) {
+            ensureHeaderVisible(nextCategory.id);
+          } else {
+            scrollToCategoryTop();
+          }
+        }, 100);
+      }
     }
   }
 
@@ -713,12 +709,12 @@ export function VotingInterface({
                   {isNextButtonVisible(localActiveCategory) && !isLastCategory && (
                     <div 
                       className={`
-                        ${scrollPosition === 'bottom'
-                          ? "mt-4 mb-2 flex justify-center" 
-                          : "fixed left-0 right-0 px-4 flex justify-center z-10"
-                        } transition-all duration-300
+                        fixed left-0 right-0 px-4 flex justify-center z-10 transition-all duration-300
+                        ${isButtonExiting ? 'animate-slide-down' : 'animate-slide-up'}
                       `}
-                      style={calculateButtonPosition()}
+                      style={{
+                        bottom: '4rem', // Posiciona logo acima do Footer
+                      }}
                     >
                       <Button 
                         className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 px-6 py-5 w-full max-w-sm shadow-lg"

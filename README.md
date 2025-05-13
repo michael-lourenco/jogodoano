@@ -81,8 +81,8 @@ O "Jogo do Ano" é um aplicativo web que permite aos usuários votar em jogos po
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/jogodoano-cursor.git
-cd jogodoano-cursor
+git clone https://github.com/seu-usuario/jogodoano.git
+cd jogodoano
 ```
 
 2. Instale as dependências:

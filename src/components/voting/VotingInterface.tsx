@@ -39,6 +39,7 @@ export function VotingInterface({
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(false)
   const contentContainerRef = useRef<HTMLDivElement>(null)
   const [selectedGameElementId, setSelectedGameElementId] = useState<string | null>(null)
+  const mobileMainContainerRef = useRef<HTMLDivElement>(null)
 
   const { tabsListRef, localActiveCategory, setLocalActiveCategory } = useVotingInterface({
     activeCategory,
@@ -229,14 +230,37 @@ export function VotingInterface({
       const headerElement = document.getElementById(`category-header-${localActiveCategory}`);
       
       if (isMobile && contentContainerRef.current) {
-        // Na versão mobile, rolar o container de conteúdo para o topo
-        contentContainerRef.current.scrollTop = 0;
+        // Na versão mobile, além de rolar para o topo, também destacamos visualmente o cabeçalho
         
-        // Adicionar um efeito visual de destaque ao cabeçalho para chamar atenção
+        // Verificar se o headerElement está dentro do contentContainerRef
+        // Se estiver, usamos o scrollTop para manipular diretamente
         if (headerElement) {
+          // Destacar visualmente o cabeçalho
           headerElement.classList.add('bg-primary/10');
+          headerElement.style.transition = 'all 0.4s ease';
+          headerElement.style.transform = 'scale(1.05)';
+          headerElement.style.boxShadow = '0 0 15px rgba(var(--primary), 0.3)';
+          
+          // Garantir que o cabeçalho esteja no topo visível
+          contentContainerRef.current.scrollTop = 0;
+          
+          // Encontrar o título dentro do cabeçalho para destacá-lo
+          const titleElement = headerElement.querySelector('h2');
+          if (titleElement) {
+            titleElement.style.transition = 'all 0.4s ease';
+            titleElement.style.textShadow = '0 0 5px rgba(var(--primary), 0.5)';
+            titleElement.style.fontSize = '1.3em';  // Aumentar temporariamente o tamanho da fonte
+          }
+          
           setTimeout(() => {
             headerElement.classList.remove('bg-primary/10');
+            headerElement.style.transform = '';
+            headerElement.style.boxShadow = '';
+            
+            if (titleElement) {
+              titleElement.style.textShadow = '';
+              titleElement.style.fontSize = '';
+            }
           }, 1000);
         }
       } else {
@@ -255,8 +279,27 @@ export function VotingInterface({
           
           // Adicionar um efeito visual de destaque ao cabeçalho
           headerElement.classList.add('bg-primary/10');
+          headerElement.style.transition = 'all 0.4s ease';
+          headerElement.style.transform = 'scale(1.05)';
+          headerElement.style.boxShadow = '0 0 15px rgba(var(--primary), 0.3)';
+          
+          // Encontrar o título dentro do cabeçalho para destacá-lo
+          const titleElement = headerElement.querySelector('h2');
+          if (titleElement) {
+            titleElement.style.transition = 'all 0.4s ease';
+            titleElement.style.textShadow = '0 0 5px rgba(var(--primary), 0.5)';
+            titleElement.style.fontSize = '1.3em';  // Aumentar temporariamente o tamanho da fonte
+          }
+          
           setTimeout(() => {
             headerElement.classList.remove('bg-primary/10');
+            headerElement.style.transform = '';
+            headerElement.style.boxShadow = '';
+            
+            if (titleElement) {
+              titleElement.style.textShadow = '';
+              titleElement.style.fontSize = '';
+            }
           }, 1000);
           
           // Rolar para a posição do elemento menos o offset
@@ -276,31 +319,260 @@ export function VotingInterface({
         }
       }
     }, 150); // Delay para garantir que os elementos estejam renderizados
-  }, [isMobile, isSticky, localActiveCategory]);
+  }, [isMobile, isSticky, localActiveCategory, editionsSelectorHeight, tabsListRef]);
 
+  // Adicionar uma função específica para resetar o scroll mobile
+  const resetMobileScroll = useCallback(() => {
+    if (contentContainerRef.current) {
+      // Em vez de apenas scrollar para o topo, vamos procurar e focar no cabeçalho
+      const headerElement = document.getElementById(`category-header-${localActiveCategory}`);
+      
+      if (headerElement) {
+        // 1. Usar scrollIntoView para garantir que o cabeçalho esteja visível
+        headerElement.scrollIntoView({ 
+          block: 'start', 
+          inline: 'nearest',
+          behavior: 'auto'
+        });
+        
+        // 2. Adicionalmente, podemos forçar o container a rolar para o topo
+        contentContainerRef.current.scrollTop = 0;
+        
+        // 3. Usar setTimeout para garantir que o scrollIntoView tenha tempo para funcionar
+        setTimeout(() => {
+          // Verificar se o scrollIntoView funcionou corretamente
+          const headerRect = headerElement.getBoundingClientRect();
+          
+          // Se o cabeçalho ainda não estiver no topo visível, tente novamente
+          if (headerRect.top > 100) {  // tolerância de 100px
+            headerElement.scrollIntoView({ 
+              block: 'start', 
+              inline: 'nearest',
+              behavior: 'auto'
+            });
+          }
+        }, 50);
+      }
+    }
+  }, [localActiveCategory]);
+
+  // Atualizar a forma como navegamos entre categorias para garantir consistência
   const navigateToCategory = (direction: "prev" | "next") => {
     const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
 
     if (direction === "prev" && currentCategoryIndex > 0) {
       const prevCategory = categories[currentCategoryIndex - 1]
+      
+      // Começar a transição visual
       handleCategoryTransition(localActiveCategory, prevCategory.id)
+      
+      // Atualizar estados logo em seguida
+      setLocalActiveCategory(prevCategory.id)
+      setActiveCategory(prevCategory.id)
+      
+      // Dar tempo para os estados serem atualizados antes de tentar rolar
+      console.log(`Navegando para categoria anterior: ${prevCategory.id}`);
       setTimeout(() => {
-        setLocalActiveCategory(prevCategory.id)
-        setActiveCategory(prevCategory.id)
-        // Rolar para o topo da categoria após a mudança
-        scrollToCategoryTop();
-      }, 50)
+        if (isMobile) {
+          // Para mobile, tentar várias abordagens para garantir que o cabeçalho seja visível
+          ensureHeaderVisible(prevCategory.id);
+        } else {
+          // Para desktop, a abordagem atual já funciona bem
+          scrollToCategoryTop();
+        }
+      }, 100);
+      
     } else if (direction === "next" && currentCategoryIndex < categories.length - 1) {
       const nextCategory = categories[currentCategoryIndex + 1]
+      
+      // Começar a transição visual
       handleCategoryTransition(localActiveCategory, nextCategory.id)
+      
+      // Atualizar estados logo em seguida
+      setLocalActiveCategory(nextCategory.id)
+      setActiveCategory(nextCategory.id)
+      
+      // Dar tempo para os estados serem atualizados antes de tentar rolar
+      console.log(`Navegando para próxima categoria: ${nextCategory.id}`);
       setTimeout(() => {
-        setLocalActiveCategory(nextCategory.id)
-        setActiveCategory(nextCategory.id)
-        // Rolar para o topo da categoria após a mudança
-        scrollToCategoryTop();
-      }, 50)
+        if (isMobile) {
+          // Para mobile, tentar várias abordagens para garantir que o cabeçalho seja visível
+          ensureHeaderVisible(nextCategory.id);
+        } else {
+          // Para desktop, a abordagem atual já funciona bem
+          scrollToCategoryTop();
+        }
+      }, 100);
     }
   }
+
+  // Ajuste no comportamento do clique nos seletores de categoria na versão mobile
+  const handleCategoryClick = (categoryId: string) => {
+    if (categoryId === localActiveCategory) return;
+    
+    // Começar a transição visual
+    handleCategoryTransition(localActiveCategory, categoryId);
+    
+    // Atualizar estados logo em seguida
+    setLocalActiveCategory(categoryId);
+    setActiveCategory(categoryId);
+    
+    // Dar tempo para os estados serem atualizados
+    console.log(`Clicou na categoria: ${categoryId}`);
+    setTimeout(() => {
+      if (isMobile) {
+        ensureHeaderVisible(categoryId);
+      } else {
+        scrollToCategoryTop();
+      }
+    }, 100);
+  };
+
+  // Nova função para garantir que o cabeçalho da categoria esteja visível na versão mobile
+  const ensureHeaderVisible = useCallback((categoryId: string) => {
+    // Esta função foca especificamente em garantir que o cabeçalho esteja visível na versão mobile
+    if (!isMobile) return; // Só precisamos disso no mobile
+    
+    console.log(`Tentando garantir que o cabeçalho da categoria ${categoryId} seja visível`);
+    
+    // Método alternativo: usar location.hash para forçar o scroll diretamente para o elemento
+    // Este é um método mais agressivo, mas pode funcionar quando outros falham
+    if (categoryId) {
+      const currentHash = window.location.hash;
+      
+      // Usar um setTimeout para permitir que a renderização ocorra primeiro
+      setTimeout(() => {
+        // Definir o hash para o ID do cabeçalho
+        window.location.hash = `category-header-${categoryId}`;
+        
+        // Usar um timeout adicional para garantir que o scroll aconteça
+        setTimeout(() => {
+          // Restaurar o hash original, se necessário
+          if (currentHash) {
+            history.replaceState(null, '', currentHash);
+          } else {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
+          
+          // Agora proceder com os métodos normais
+          proceedWithNormalScrollMethods(categoryId);
+        }, 50);
+      }, 50);
+    } else {
+      proceedWithNormalScrollMethods(categoryId);
+    }
+  }, [isMobile, isSticky]);
+  
+  // Função para aplicar o destaque visual ao cabeçalho
+  const applyHeaderHighlight = useCallback((headerElement: HTMLElement) => {
+    headerElement.classList.add('bg-primary/20');
+    headerElement.style.transition = 'all 0.4s ease';
+    headerElement.style.transform = 'scale(1.05)';
+    
+    // Destacar o título dentro do cabeçalho
+    const titleElement = headerElement.querySelector('h2');
+    if (titleElement) {
+      titleElement.style.fontSize = '1.3em';
+      titleElement.style.color = 'var(--primary)';
+      titleElement.style.fontWeight = 'bold';
+    }
+    
+    // Remover os efeitos visuais após um tempo
+    setTimeout(() => {
+      headerElement.classList.remove('bg-primary/20');
+      headerElement.style.transform = '';
+      
+      if (titleElement) {
+        titleElement.style.fontSize = '';
+        titleElement.style.color = '';
+        titleElement.style.fontWeight = '';
+      }
+    }, 1200);
+  }, []);
+  
+  // Função auxiliar para separar os métodos "normais" de scroll
+  const proceedWithNormalScrollMethods = useCallback((categoryId: string) => {
+    // Esperar um momento para garantir que a DOM está atualizada
+    setTimeout(() => {
+      // Primeiro, vamos garantir que o cabeçalho existe
+      const headerElement = document.getElementById(`category-header-${categoryId}`);
+      console.log("Elemento do cabeçalho encontrado:", !!headerElement);
+      
+      if (!headerElement) {
+        console.warn(`Cabeçalho da categoria ${categoryId} não encontrado!`);
+        return;
+      }
+      
+      if (headerElement && mobileMainContainerRef.current) {
+        // Obter a posição do cabeçalho em relação ao viewport
+        const headerRect = headerElement.getBoundingClientRect();
+        const containerRect = mobileMainContainerRef.current.getBoundingClientRect();
+        
+        console.log("Posições e dimensões:", {
+          header: {
+            top: headerRect.top,
+            bottom: headerRect.bottom,
+            height: headerRect.height,
+          },
+          container: {
+            top: containerRect.top,
+            scrollTop: mobileMainContainerRef.current.scrollTop,
+          },
+          window: {
+            scrollY: window.scrollY,
+            innerHeight: window.innerHeight,
+          }
+        });
+        
+        // Métodos diferentes para garantir que o cabeçalho seja visível
+        
+        // Método 1: ScrollIntoView direto
+        console.log("Aplicando scrollIntoView no cabeçalho");
+        headerElement.scrollIntoView({
+          behavior: 'auto',
+          block: 'start'
+        });
+        
+        // Método 2: Scroll para a posição calculada
+        const targetPosition = window.scrollY + headerRect.top - 100; // 100px de offset
+        console.log(`Aplicando window.scrollTo para posição ${targetPosition}`);
+        window.scrollTo({
+          top: targetPosition,
+          behavior: 'auto'
+        });
+        
+        // Método 3: Se os métodos anteriores não funcionarem, tentar usando o scroll do container
+        if (contentContainerRef.current) {
+          console.log("Resetando scrollTop do contentContainer para 0");
+          contentContainerRef.current.scrollTop = 0;
+        }
+        
+        // Destacar visualmente o cabeçalho com uma borda mais evidente para debug
+        headerElement.style.border = '2px solid var(--primary)';
+        
+        // Aplicar destaque visual normal
+        applyHeaderHighlight(headerElement);
+        
+        // Remover a borda de debug após um tempo
+        setTimeout(() => {
+          headerElement.style.border = '';
+        }, 1500);
+      }
+    }, 100);
+  }, [applyHeaderHighlight]);
+
+  // Atualizar a função focusCategoryHeader para usar ensureHeaderVisible
+  const focusCategoryHeader = useCallback((categoryId: string) => {
+    setTimeout(() => {
+      if (isMobile) {
+        // Para mobile, usamos nossa nova função que garante visibilidade do cabeçalho
+        ensureHeaderVisible(categoryId);
+      } else {
+        // Na versão desktop, continuamos usando scrollToCategoryTop
+        scrollToCategoryTop();
+      }
+    }, 20);
+  }, [isMobile, scrollToCategoryTop, ensureHeaderVisible]);
 
   const navigateToNextCategory = () => {
     const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
@@ -354,7 +626,7 @@ export function VotingInterface({
               />
 
               {isMobile ? (
-                <div className="mb-6 relative">
+                <div className="mb-6 relative" ref={mobileMainContainerRef}>
                   {/* Category selector tabs */}
                   <div
                     ref={categoryTabsRef}
@@ -366,17 +638,7 @@ export function VotingInterface({
                       {getCurrentEditionCategories().map((category) => (
                         <button
                           key={category.id}
-                          onClick={() => {
-                            if (category.id !== localActiveCategory) {
-                              handleCategoryTransition(localActiveCategory, category.id)
-                              setTimeout(() => {
-                                setLocalActiveCategory(category.id)
-                                setActiveCategory(category.id)
-                                // Rolar para o topo da categoria após clicar diretamente na categoria
-                                scrollToCategoryTop();
-                              }, 50)
-                            }
-                          }}
+                          onClick={() => handleCategoryClick(category.id)}
                           className={`px-3 py-2 text-sm whitespace-nowrap rounded-md flex items-center ${
                             localActiveCategory === category.id ? "bg-primary text-primary-foreground" : "bg-muted/30"
                           } ${votes[selectedEditionId]?.[category.id] ? "text-success" : ""}`}
@@ -397,7 +659,12 @@ export function VotingInterface({
                   )}
 
                   {/* Category heading and description */}
-                  <div className="mb-3 text-center" id={`category-header-${currentCategory?.id}`}>
+                  <div 
+                    className="mb-3 text-center" 
+                    id={`category-header-${currentCategory?.id}`}
+                    data-category-header="true"
+                    style={{ scrollMarginTop: '120px' }}
+                  >
                     <h2 className="text-xl font-bold text-primary mb-1 scroll-mt-20">{currentCategory?.name}</h2>
                     <p className="text-sm text-muted-foreground">{currentCategory?.description}</p>
                   </div>
@@ -477,17 +744,11 @@ export function VotingInterface({
               ) : (
                 // Desktop view with improved accessibility
                 <div className="hidden md:block mb-6">
-                  <Tabs value={localActiveCategory} onValueChange={(newValue) => {
-                    if (newValue !== localActiveCategory) {
-                      handleCategoryTransition(localActiveCategory, newValue)
-                      setTimeout(() => {
-                        setLocalActiveCategory(newValue)
-                        setActiveCategory(newValue)
-                        // Rolar para o topo da categoria após a mudança na versão desktop
-                        scrollToCategoryTop();
-                      }, 50)
-                    }
-                  }} className="w-full">
+                  <Tabs 
+                    value={localActiveCategory} 
+                    onValueChange={(newValue) => handleCategoryClick(newValue)} 
+                    className="w-full"
+                  >
                     <TabsList
                       ref={tabsListRef}
                       className={`w-full overflow-x-auto flex-nowrap scroll-smooth p-1 bg-muted/20 ${
@@ -534,7 +795,12 @@ export function VotingInterface({
                         role="tabpanel"
                         aria-labelledby={`tab-${category.id}`}
                       >
-                        <div className="mb-3 text-center" id={`category-header-${category.id}`}>
+                        <div 
+                          className="mb-3 text-center" 
+                          id={`category-header-${category.id}`}
+                          data-category-header="true"
+                          style={{ scrollMarginTop: '120px' }}
+                        >
                           <h2 className="text-xl font-bold text-primary mb-1 scroll-mt-20">{category.name}</h2>
                           <p className="text-sm text-muted-foreground">{category.description}</p>
                         </div>

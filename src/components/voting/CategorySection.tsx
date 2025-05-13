@@ -33,6 +33,7 @@ export function CategorySection({ category, selectedGameId, onVote }: CategorySe
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
+        delayChildren: 0.2, // Pequeno atraso para começar após a animação do cabeçalho
       },
     },
   };

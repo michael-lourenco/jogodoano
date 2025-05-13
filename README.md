@@ -14,7 +14,7 @@ O "Jogo do Ano" é um aplicativo web que permite aos usuários votar em jogos po
 - Envio final dos votos
 
 ## Estrutura do Projeto
-
+```
 ├── src/
 │ ├── app/ # Rotas e páginas da aplicação (Next.js)
 │ │ ├── about/ # Página sobre o projeto
@@ -53,7 +53,7 @@ O "Jogo do Ano" é um aplicativo web que permite aos usuários votar em jogos po
 │ ├── services/ # Serviços da aplicação
 │ ├── types/ # Definições de tipos TypeScript
 │ └── utils/ # Funções utilitárias
-
+```
 ## Tecnologias Utilizadas
 
 - **Frontend**:

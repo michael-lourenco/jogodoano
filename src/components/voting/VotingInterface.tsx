@@ -222,6 +222,62 @@ export function VotingInterface({
     console.log("VotingInterface: votes updated", votes)
   }, [votes])
 
+  // Função aprimorada para rolar para o topo da categoria
+  const scrollToCategoryTop = useCallback(() => {
+    setTimeout(() => {
+      // Encontrar o cabeçalho da categoria atual com base no ID
+      const headerElement = document.getElementById(`category-header-${localActiveCategory}`);
+      
+      if (isMobile && contentContainerRef.current) {
+        // Na versão mobile, rolar o container de conteúdo para o topo
+        contentContainerRef.current.scrollTop = 0;
+        
+        // Adicionar um efeito visual de destaque ao cabeçalho para chamar atenção
+        if (headerElement) {
+          headerElement.classList.add('bg-primary/10');
+          setTimeout(() => {
+            headerElement.classList.remove('bg-primary/10');
+          }, 1000);
+        }
+      } else {
+        // Na versão desktop, usar o scrollIntoView para uma rolagem mais precisa
+        if (headerElement) {
+          // Calcular o offset para considerar elementos fixos no topo
+          let offsetTop = 0;
+          
+          if (isSticky && editionsSelectorHeight.current) {
+            offsetTop += editionsSelectorHeight.current;
+          }
+          
+          if (tabsListRef.current) {
+            offsetTop += tabsListRef.current.offsetHeight;
+          }
+          
+          // Adicionar um efeito visual de destaque ao cabeçalho
+          headerElement.classList.add('bg-primary/10');
+          setTimeout(() => {
+            headerElement.classList.remove('bg-primary/10');
+          }, 1000);
+          
+          // Rolar para a posição do elemento menos o offset
+          const headerRect = headerElement.getBoundingClientRect();
+          const targetPosition = window.scrollY + headerRect.top - offsetTop - 20; // 20px extra de margem
+          
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+        } else {
+          // Fallback: rolar para o topo se não encontrar o elemento
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        }
+      }
+    }, 150); // Delay para garantir que os elementos estejam renderizados
+  }, [isMobile, isSticky, localActiveCategory]);
+
   const navigateToCategory = (direction: "prev" | "next") => {
     const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
 
@@ -231,6 +287,8 @@ export function VotingInterface({
       setTimeout(() => {
         setLocalActiveCategory(prevCategory.id)
         setActiveCategory(prevCategory.id)
+        // Rolar para o topo da categoria após a mudança
+        scrollToCategoryTop();
       }, 50)
     } else if (direction === "next" && currentCategoryIndex < categories.length - 1) {
       const nextCategory = categories[currentCategoryIndex + 1]
@@ -238,6 +296,8 @@ export function VotingInterface({
       setTimeout(() => {
         setLocalActiveCategory(nextCategory.id)
         setActiveCategory(nextCategory.id)
+        // Rolar para o topo da categoria após a mudança
+        scrollToCategoryTop();
       }, 50)
     }
   }
@@ -312,6 +372,8 @@ export function VotingInterface({
                               setTimeout(() => {
                                 setLocalActiveCategory(category.id)
                                 setActiveCategory(category.id)
+                                // Rolar para o topo da categoria após clicar diretamente na categoria
+                                scrollToCategoryTop();
                               }, 50)
                             }
                           }}
@@ -335,8 +397,8 @@ export function VotingInterface({
                   )}
 
                   {/* Category heading and description */}
-                  <div className="mb-3 text-center">
-                    <h2 className="text-xl font-bold text-primary mb-1">{currentCategory?.name}</h2>
+                  <div className="mb-3 text-center" id={`category-header-${currentCategory?.id}`}>
+                    <h2 className="text-xl font-bold text-primary mb-1 scroll-mt-20">{currentCategory?.name}</h2>
                     <p className="text-sm text-muted-foreground">{currentCategory?.description}</p>
                   </div>
 
@@ -421,6 +483,8 @@ export function VotingInterface({
                       setTimeout(() => {
                         setLocalActiveCategory(newValue)
                         setActiveCategory(newValue)
+                        // Rolar para o topo da categoria após a mudança na versão desktop
+                        scrollToCategoryTop();
                       }, 50)
                     }
                   }} className="w-full">
@@ -470,8 +534,8 @@ export function VotingInterface({
                         role="tabpanel"
                         aria-labelledby={`tab-${category.id}`}
                       >
-                        <div className="mb-3 text-center">
-                          <h2 className="text-xl font-bold text-primary mb-1">{category.name}</h2>
+                        <div className="mb-3 text-center" id={`category-header-${category.id}`}>
+                          <h2 className="text-xl font-bold text-primary mb-1 scroll-mt-20">{category.name}</h2>
                           <p className="text-sm text-muted-foreground">{category.description}</p>
                         </div>
                         

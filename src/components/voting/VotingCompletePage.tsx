@@ -43,7 +43,7 @@ export const VotingCompletePage = ({
             </CardTitle>
 
             <p className="text-center text-muted-foreground">
-              Obrigado por participar da votação do Jogo do Ano de {votedEditionId}. Seus votos foram registrados com
+              Obrigado por participar da votação da edição {votedEditionId}. Seus votos foram registrados com
               sucesso!
             </p>
 
@@ -58,7 +58,7 @@ export const VotingCompletePage = ({
 
             <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
               <Button onClick={onBackToVoting} variant="outline" className="mt-2">
-                Votar em outro ano
+                Votar em outra edição
               </Button>
 
               <Button

@@ -127,7 +127,7 @@ export const votingEditions: VotingEdition[] = [
   // },
   {
     id: "all_time",
-    name: "Melhor de Todos",
+    name: "Todos os Tempos",
     categories: [
       {
         id: "all_time_goty",

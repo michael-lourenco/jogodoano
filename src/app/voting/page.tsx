@@ -9,6 +9,9 @@ import type { VotingEdition } from "@/types/types"
 import { rehydrateVotingEditions } from "@/utils/utils"
 import { VotingCompletePage } from "@/components/voting/VotingCompletePage"
 import { VotingInterface } from "@/components/voting/VotingInterface"
+import { LoginModal } from "@/components/voting/LoginModal"
+import { UserInfo } from "@/components/UserInfo"
+import { Footer } from "@/components/Footer"
 
 export default function VotingPage() {
   const navigationService = useNavigation()
@@ -56,6 +59,21 @@ export default function VotingPage() {
     return (
       <div className="flex justify-center items-center h-screen bg-background">
         <div className="animate-pulse text-primary">Carregando...</div>
+      </div>
+    )
+  }
+
+  // Se o usuário não estiver logado, exibir o modal de login
+  if (!user) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background text-foreground">
+        <main className="flex-grow flex flex-col items-center justify-start pt-4 px-4">
+          <div className="w-full max-w-4xl mx-auto">
+            <UserInfo user={user} handleLogin={handleLogin} handleLogout={handleLogout} />
+            <LoginModal handleLogin={handleLogin} />
+          </div>
+        </main>
+        <Footer />
       </div>
     )
   }

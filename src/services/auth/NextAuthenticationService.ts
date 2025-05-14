@@ -63,8 +63,7 @@ async function signInWithGoogle(): Promise<void> {
 
 async function signOutUser(): Promise<void> {
   try {
-    await signOut({ callbackUrl: "/" });
-    localStorage.removeItem("user");
+    await signOut();
     globalUser = null;
   } catch (error) {
     console.error("Error during sign out:", error);

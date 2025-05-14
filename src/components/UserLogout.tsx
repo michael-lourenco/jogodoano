@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   UserData,
@@ -17,17 +17,46 @@ export const UserLogout: React.FC<UserLogoutProps> = ({
   handleLogin,
   handleLogout,
 }) => {
-  const localStorageUser =
-    typeof window !== "undefined" && localStorage.getItem("user") !== null
-      ? JSON.parse(localStorage.getItem("user") || "{}")
-      : null;
+  const [initialized, setInitialized] = useState(false);
+  const [localUser, setLocalUser] = useState<UserData | null>(null);
+
+  useEffect(() => {
+    // Verificar se existe usuário no localStorage
+    if (typeof window !== "undefined") {
+      const userFromStorage = localStorage.getItem("user");
+      if (userFromStorage) {
+        try {
+          const parsedUser = JSON.parse(userFromStorage);
+          setLocalUser(parsedUser);
+        } catch (error) {
+          console.error("Erro ao parsear usuário do localStorage:", error);
+        }
+      }
+      setInitialized(true);
+    }
+  }, []);
+
+  // Atualizar localUser quando user prop mudar
+  useEffect(() => {
+    if (user) {
+      setLocalUser(user);
+    }
+  }, [user]);
+
   const handleDonation = () => {
     window.open("https://buy.stripe.com/00g02GeSnaJC12g5kk", "_blank");
   };
 
+  // Não renderizar nada até que o componente esteja inicializado
+  if (!initialized) {
+    return null;
+  }
+
+  const isLoggedIn = user || localUser;
+
   return (
     <>
-      {user || (localStorageUser && localStorage.getItem("user") != null)  ? (
+      {isLoggedIn ? (
         <div className="flex flex-col text-primary mb-4 p-4 bg-background rounded-lg">
           <div className="grid grid-cols-[1fr,auto,auto] items-center gap-2">
             <Button
@@ -43,6 +72,6 @@ export const UserLogout: React.FC<UserLogoutProps> = ({
       ) : (
         <></>
       )}
-      </>
+    </>
   );
 };

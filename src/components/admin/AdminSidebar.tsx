@@ -13,10 +13,22 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { signOut } from "next-auth/react"
+import { useAuth } from "@/hooks/useAuth"
+import { useRouter } from "next/navigation"
 
 export function AdminSidebar() {
   const pathname = usePathname()
+  const { handleLogout } = useAuth()
+  const router = useRouter()
+
+  const handleSafeLogout = async () => {
+    // Primeiro navegamos para a home antes de fazer logout
+    router.push("/")
+    // Depois executamos o logout com um pequeno delay
+    setTimeout(() => {
+      handleLogout()
+    }, 100)
+  }
 
   const menuItems = [
     {
@@ -77,7 +89,7 @@ export function AdminSidebar() {
         </SidebarContent>
 
         <SidebarFooter className="border-t p-4">
-          <Button variant="ghost" className="w-full justify-start gap-2" onClick={() => signOut()}>
+          <Button variant="ghost" className="w-full justify-start gap-2" onClick={handleSafeLogout}>
             <LogOut className="h-5 w-5" />
             <span>Sair</span>
           </Button>

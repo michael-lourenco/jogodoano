@@ -20,15 +20,33 @@ export const UserInfo: React.FC<UserInfoProps> = ({
 }) => {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [initialized, setInitialized] = useState(false);
+  const [localUser, setLocalUser] = useState<UserData | null>(null);
 
   useEffect(() => {
     setMounted(true);
+    
+    // Verificar se existe usuário no localStorage
+    if (typeof window !== "undefined") {
+      const userFromStorage = localStorage.getItem("user");
+      if (userFromStorage) {
+        try {
+          const parsedUser = JSON.parse(userFromStorage);
+          setLocalUser(parsedUser);
+        } catch (error) {
+          console.error("Erro ao parsear usuário do localStorage:", error);
+        }
+      }
+      setInitialized(true);
+    }
   }, []);
 
-  const localStorageUser =
-    typeof window !== "undefined" && localStorage.getItem("user") !== null
-      ? JSON.parse(localStorage.getItem("user") || "{}")
-      : null;
+  // Atualizar localUser quando user prop mudar
+  useEffect(() => {
+    if (user) {
+      setLocalUser(user);
+    }
+  }, [user]);
 
   const handleDonation = () => {
     window.open("https://buy.stripe.com/00g02GeSnaJC12g5kk", "_blank");
@@ -38,9 +56,16 @@ export const UserInfo: React.FC<UserInfoProps> = ({
     setTheme(theme === "dark" ? "light" : "dark");
   };
 
+  // Não renderizar nada até que o componente esteja inicializado
+  if (!initialized) {
+    return null;
+  }
+
+  const isLoggedIn = user || localUser;
+
   return (
     <>
-      {user || (localStorageUser && localStorage.getItem("user") != null) ? (
+      {isLoggedIn ? (
         <div className="flex flex-col text-foreground mb-4 p-4 bg-card rounded-sm">
           <div className="flex items-center gap-4 mb-2">
             <Image src="/logo.png" alt="Logo" width={40} height={40} />
@@ -51,19 +76,19 @@ export const UserInfo: React.FC<UserInfoProps> = ({
                   className="w-6 h-6 text-success mx-2 flex-shrink-0"
                 />
                 <span className="text-foreground">
-                  {user?.best_score?.value ?? 0}
+                  {localUser?.best_score?.value ?? 0}
                 </span>
                 <Icon
                   name="PiCoin"
                   className="w-6 h-6 text-warning mx-2 flex-shrink-0"
                 />
-                <span className="text-foreground">{user?.currency?.value ?? 0}</span>
+                <span className="text-foreground">{localUser?.currency?.value ?? 0}</span>
                 <Icon
                   name="PiStar"
                   className="w-6 h-6 text-info mx-2 flex-shrink-0"
                 />
                 <span className="text-foreground">
-                  {user?.credits?.value ?? 0}
+                  {localUser?.credits?.value ?? 0}
                 </span>
               </div>
               {mounted && (

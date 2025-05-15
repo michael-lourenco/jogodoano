@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Category } from "@/types/types"
 import { GameCard } from "@/components/voting/GameCard"
 import { motion } from "framer-motion"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 
 interface CategorySectionProps {
   category: Category
@@ -16,15 +16,17 @@ export function CategorySection({ category, selectedGameId, onVote }: CategorySe
 
   // Atualiza o estado local quando o prop selectedGameId muda
   useEffect(() => {
-    setSelected(selectedGameId);
-    console.log("CategorySection: selectedGameId changed", selectedGameId, category.name);
-  }, [selectedGameId, category.name]);
+    // Só atualiza se realmente mudou, para evitar ciclos
+    if (selected !== selectedGameId) {
+      setSelected(selectedGameId);
+    }
+  }, [selectedGameId]);
 
   // Função para lidar com a seleção de um jogo
-  const handleSelect = (gameId: string) => {
+  const handleSelect = useCallback((gameId: string) => {
     setSelected(gameId); // Atualiza o estado local imediatamente
     onVote(gameId); // Propaga o evento de voto para o componente pai
-  };
+  }, [onVote]);
 
   // Animação para o container de cards
   const containerVariants = {

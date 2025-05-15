@@ -73,16 +73,14 @@ export function useAuth() {
           setUser(userData);
         }
       } else if (status === "unauthenticated") {
-        // Manter o usuário do localStorage mesmo se a sessão NextAuth não existir
-        // O Firebase pode estar gerenciando a autenticação
-        if (!user) {
-          setLoading(false);
-        }
+        // Verificamos apenas se não existe sessão, mas não resetamos o usuário
+        // que pode estar autenticado pelo Firebase
+        setLoading(false);
       }
     };
 
     initializeAuth();
-  }, [session, status, user]);
+  }, [session, status]);
 
   // Efeito para inicializar o Firebase
   useEffect(() => {
@@ -104,23 +102,27 @@ export function useAuth() {
 
   // Efeito para observar mudanças no estado de autenticação do Firebase
   useEffect(() => {
-    if (auth) {
-      const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
-        if (authUser) {
-          const userData = await fetchUserData(db, authUser.email!);
-          if (userData) {
-            setUser(userData);
-          }
-        } else if (!user) {
-          // Apenas definir como null se ainda não tivermos um usuário do localStorage
+    if (!auth || !db) return;
+
+    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
+      if (authUser) {
+        // Só busca dados se tiver um usuário autenticado
+        const userData = await fetchUserData(db, authUser.email!);
+        if (userData) {
+          setUser(userData);
+        }
+      } else {
+        // Se não há usuário autenticado no Firebase e não há sessão NextAuth,
+        // então realmente não existe usuário logado
+        if (status === "unauthenticated") {
           setUser(null);
         }
-        setLoading(false);
-      });
+      }
+      setLoading(false);
+    });
 
-      return () => unsubscribe();
-    }
-  }, [auth, db, user]);
+    return () => unsubscribe();
+  }, [auth, db, status]); // Removido user da lista de dependências
 
   return { user, loading, status, handleLogin, handleLogout };
 }

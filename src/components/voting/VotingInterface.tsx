@@ -314,21 +314,20 @@ export function VotingInterface({
   }, [checkScrollPosition]);
 
   // Usar o callback no handleGameSelection
-  const handleGameSelection = (categoryId: string, gameId: string) => {
-    console.log("VotingInterface: handleGameSelection", categoryId, gameId)
+  const handleGameSelection = useCallback((categoryId: string, gameId: string) => {
+    // Verificar se o voto já está definido para este jogo
+    const currentVote = votes[selectedEditionId]?.[categoryId];
     
-    // Primeiro registramos o voto no sistema
-    handleVoteInUI(categoryId, gameId)
-    
-    // Atualizar o estado local e a referência
-    setSelectedGame(gameId)
-    updateSelectedGameRef(categoryId, gameId)
-  }
-
-  // Debug: observar mudanças em votes
-  useEffect(() => {
-    console.log("VotingInterface: votes updated", votes)
-  }, [votes])
+    // Só atualizar se o voto for diferente, para evitar atualizações desnecessárias
+    if (currentVote !== gameId) {
+      // Registra o voto no sistema
+      handleVoteInUI(categoryId, gameId);
+      
+      // Atualizar o estado local e a referência
+      setSelectedGame(gameId);
+      updateSelectedGameRef(categoryId, gameId);
+    }
+  }, [votes, selectedEditionId, handleVoteInUI, setSelectedGame, updateSelectedGameRef]);
 
   // Função aprimorada para rolar para o topo da categoria
   const scrollToCategoryTop = useCallback(() => {

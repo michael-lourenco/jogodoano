@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { dbFirestore, updateUserVotes, UserData } from "@/services/firebase/FirebaseService";
 import { VotingEdition } from "@/types/types";
@@ -27,6 +27,7 @@ export function useVotes({ user, editions }: UseVotesProps): UseVotesReturn {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
   const [votedEditionId, setVotedEditionId] = useState<string>("");
+  const [userVotesLoaded, setUserVotesLoaded] = useState(false);
 
   // Carregar votos do usuário quando disponíveis
   useEffect(() => {
@@ -48,30 +49,42 @@ export function useVotes({ user, editions }: UseVotesProps): UseVotesReturn {
       } else {
         setVotes({});
       }
+      setUserVotesLoaded(true);
     } else {
       setVotes({});
+      setUserVotesLoaded(false);
     }
   }, [user]);
 
   // Função para registrar um voto
-  const handleVote = (editionId: string, categoryId: string, gameId: string) => {
-    setVotes((prev) => ({
-      ...prev,
-      [editionId]: {
-        ...(prev[editionId] || {}),
-        [categoryId]: gameId,
-      },
-    }));
-  };
+  const handleVote = useCallback((editionId: string, categoryId: string, gameId: string) => {
+    setVotes((prev) => {
+      // Verificar se o voto está mudando
+      const currentVote = prev[editionId]?.[categoryId];
+      if (currentVote === gameId) {
+        // Se o voto é o mesmo, não faz nada para evitar atualizações desnecessárias
+        return prev;
+      }
+      
+      // Se o voto é diferente, atualiza o estado
+      return {
+        ...prev,
+        [editionId]: {
+          ...(prev[editionId] || {}),
+          [categoryId]: gameId,
+        },
+      };
+    });
+  }, []);
 
   // Verificar se todas as categorias foram votadas
-  const areAllCategoriesVoted = (editionId: string, categories: { id: string }[]) => {
+  const areAllCategoriesVoted = useCallback((editionId: string, categories: { id: string }[]) => {
     const editionVotes = votes[editionId] || {};
     return categories.every((category) => editionVotes[category.id]);
-  };
+  }, [votes]);
 
   // Função para enviar os votos
-  const handleSubmitVotes = async (editionId: string): Promise<boolean> => {
+  const handleSubmitVotes = useCallback(async (editionId: string): Promise<boolean> => {
     const currentEdition = editions.find((edition) => edition.id === editionId);
     
     if (!currentEdition) {
@@ -101,8 +114,13 @@ export function useVotes({ user, editions }: UseVotesProps): UseVotesReturn {
     setIsSubmitting(true);
 
     try {
+      // Usar os votos existentes do usuário como base e adicionar/atualizar os novos
+      const userVotes = user.votes || {};
+      
+      // Combinar os votos existentes com os novos
       const updatedVotes = {
-        ...votes,
+        ...userVotes,
+        [editionId]: votes[editionId] || {}
       };
 
       await updateUserVotes(user.email, updatedVotes, dbFirestore);
@@ -122,7 +140,7 @@ export function useVotes({ user, editions }: UseVotesProps): UseVotesReturn {
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [votes, editions, user, areAllCategoriesVoted]);
 
   return {
     votes,

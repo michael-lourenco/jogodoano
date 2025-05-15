@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import Image from "next/image"
 import { CheckCircle2, Gamepad2 } from "lucide-react"
 import { motion } from "framer-motion"
-import { useEffect, useState } from "react"
+import { useEffect, useState, memo } from "react"
 import type { Game } from "@/types/types"
 
 interface GameCardProps {
@@ -14,14 +14,17 @@ interface GameCardProps {
   onSelect: () => void
 }
 
-export function GameCard({ game, isSelected, onSelect }: GameCardProps) {
+// Usando memo para evitar renderizações desnecessárias
+const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCardProps) {
   // Estado local para animação suave
   const [localSelected, setLocalSelected] = useState(isSelected)
 
   // Atualiza o estado local quando a prop isSelected muda
   useEffect(() => {
-    setLocalSelected(isSelected)
-  }, [isSelected])
+    if (localSelected !== isSelected) {
+      setLocalSelected(isSelected)
+    }
+  }, [isSelected, localSelected])
 
   // Variantes para animação do card
   const cardVariants = {
@@ -37,18 +40,14 @@ export function GameCard({ game, isSelected, onSelect }: GameCardProps) {
 
   // Função para lidar com o clique no card
   const handleClick = () => {
-    // Chamamos a função onSelect para registrar o voto
-    onSelect();
-    
-    // Como o sistema de votação pode levar um tempo para atualizar,
-    // atualizamos também o estado local para feedback imediato
-    setLocalSelected(true);
+    // Só atualiza se o estado atual for diferente
+    if (!localSelected) {
+      // Atualizamos também o estado local para feedback imediato
+      setLocalSelected(true);
+      // Chamamos a função onSelect para registrar o voto
+      onSelect();
+    }
   };
-
-  // Forçando a renderização do componente quando isSelected muda
-  useEffect(() => {
-    console.log("GameCard: isSelected changed", isSelected, game.title);
-  }, [isSelected, game.title]);
 
   return (
     <motion.div
@@ -125,4 +124,6 @@ export function GameCard({ game, isSelected, onSelect }: GameCardProps) {
       </Card>
     </motion.div>
   )
-}
+});
+
+export { GameCard }

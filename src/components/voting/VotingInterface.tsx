@@ -602,12 +602,14 @@ export function VotingInterface({
 
           {selectedEditionId && editions.length > 0 && (
             <>
-              {/* Progress bar showing voting completion */}
-              <VotingProgress
-                categories={categories}
-                votes={votes[selectedEditionId] || {}}
-                editionId={selectedEditionId}
-              />
+              {/* Progress bar showing voting completion - apenas para desktop */}
+              {!isMobile && (
+                <VotingProgress
+                  categories={categories}
+                  votes={votes[selectedEditionId] || {}}
+                  editionId={selectedEditionId}
+                />
+              )}
 
               {isMobile ? (
                 <div className="mb-6 relative" ref={mobileMainContainerRef}>

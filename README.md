@@ -17,58 +17,37 @@ O "Jogo do Ano" é um aplicativo web que permite aos usuários votar em jogos po
 ```
 ├── src/
 │ ├── app/ # Rotas e páginas da aplicação (Next.js)
-│ │ ├── about/ # Página sobre o projeto
-│ │ ├── admin/ # Área administrativa
-│ │ ├── api/ # Endpoints da API
-│ │ ├── player/ # Player de conteúdo
-│ │ ├── voting/ # Sistema de votação
-│ │ │ └── [edition]/ # Páginas de edições específicas
-│ │ ├── layout.tsx # Layout principal
-│ │ └── page.tsx # Página inicial
+│ ├── application/ # Lógica de aplicação e casos de uso
 │ ├── components/ # Componentes React reutilizáveis
-│ │ ├── ui/ # Componentes de UI básicos
-│ │ ├── voting/ # Componentes específicos do sistema de votação
-│ │ │ ├── CategoryNavigation.tsx # Navegação entre categorias
-│ │ │ ├── CategorySection.tsx # Seção de uma categoria
-│ │ │ ├── EditionsSelector.tsx # Seletor de edições
-│ │ │ ├── VotingInterface.tsx # Interface principal de votação
-│ │ │ └── VotingProgress.tsx # Barra de progresso da votação
-│ │ ├── Footer.tsx # Rodapé global
-│ │ └── UserInfo.tsx # Informações do usuário
 │ ├── hooks/ # Hooks personalizados
-│ │ ├── useAuth.ts # Autenticação
-│ │ ├── useCategoryNavigation.ts # Navegação entre categorias
-│ │ ├── useEditionManager.ts # Gerenciamento de edições
-│ │ ├── useEditions.ts # Dados de edições
-│ │ ├── useKeyboardNavigation.ts # Navegação por teclado
-│ │ ├── useMobile.tsx # Detecção de dispositivos móveis
-│ │ ├── useNavigation.ts # Navegação geral
-│ │ ├── useStickyHeader.ts # Cabeçalho fixo
-│ │ ├── useSwipeNavigation.ts # Navegação por gestos (swipe)
-│ │ ├── useToast.ts # Sistema de notificações
-│ │ ├── useVotes.ts # Gerenciamento de votos
-│ │ └── useVotingInterface.ts # Interface de votação
 │ ├── lib/ # Bibliotecas e utilidades
 │ ├── repositories/ # Acesso a dados
 │ ├── services/ # Serviços da aplicação
 │ ├── types/ # Definições de tipos TypeScript
 │ └── utils/ # Funções utilitárias
+├── types/ # Tipos globais do projeto
+├── atual/ # Diretório de dados atuais
+├── tailwind.config.ts # Configuração do TailwindCSS
+├── components.json # Configuração dos componentes
+├── tsconfig.json # Configuração do TypeScript
+├── next.config.js # Configuração do Next.js
+├── postcss.config.mjs # Configuração do PostCSS
+├── Dockerfile # Configuração do container Docker
+└── docker-compose.yml # Configuração do ambiente Docker
 ```
+
 ## Tecnologias Utilizadas
 
 - **Frontend**:
   - Next.js: Framework React com suporte a SSR e rotas
   - React: Biblioteca para construção de interfaces
   - TypeScript: Superset tipado de JavaScript
-  - Framer Motion: Biblioteca de animações
-  - Lucide React: Ícones
   - TailwindCSS: Framework CSS utilitário
   - Shadcn/ui: Componentes de UI acessíveis
 
-- **Responsividade**:
-  - Design adaptável para desktop e mobile
-  - Gestos de swipe em dispositivos móveis
-  - Navegação por teclado em desktop
+- **Infraestrutura**:
+  - Docker: Containerização da aplicação
+  - Docker Compose: Orquestração de containers
 
 ## Instalação e Execução
 
@@ -76,6 +55,7 @@ O "Jogo do Ano" é um aplicativo web que permite aos usuários votar em jogos po
 
 - Node.js (versão 16 ou superior)
 - NPM ou Yarn
+- Docker e Docker Compose (opcional)
 
 ### Instalação
 
@@ -101,79 +81,45 @@ yarn dev
 
 4. Abra [http://localhost:3000](http://localhost:3000) no seu navegador.
 
-## Estrutura Principal de Componentes
+### Execução com Docker
 
-### VotingInterface
+1. Construa e inicie os containers:
+```bash
+docker-compose up --build
+```
 
-O componente principal que gerencia a interface de votação, localizado em `src/components/voting/VotingInterface.tsx`. Ele integra:
+2. Acesse a aplicação em [http://localhost:3000](http://localhost:3000)
 
-- Seleção de edições
-- Navegação entre categorias
-- Votação em jogos
-- Transições visuais
-- Envio de votos
+## Arquitetura do Projeto
 
-### Navegação e Acessibilidade
+### Camadas da Aplicação
 
-O sistema implementa múltiplas formas de navegação:
+1. **Presentation Layer** (`src/app/` e `src/components/`)
+   - Componentes React
+   - Páginas Next.js
+   - Interface do usuário
 
-1. **Navegação por Swipe** (`useSwipeNavigation.ts`):
-   - Detecta gestos de deslize em dispositivos touch
-   - Implementa transições visuais suaves entre categorias
+2. **Application Layer** (`src/application/`)
+   - Casos de uso
+   - Lógica de negócios
+   - Orquestração de serviços
 
-2. **Navegação por Teclado** (`useKeyboardNavigation.ts`):
-   - Suporte a navegação via setas do teclado
-   - Atalhos para alternar entre categorias
+3. **Domain Layer** (`src/types/`)
+   - Entidades
+   - Interfaces
+   - Tipos de domínio
 
-3. **Navegação por Interface** (`CategoryNavigation.tsx`):
-   - Botões "Anterior" e "Próxima"
-   - Indicadores visuais de progresso
-   - Botão "Ir para Próxima Categoria" após realizar um voto
+4. **Infrastructure Layer** (`src/repositories/` e `src/services/`)
+   - Acesso a dados
+   - Serviços externos
+   - Implementações concretas
 
-## Soluções de UX Implementadas
+### Padrões de Código
 
-### Rolagem Automática
-
-- O sistema implementa uma função `ensureHeaderVisible` que utiliza múltiplas técnicas para garantir que o cabeçalho da categoria seja visível após a navegação:
-  - Manipulação do hash da URL
-  - Uso de `scrollIntoView`
-  - Cálculo manual da posição de scroll
-  - Reset do `scrollTop` do container
-
-### Feedback Visual
-
-- Destaque temporário do cabeçalho da categoria atual
-- Transições suaves entre categorias
-- Indicação visual de categorias já votadas
-- Barra de progresso global
-
-### Posicionamento do Botão "Próxima Categoria"
-
-- Posicionamento consistente em 40% da altura da tela
-- Adaptação baseada na posição de rolagem
-- Versões específicas para mobile e desktop
-
-## Padrões de Código
-
-### Estrutura de Funções
-
-O código segue uma ordem lógica de declaração para evitar referências circulares:
-
-1. Funções básicas sem dependências
-2. Funções que dependem das funções básicas
-3. Hooks e efeitos que usam essas funções
-
-### Padrões de Nomenclatura
-
-- **Prefixos**:
-  - `handle*`: Para funções que lidam com eventos
-  - `use*`: Para hooks personalizados
-  - `is*`: Para estados booleanos
-  - `set*`: Para funções que definem estado
-
-- **Componentes**: PascalCase (ex: `VotingInterface`, `CategorySection`)
-- **Funções e variáveis**: camelCase (ex: `handleGameSelection`, `localActiveCategory`)
-- **Constantes**: SNAKE_CASE (não muito utilizado no código atual)
+- **Clean Architecture**: Separação clara de responsabilidades
+- **Repository Pattern**: Abstração do acesso a dados
+- **Service Pattern**: Encapsulamento de lógica de negócios
+- **Hooks Pattern**: Reutilização de lógica de estado e efeitos
 
 ## Contribuição
 
@@ -189,7 +135,7 @@ O código segue uma ordem lógica de declaração para evitar referências circu
 
 3. **Padrões de Código**:
    - Siga os padrões de nomenclatura existentes
-   - Mantenha a estrutura lógica de declaração de funções
+   - Mantenha a estrutura de arquitetura limpa
    - Mantenha a compatibilidade mobile e desktop
 
 ### Testes Recomendados
@@ -197,8 +143,8 @@ O código segue uma ordem lógica de declaração para evitar referências circu
 Ao implementar novos recursos ou corrigir bugs, teste:
 
 1. **Compatibilidade Mobile/Desktop**:
-   - Verificar comportamento responsivo em diferentes tamanhos de tela
-   - Testar gestos de swipe em dispositivos touch
+   - Verificar comportamento responsivo
+   - Testar em diferentes navegadores
 
 2. **Acessibilidade**:
    - Navegação por teclado
@@ -206,28 +152,8 @@ Ao implementar novos recursos ou corrigir bugs, teste:
    - Semântica apropriada
 
 3. **Performance**:
-   - Fluidez das animações
+   - Tempo de carregamento
    - Responsividade da interface
-
-## Considerações Importantes
-
-### Problemas Conhecidos e Soluções
-
-1. **Rolagem para o Topo em Mobile**:
-   - Implementação da função `ensureHeaderVisible` para garantir que o cabeçalho da categoria seja visível ao navegar entre categorias.
-   - Utiliza múltiplas técnicas complementares para maior robustez.
-
-2. **Posicionamento do Botão "Próxima Categoria"**:
-   - Posicionamento fixo a 40% da altura da tela para evitar "piscagem"
-   - Remoção de efeitos de animação desnecessários
-
-### Linter Errors
-
-O código atual apresenta erros de linter relacionados principalmente a:
-- Importações não encontradas (como 'lucide-react' e 'react')
-- Tipos implícitos em elementos JSX
-
-Estes problemas provavelmente se devem à configuração do linter no ambiente específico e não afetam o funcionamento da aplicação.
 
 ## Licença
 

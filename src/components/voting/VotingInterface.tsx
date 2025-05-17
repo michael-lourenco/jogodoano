@@ -655,7 +655,7 @@ export function VotingInterface({
 
                   {/* Swipeable content area */}
                   <div
-                    className="border border-muted rounded-md shadow-sm"
+                    className="border border-muted rounded-md shadow-sm mb-32"
                     onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
@@ -696,34 +696,36 @@ export function VotingInterface({
                       ))}
                     </div>
 
-                    {/* Navigation buttons */}
-                    <CategoryNavigation
-                      categories={categories}
-                      currentCategoryId={localActiveCategory}
-                      navigateToCategory={navigateToCategory}
-                    />
-                  </div>
+                    {/* Container fixo para progresso e botão */}
+                    <div className="fixed bottom-16 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-muted z-20">
+                      {/* Progress bar */}
+                      <div className="px-4 py-2">
+                        <VotingProgress
+                          categories={categories}
+                          votes={votes[selectedEditionId] || {}}
+                          editionId={selectedEditionId}
+                        />
+                      </div>
 
-                  {/* Botão de próxima categoria - versão móvel */}
-                  {isNextButtonVisible(localActiveCategory) && !isLastCategory && (
-                    <div 
-                      className={`
-                        fixed left-0 right-0 px-4 flex justify-center z-10 transition-all duration-300
-                        ${isButtonExiting ? 'animate-slide-down' : 'animate-slide-up'}
-                      `}
-                      style={{
-                        bottom: '4rem', // Posiciona logo acima do Footer
-                      }}
-                    >
-                      <Button 
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 px-6 py-5 w-full max-w-sm shadow-lg"
-                        onClick={() => navigateToCategory("next")}
-                      >
-                        Ir para Próxima Categoria
-                        <ArrowRight className="h-5 w-5 ml-1" />
-                      </Button>
+                      {/* Botão de próxima categoria - versão móvel */}
+                      {isNextButtonVisible(localActiveCategory) && !isLastCategory && (
+                        <div 
+                          className={`
+                            px-4 pb-4 flex justify-center transition-all duration-300
+                            ${isButtonExiting ? 'animate-slide-down' : 'animate-slide-up'}
+                          `}
+                        >
+                          <Button 
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 px-6 py-5 w-full max-w-sm shadow-lg"
+                            onClick={() => navigateToCategory("next")}
+                          >
+                            Ir para Próxima Categoria
+                            <ArrowRight className="h-5 w-5 ml-1" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
               ) : (
                 // Desktop view with improved accessibility

@@ -36,7 +36,7 @@ export default function CookieConsent() {
   if (!initialized || !showBanner) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-secondary text-secondary-foreground p-4 flex flex-col md:flex-row items-center justify-between shadow-md border-t">
+    <div className="fixed bottom-0 left-0 w-full bg-secondary text-secondary-foreground p-4 flex flex-col md:flex-row items-center justify-between shadow-md border-t z-[1000]">
       <p className="text-sm text-muted-foreground">
         Usamos cookies para melhorar sua experiência. Ao continuar, você concorda com nossa{" "}
         <a href="/politica-de-cookies" className="underline text-primary">Política de Cookies</a>.

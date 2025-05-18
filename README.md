@@ -155,6 +155,23 @@ Ao implementar novos recursos ou corrigir bugs, teste:
    - Tempo de carregamento
    - Responsividade da interface
 
+## Melhorias de Interface
+
+### Navegação e Visibilidade
+- Footer sempre visível com z-index elevado (z-[100])
+- Botão de expandir/recolher menu com z-index adequado (z-50)
+- Container de progresso e botões de navegação com z-index dinâmico
+  - z-index: 20 quando o menu está expandido
+  - z-index: 50 quando o menu está recolhido
+- Transições suaves entre estados do menu
+- Feedback visual aprimorado para interações do usuário
+
+### Responsividade
+- Adaptação automática para dispositivos móveis
+- Menu colapsável em dispositivos móveis
+- Navegação por gestos (swipe) em dispositivos móveis
+- Layout otimizado para diferentes tamanhos de tela
+
 ## Licença
 
 [Incluir informações de licença aqui]

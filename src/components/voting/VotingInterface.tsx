@@ -17,6 +17,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { useState, useEffect, useRef, useCallback } from "react"
 import type { VotingInterfaceProps } from "@/types/voting/interfaces"
 import { CategorySelector } from "@/components/voting/CategorySelector"
+import { useLocalVotes } from "@/stores/useLocalVotes"
 
 export function VotingInterface({
   user,
@@ -42,6 +43,9 @@ export function VotingInterface({
   const [selectedGameElementId, setSelectedGameElementId] = useState<string | null>(null)
   const mobileMainContainerRef = useRef<HTMLDivElement>(null)
   const [footerState, setFooterState] = useState({ height: 64, isExpanded: true })
+  
+  // Adicionar hook para gerenciar votos locais
+  const { setVote, getVotes, clearVotes } = useLocalVotes()
 
   const { tabsListRef, localActiveCategory, setLocalActiveCategory } = useVotingInterface({
     activeCategory,
@@ -315,21 +319,48 @@ export function VotingInterface({
     };
   }, [checkScrollPosition]);
 
-  // Usar o callback no handleGameSelection
+  // Carregar votos locais ao entrar na edição
+  useEffect(() => {
+    if (selectedEditionId) {
+      const localVotes = getVotes(selectedEditionId)
+      if (localVotes) {
+        // Atualizar o estado local com os votos salvos
+        Object.entries(localVotes).forEach(([categoryId, gameId]) => {
+          handleVoteInUI(categoryId, gameId as string)
+        })
+      }
+    }
+  }, [selectedEditionId, getVotes, handleVoteInUI])
+
+  // Modificar handleGameSelection para salvar votos localmente
   const handleGameSelection = useCallback((categoryId: string, gameId: string) => {
     // Verificar se o voto já está definido para este jogo
     const currentVote = votes[selectedEditionId]?.[categoryId];
     
-    // Só atualizar se o voto for diferente, para evitar atualizações desnecessárias
+    // Só atualizar se o voto for diferente
     if (currentVote !== gameId) {
       // Registra o voto no sistema
       handleVoteInUI(categoryId, gameId);
+      
+      // Salvar voto localmente
+      setVote(selectedEditionId, categoryId, gameId, user?.email);
       
       // Atualizar o estado local e a referência
       setSelectedGame(gameId);
       updateSelectedGameRef(categoryId, gameId);
     }
-  }, [votes, selectedEditionId, handleVoteInUI, setSelectedGame, updateSelectedGameRef]);
+  }, [votes, selectedEditionId, handleVoteInUI, setSelectedGame, updateSelectedGameRef, setVote, user?.email]);
+
+  // Modificar handleSubmitVotesInUI para limpar votos locais após envio bem-sucedido
+  const handleSubmitVotesInUIWithCleanup = useCallback(async () => {
+    try {
+      await handleSubmitVotesInUI();
+      // Limpar votos locais após envio bem-sucedido
+      clearVotes(selectedEditionId);
+    } catch (error) {
+      console.error('Erro ao enviar votos:', error);
+    }
+  }, [handleSubmitVotesInUI, clearVotes, selectedEditionId]);
 
   // Função aprimorada para rolar para o topo da categoria
   const scrollToCategoryTop = useCallback(() => {
@@ -774,7 +805,7 @@ export function VotingInterface({
                           </Button>
 
                           <Button
-                            onClick={handleSubmitVotesInUI}
+                            onClick={handleSubmitVotesInUIWithCleanup}
                             disabled={isSubmitting || !isAllCategoriesVoted()}
                             className="flex-1 h-10 text-primary-foreground bg-gradient-to-r from-chart-1 to-success hover:from-chart-1 hover:to-success-foreground shadow-lg hover:shadow-success/25 hover:text-secondary-foreground transition-all duration-300"
                             aria-live="polite"

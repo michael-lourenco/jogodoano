@@ -5,6 +5,9 @@ import { usePathname } from "next/navigation"
 import { Icon } from "./icons"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useState, useEffect } from "react"
+import { ChevronUp, ChevronDown } from "lucide-react"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 const menuItems = [
   { icon: "LuHome", label: "Home", href: "/" },
@@ -15,12 +18,52 @@ const menuItems = [
 
 export function Footer() {
   const pathname = usePathname()
+  const isMobile = useIsMobile()
+  const [isExpanded, setIsExpanded] = useState(true)
+  const [lastScrollY, setLastScrollY] = useState(0)
+
+  // Efeito para controlar o colapso automático ao rolar
+  useEffect(() => {
+    if (!isMobile) return
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      
+      // Colapsa ao rolar para baixo, expande ao rolar para cima
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setIsExpanded(false)
+      } else if (currentScrollY < lastScrollY) {
+        setIsExpanded(true)
+      }
+      
+      setLastScrollY(currentScrollY)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [lastScrollY, isMobile])
 
   return (
     <TooltipProvider>
-      <footer className="sticky bottom-0 w-full bg-background border-dashed border-t ">
-        <nav className="max-w-md mx-auto px-0 py-0">
-          <div className="flex justify-between items-center">
+      <footer 
+        className={`sticky bottom-0 w-full bg-background border-dashed border-t transition-all duration-300 ${
+          isMobile ? (isExpanded ? 'h-16' : 'h-8') : 'h-16'
+        }`}
+      >
+        <nav className="max-w-md mx-auto px-0 py-0 relative">
+          {isMobile && !isExpanded && (
+            <button
+              onClick={() => setIsExpanded(true)}
+              className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-background border border-dashed rounded-t-lg px-3 py-1.5 flex items-center justify-center hover:bg-muted/50 transition-colors shadow-sm z-50"
+              aria-label="Expandir menu"
+            >
+              <ChevronUp className="h-4 w-4" />
+            </button>
+          )}
+          
+          <div className={`flex justify-between items-center transition-all duration-300 ${
+            isMobile && !isExpanded ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`}>
             {menuItems.map((item) => {
               const isActive = pathname === item.href
               return (

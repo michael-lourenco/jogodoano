@@ -18,6 +18,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import type { VotingInterfaceProps } from "@/types/voting/interfaces"
 import { CategorySelector } from "@/components/voting/CategorySelector"
 import { useLocalVotes } from "@/stores/useLocalVotes"
+import { CategoryStepper } from "@/components/voting/CategoryStepper"
 
 export function VotingInterface({
   user,
@@ -742,6 +743,14 @@ export function VotingInterface({
                       </div>
                     </div>
 
+                    {/* Adicionar o CategoryStepper */}
+                    <CategoryStepper
+                      categories={categories}
+                      currentCategoryId={localActiveCategory}
+                      onStepClick={handleCategoryClick}
+                      votes={votes[selectedEditionId] || {}}
+                    />
+
                     {isSticky && categoryTabsRef.current && (
                       <div style={{ height: categoryTabsHeight.current, marginBottom: "1rem" }}></div>
                     )}
@@ -899,6 +908,14 @@ export function VotingInterface({
                           selectedCategoryId={localActiveCategory}
                           votes={votes[selectedEditionId] || {}}
                           onCategoryChange={handleCategoryClick}
+                        />
+                        
+                        {/* Adicionar o CategoryStepper */}
+                        <CategoryStepper
+                          categories={categories}
+                          currentCategoryId={localActiveCategory}
+                          onStepClick={handleCategoryClick}
+                          votes={votes[selectedEditionId] || {}}
                         />
                       </div>
 

@@ -16,6 +16,7 @@ import { useStickyHeader } from "@/hooks/useStickyHeader"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useState, useEffect, useRef, useCallback } from "react"
 import type { VotingInterfaceProps } from "@/types/voting/interfaces"
+import { CategorySelector } from "@/components/voting/CategorySelector"
 
 export function VotingInterface({
   user,
@@ -577,6 +578,14 @@ export function VotingInterface({
     return votes[selectedEditionId]?.[categoryId] && categoryId === localActiveCategory
   }
 
+  // Adicionar um efeito para calcular e atualizar a altura do seletor de edições
+  useEffect(() => {
+    if (editionsSelectorRef.current && isSticky) {
+      const height = editionsSelectorRef.current.offsetHeight;
+      document.documentElement.style.setProperty('--editions-height', `${height}px`);
+    }
+  }, [isSticky]);
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <main className="flex-grow flex flex-col items-center justify-start pt-4 px-4">
@@ -585,9 +594,13 @@ export function VotingInterface({
 
           <div
             ref={editionsSelectorRef}
-            className={`w-full ${isSticky ? "fixed top-0 left-0 right-0 z-10 bg-background px-4 py-2 shadow-md" : ""}`}
+            className={`w-full transition-all duration-200 ${
+              isSticky 
+                ? "fixed top-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm" 
+                : ""
+            }`}
           >
-            <div className={`${isSticky ? "max-w-4xl mx-auto" : ""}`}>
+            <div className={`${isSticky ? "max-w-4xl mx-auto px-4 py-3" : ""}`}>
               <EditionsSelector
                 editions={editions}
                 selectedEditionId={selectedEditionId}
@@ -616,11 +629,13 @@ export function VotingInterface({
                   {/* Category selector tabs */}
                   <div
                     ref={categoryTabsRef}
-                    className={`overflow-x-auto mb-4 ${
-                      isSticky ? "fixed top-0 left-0 right-0 z-10 bg-background px-4 py-2 shadow-md mt-12" : ""
+                    className={`overflow-x-auto transition-all duration-200 ${
+                      isSticky 
+                        ? "fixed top-0 left-0 right-0 z-20 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm mt-[var(--editions-height,0px)]" 
+                        : "mb-4"
                     }`}
                   >
-                    <div className={`flex space-x-2 p-1 ${isSticky ? "max-w-4xl mx-auto" : ""}`}>
+                    <div className={`flex space-x-2 p-2 ${isSticky ? "max-w-4xl mx-auto" : ""}`}>
                       {getCurrentEditionCategories().map((category) => (
                         <button
                           key={category.id}
@@ -762,41 +777,30 @@ export function VotingInterface({
                     onValueChange={(newValue) => handleCategoryClick(newValue)} 
                     className="w-full"
                   >
-                    <TabsList
+                    <div
                       ref={tabsListRef}
-                      className={`w-full overflow-x-auto flex-nowrap scroll-smooth p-1 bg-muted/20 ${
+                      className={`w-full ${
                         isSticky
                           ? "fixed top-0 left-0 right-0 z-10 bg-background px-4 py-2 shadow-md mt-12 max-w-4xl mx-auto"
                           : ""
                       }`}
                     >
-                      {getCurrentEditionCategories()
-                        .slice()
-                        .sort((a, b) => {
-                          const hasVoteA = Boolean(votes[selectedEditionId]?.[a.id])
-                          const hasVoteB = Boolean(votes[selectedEditionId]?.[b.id])
-                          if (hasVoteA === hasVoteB) {
-                            return 0
-                          }
-                          return hasVoteA ? 1 : -1
-                        })
-                        .map((category) => (
-                          <TabsTrigger
-                            key={category.id}
-                            id={`tab-${category.id}`}
-                            value={category.id}
-                            className={`flex-shrink-0 ${
-                              votes[selectedEditionId]?.[category.id] ? "text-success" : ""
-                            } px-2 py-1 rounded-md text-sm whitespace-nowrap`}
-                            aria-label={`Categoria ${category.name} ${votes[selectedEditionId]?.[category.id] ? "(votada)" : ""}`}
-                          >
-                            {category.name.split(" ").pop()}
-                            {votes[selectedEditionId]?.[category.id] && (
-                              <CheckCircle2 className="ml-1 h-3 w-3 inline-block" aria-hidden="true" />
-                            )}
-                          </TabsTrigger>
-                        ))}
-                    </TabsList>
+                      <CategorySelector
+                        categories={getCurrentEditionCategories()
+                          .slice()
+                          .sort((a, b) => {
+                            const hasVoteA = Boolean(votes[selectedEditionId]?.[a.id])
+                            const hasVoteB = Boolean(votes[selectedEditionId]?.[b.id])
+                            if (hasVoteA === hasVoteB) {
+                              return 0
+                            }
+                            return hasVoteA ? 1 : -1
+                          })}
+                        selectedCategoryId={localActiveCategory}
+                        votes={votes[selectedEditionId] || {}}
+                        onCategoryChange={handleCategoryClick}
+                      />
+                    </div>
 
                     {isSticky && <div style={{ height: "3rem", marginBottom: "1rem" }}></div>}
 

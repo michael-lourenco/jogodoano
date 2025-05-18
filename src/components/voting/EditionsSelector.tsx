@@ -58,7 +58,7 @@ export function EditionsSelector({
         }`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center gap-2 ${!isOpen ? 'w-full justify-center' : ''}`}>
           <span className="font-medium">{selectedEdition?.name}</span>
           {isEditionComplete(selectedEditionId) && (
             <CheckCircle2 className="h-4 w-4 text-success" />

@@ -41,6 +41,7 @@ export function VotingInterface({
   const contentContainerRef = useRef<HTMLDivElement>(null)
   const [selectedGameElementId, setSelectedGameElementId] = useState<string | null>(null)
   const mobileMainContainerRef = useRef<HTMLDivElement>(null)
+  const [footerState, setFooterState] = useState({ height: 64, isExpanded: true })
 
   const { tabsListRef, localActiveCategory, setLocalActiveCategory } = useVotingInterface({
     activeCategory,
@@ -586,6 +587,33 @@ export function VotingInterface({
     }
   }, [isSticky]);
 
+  // Efeito para observar o estado do footer
+  useEffect(() => {
+    const footer = document.querySelector('footer')
+    if (!footer) return
+
+    const observer = new MutationObserver(() => {
+      const isExpanded = footer.classList.contains('h-16')
+      setFooterState({
+        height: footer.offsetHeight,
+        isExpanded
+      })
+    })
+
+    observer.observe(footer, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+
+    // Configurar estado inicial
+    setFooterState({
+      height: footer.offsetHeight,
+      isExpanded: footer.classList.contains('h-16')
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <main className="flex-grow flex flex-col items-center justify-start pt-4 px-4">
@@ -713,8 +741,15 @@ export function VotingInterface({
                       ))}
                     </div>
 
-                    {/* Container fixo para progresso e botão */}
-                    <div className="fixed bottom-16 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-muted z-20">
+                    {/* Container para progresso e botão */}
+                    <div 
+                      className="sticky left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-muted transition-all duration-300"
+                      style={{
+                        bottom: footerState.isExpanded ? '4rem' : '1rem',
+                        marginBottom: '0',
+                        zIndex: footerState.isExpanded ? 20 : 50
+                      }}
+                    >
                       {/* Progress bar */}
                       <div className="px-4 py-2">
                         <VotingProgress
@@ -818,39 +853,9 @@ export function VotingInterface({
                         <div 
                           className="mb-3 text-center" 
                           id={`category-header-${category.id}`}
-                          data-category-header="true"
-                          style={{ scrollMarginTop: '120px' }}
                         >
                           <h2 className="text-xl font-bold text-primary mb-1 scroll-mt-20">{category.name}</h2>
                           <p className="text-sm text-muted-foreground">{category.description}</p>
-                        </div>
-                        
-                        <CategorySection
-                          category={category}
-                          selectedGameId={votes[selectedEditionId]?.[category.id]}
-                          onVote={(gameId) => handleGameSelection(category.id, gameId)}
-                        />
-
-                        {/* Botão de próxima categoria - versão desktop */}
-                        {isNextButtonVisible(category.id) && !isLastCategory && (
-                          <div className="mt-4 flex justify-center transition-all duration-300">
-                            <Button 
-                              className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 px-6 py-5 shadow-lg"
-                              onClick={() => navigateToCategory("next")}
-                            >
-                              Ir para Próxima Categoria
-                              <ArrowRight className="h-5 w-5 ml-1" />
-                            </Button>
-                          </div>
-                        )}
-
-                        {/* Add navigation to desktop view as well */}
-                        <div className="mt-6">
-                          <CategoryNavigation
-                            categories={categories}
-                            currentCategoryId={localActiveCategory}
-                            navigateToCategory={navigateToCategory}
-                          />
                         </div>
                       </TabsContent>
                     ))}

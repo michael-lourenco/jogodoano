@@ -45,8 +45,9 @@ export function Footer() {
 
   return (
     <TooltipProvider>
+
       <footer 
-        className={`sticky bottom-0 w-full bg-background border-dashed border-t transition-all duration-300 ${
+        className={`sticky bottom-0 w-full bg-background border-dashed border-t transition-all duration-300 z-[100] ${
           isMobile ? (isExpanded ? 'h-16' : 'h-4') : 'h-16'
         }`}
       >

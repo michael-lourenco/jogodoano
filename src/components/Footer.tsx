@@ -47,17 +47,17 @@ export function Footer() {
     <TooltipProvider>
       <footer 
         className={`sticky bottom-0 w-full bg-background border-dashed border-t transition-all duration-300 ${
-          isMobile ? (isExpanded ? 'h-16' : 'h-8') : 'h-16'
+          isMobile ? (isExpanded ? 'h-16' : 'h-4') : 'h-16'
         }`}
       >
         <nav className="max-w-md mx-auto px-0 py-0 relative">
           {isMobile && !isExpanded && (
             <button
               onClick={() => setIsExpanded(true)}
-              className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-background border border-dashed rounded-t-lg px-3 py-1.5 flex items-center justify-center hover:bg-muted/50 transition-colors shadow-sm z-50"
+              className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-background border border-dashed rounded-t-lg px-3 py-1 flex items-center justify-center hover:bg-muted/50 transition-colors shadow-sm z-50"
               aria-label="Expandir menu"
             >
-              <ChevronUp className="h-4 w-4" />
+              <ChevronUp className="h-3 w-3" />
             </button>
           )}
           

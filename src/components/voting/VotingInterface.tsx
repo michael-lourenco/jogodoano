@@ -645,264 +645,299 @@ export function VotingInterface({
     return () => observer.disconnect()
   }, [])
 
+  const styles = `
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  `;
+
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <main className="flex-grow flex flex-col items-center justify-start pt-4 px-4">
-        <div className="w-full max-w-4xl mx-auto">
-          <UserInfo user={user} handleLogin={handleLogin} handleLogout={handleLogout} />
+    <>
+      <style>{styles}</style>
+      <div className="flex flex-col min-h-screen bg-background text-foreground">
+        <main className="flex-grow flex flex-col items-center justify-start pt-4 px-4">
+          <div className="w-full max-w-4xl mx-auto">
+            <UserInfo user={user} handleLogin={handleLogin} handleLogout={handleLogout} />
 
-          <div
-            ref={editionsSelectorRef}
-            className={`w-full transition-all duration-200 ${
-              isSticky 
-                ? "fixed top-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm" 
-                : ""
-            }`}
-          >
-            <div className={`${isSticky ? "max-w-4xl mx-auto px-4 py-3" : ""}`}>
-              <EditionsSelector
-                editions={editions}
-                selectedEditionId={selectedEditionId}
-                votes={votes}
-                getCurrentEditionCategories={getCurrentEditionCategories}
-                onEditionChange={handleEditionChange}
-              />
-            </div>
-          </div>
-
-          {isSticky && <div style={{ height: editionsSelectorHeight.current }}></div>}
-
-          {selectedEditionId && editions.length > 0 && (
-            <>
-              {/* Progress bar showing voting completion - apenas para desktop */}
-              {!isMobile && (
-                <VotingProgress
-                  categories={categories}
-                  votes={votes[selectedEditionId] || {}}
-                  editionId={selectedEditionId}
+            <div
+              ref={editionsSelectorRef}
+              className={`w-full transition-all duration-200 ${
+                isSticky 
+                  ? "fixed top-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm" 
+                  : ""
+              }`}
+            >
+              <div className={`${isSticky ? "max-w-4xl mx-auto px-4 py-3" : ""}`}>
+                <EditionsSelector
+                  editions={editions}
+                  selectedEditionId={selectedEditionId}
+                  votes={votes}
+                  getCurrentEditionCategories={getCurrentEditionCategories}
+                  onEditionChange={handleEditionChange}
                 />
-              )}
+              </div>
+            </div>
 
-              {isMobile ? (
-                <div className="mb-6 relative" ref={mobileMainContainerRef}>
-                  {/* Category selector tabs */}
-                  <div
-                    ref={categoryTabsRef}
-                    className={`overflow-x-auto transition-all duration-200 ${
-                      isSticky 
-                        ? "fixed top-0 left-0 right-0 z-20 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm mt-[var(--editions-height,0px)]" 
-                        : "mb-4"
-                    }`}
-                  >
-                    <div className={`flex space-x-2 p-2 ${isSticky ? "max-w-4xl mx-auto" : ""}`}>
-                      {getCurrentEditionCategories().map((category) => (
-                        <button
-                          key={category.id}
-                          onClick={() => handleCategoryClick(category.id)}
-                          className={`px-3 py-2 text-sm whitespace-nowrap rounded-md flex items-center ${
-                            localActiveCategory === category.id ? "bg-primary text-primary-foreground" : "bg-muted/30"
-                          } ${votes[selectedEditionId]?.[category.id] ? "text-success" : ""}`}
-                          aria-pressed={localActiveCategory === category.id}
-                          aria-label={`Categoria ${category.name} ${votes[selectedEditionId]?.[category.id] ? "(votada)" : ""}`}
-                        >
-                          {category.name.split(" ").pop()}
-                          {votes[selectedEditionId]?.[category.id] && (
-                            <CheckCircle2 className="ml-1 h-3 w-3 inline-block" aria-hidden="true" />
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+            {isSticky && <div style={{ height: editionsSelectorHeight.current }}></div>}
 
-                  {isSticky && categoryTabsRef.current && (
-                    <div style={{ height: categoryTabsHeight.current, marginBottom: "1rem" }}></div>
-                  )}
+            {selectedEditionId && editions.length > 0 && (
+              <>
+                {/* Progress bar showing voting completion - apenas para desktop */}
+                {!isMobile && (
+                  <VotingProgress
+                    categories={categories}
+                    votes={votes[selectedEditionId] || {}}
+                    editionId={selectedEditionId}
+                  />
+                )}
 
-                  {/* Category heading and description */}
-                  <div 
-                    className="mb-3 text-center" 
-                    id={`category-header-${currentCategory?.id}`}
-                    data-category-header="true"
-                    style={{ scrollMarginTop: '120px' }}
-                  >
-                    <h2 className="text-xl font-bold text-primary mb-1 scroll-mt-20">{currentCategory?.name}</h2>
-                    <p className="text-sm text-muted-foreground">{currentCategory?.description}</p>
-                  </div>
-
-                  {/* Swipeable content area */}
-                  <div
-                    className="border border-muted rounded-md shadow-sm mb-32"
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                    role="region"
-                    aria-label="Área de votação"
-                    ref={contentContainerRef}
-                  >
-                    <div className="relative overflow-hidden">
-                      {getCurrentEditionCategories().map((category) => (
-                        <div
-                          key={category.id}
-                          ref={(el) => {
-                            if (el) {
-                              categoryRefs.current = {
-                                ...categoryRefs.current,
-                                [category.id]: el
-                              }
-                            } else if (categoryRefs.current[category.id]) {
-                              const { [category.id]: _, ...rest } = categoryRefs.current
-                              categoryRefs.current = rest
-                            }
-                          }}
-                          className={`transition-all duration-300 ease-in-out ${
-                            localActiveCategory === category.id ? "block opacity-100" : "hidden opacity-0"
-                          }`}
-                          role="tabpanel"
-                          aria-labelledby={`tab-${category.id}`}
-                          tabIndex={localActiveCategory === category.id ? 0 : -1}
-                        >
-                          <div className="p-4">
-                            <CategorySection
-                              category={category}
-                              selectedGameId={votes[selectedEditionId]?.[category.id]}
-                              onVote={(gameId) => handleGameSelection(category.id, gameId)}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Container para progresso e botão */}
-                    <div 
-                      className="sticky left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-muted transition-all duration-300"
-                      style={{
-                        bottom: footerState.isExpanded ? '4rem' : '1rem',
-                        marginBottom: '0',
-                        zIndex: footerState.isExpanded ? 20 : 50
-                      }}
-                    >
-                      {/* Progress bar */}
-                      <div className="px-4 py-2">
-                        <VotingProgress
-                          categories={categories}
-                          votes={votes[selectedEditionId] || {}}
-                          editionId={selectedEditionId}
-                        />
-                      </div>
-
-                      {/* Botões de navegação */}
-                      <div className="px-4 pb-4 flex flex-col gap-4">
-                        <div className="flex items-center justify-between gap-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-10 w-10 bg-background hover:bg-muted"
-                            onClick={() => navigateToCategory("prev")}
-                            disabled={currentCategoryIndex === 0}
-                            aria-label="Categoria anterior"
-                          >
-                            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-                          </Button>
-
-                          <Button
-                            onClick={handleSubmitVotesInUIWithCleanup}
-                            disabled={isSubmitting || !isAllCategoriesVoted()}
-                            className="flex-1 h-10 text-primary-foreground bg-gradient-to-r from-chart-1 to-success hover:from-chart-1 hover:to-success-foreground shadow-lg hover:shadow-success/25 hover:text-secondary-foreground transition-all duration-300"
-                            aria-live="polite"
-                          >
-                            {isSubmitting ? (
-                              <div className="flex items-center justify-center">
-                                <div
-                                  className="w-5 h-5 border-2 border-t-transparent border-primary-foreground rounded-full animate-spin mr-2"
-                                  aria-hidden="true"
-                                ></div>
-                                <span className="text-sm">Processando...</span>
-                              </div>
-                            ) : (
-                              <span className="text-sm">Enviar Votos</span>
-                            )}
-                          </Button>
-
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-10 w-10 bg-background hover:bg-muted"
-                            onClick={() => navigateToCategory("next")}
-                            disabled={currentCategoryIndex === categories.length - 1}
-                            aria-label="Próxima categoria"
-                          >
-                            <ArrowRight className="h-5 w-5" aria-hidden="true" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                // Desktop view with improved accessibility
-                <div className="hidden md:block mb-6">
-                  <Tabs 
-                    value={localActiveCategory} 
-                    onValueChange={(newValue) => handleCategoryClick(newValue)} 
-                    className="w-full"
-                  >
+                {isMobile ? (
+                  <div className="mb-6 relative" ref={mobileMainContainerRef}>
+                    {/* Category selector tabs */}
                     <div
-                      ref={tabsListRef}
-                      className={`w-full ${
-                        isSticky
-                          ? "fixed top-0 left-0 right-0 z-10 bg-background px-4 py-2 shadow-md mt-12 max-w-4xl mx-auto"
-                          : ""
+                      ref={categoryTabsRef}
+                      className={`overflow-x-auto ${
+                        isSticky 
+                          ? "fixed top-0 left-0 right-0 z-20 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm mt-[var(--editions-height,0px)]" 
+                          : "mb-4"
                       }`}
                     >
-                      <CategorySelector
-                        categories={getCurrentEditionCategories()
-                          .slice()
-                          .sort((a, b) => {
-                            const hasVoteA = Boolean(votes[selectedEditionId]?.[a.id])
-                            const hasVoteB = Boolean(votes[selectedEditionId]?.[b.id])
-                            if (hasVoteA === hasVoteB) {
-                              return 0
-                            }
-                            return hasVoteA ? 1 : -1
-                          })}
-                        selectedCategoryId={localActiveCategory}
-                        votes={votes[selectedEditionId] || {}}
-                        onCategoryChange={handleCategoryClick}
-                      />
+                      <div className={`flex space-x-2 p-2 ${isSticky ? "max-w-4xl mx-auto" : ""}`}>
+                        {getCurrentEditionCategories().map((category) => (
+                          <button
+                            key={category.id}
+                            onClick={() => handleCategoryClick(category.id)}
+                            className={`px-3 py-2 text-sm whitespace-nowrap rounded-md flex items-center transition-all duration-200 ${
+                              localActiveCategory === category.id 
+                                ? "bg-primary text-primary-foreground scale-105" 
+                                : "bg-muted/30 hover:bg-muted/50"
+                            } ${votes[selectedEditionId]?.[category.id] ? "text-success" : ""}`}
+                            aria-pressed={localActiveCategory === category.id}
+                            aria-label={`Categoria ${category.name} ${votes[selectedEditionId]?.[category.id] ? "(votada)" : ""}`}
+                          >
+                            {category.name.split(" ").pop()}
+                            {votes[selectedEditionId]?.[category.id] && (
+                              <CheckCircle2 className="ml-1 h-3 w-3 inline-block" aria-hidden="true" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
-                    {isSticky && <div style={{ height: "3rem", marginBottom: "1rem" }}></div>}
+                    {isSticky && categoryTabsRef.current && (
+                      <div style={{ height: categoryTabsHeight.current, marginBottom: "1rem" }}></div>
+                    )}
 
-                    {getCurrentEditionCategories().map((category) => (
-                      <TabsContent
-                        key={category.id}
-                        value={category.id}
-                        className="mt-4"
-                        role="tabpanel"
-                        aria-labelledby={`tab-${category.id}`}
+                    {/* Category heading and description */}
+                    <div 
+                      className="mb-6 text-center relative z-10" 
+                      id={`category-header-${currentCategory?.id}`}
+                      data-category-header="true"
+                      style={{ 
+                        scrollMarginTop: '120px',
+                        paddingTop: isSticky ? '4rem' : '0',
+                        transition: 'padding-top 0.2s ease-out'
+                      }}
+                    >
+                      <div className="bg-background">
+                        <h2 className="text-xl font-bold text-primary mb-2">{currentCategory?.name}</h2>
+                        <p className="text-sm text-muted-foreground max-w-2xl mx-auto">{currentCategory?.description}</p>
+                      </div>
+                    </div>
+
+                    {/* Swipeable content area */}
+                    <div
+                      className="border border-muted rounded-md shadow-sm mb-32 relative z-0"
+                      onTouchStart={handleTouchStart}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
+                      role="region"
+                      aria-label="Área de votação"
+                      ref={contentContainerRef}
+                    >
+                      <div className="relative overflow-hidden">
+                        {getCurrentEditionCategories().map((category) => (
+                          <div
+                            key={category.id}
+                            ref={(el) => {
+                              if (el) {
+                                categoryRefs.current = {
+                                  ...categoryRefs.current,
+                                  [category.id]: el
+                                }
+                              } else if (categoryRefs.current[category.id]) {
+                                const { [category.id]: _, ...rest } = categoryRefs.current
+                                categoryRefs.current = rest
+                              }
+                            }}
+                            className={`transition-all duration-300 ease-in-out ${
+                              localActiveCategory === category.id ? "block opacity-100" : "hidden opacity-0"
+                            }`}
+                            role="tabpanel"
+                            aria-labelledby={`tab-${category.id}`}
+                            tabIndex={localActiveCategory === category.id ? 0 : -1}
+                          >
+                            <div className="p-4">
+                              <CategorySection
+                                category={category}
+                                selectedGameId={votes[selectedEditionId]?.[category.id]}
+                                onVote={(gameId) => handleGameSelection(category.id, gameId)}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Container para progresso e botão */}
+                      <div 
+                        className="sticky left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-muted transition-all duration-300"
+                        style={{
+                          bottom: footerState.isExpanded ? '4rem' : '1rem',
+                          marginBottom: '0',
+                          zIndex: footerState.isExpanded ? 20 : 50
+                        }}
                       >
-                        <div 
-                          className="mb-3 text-center" 
-                          id={`category-header-${category.id}`}
-                        >
-                          <h2 className="text-xl font-bold text-primary mb-1 scroll-mt-20">{category.name}</h2>
-                          <p className="text-sm text-muted-foreground">{category.description}</p>
+                        {/* Progress bar */}
+                        <div className="px-4 py-2">
+                          <VotingProgress
+                            categories={categories}
+                            votes={votes[selectedEditionId] || {}}
+                            editionId={selectedEditionId}
+                          />
                         </div>
-                        <CategorySection
-                          category={category}
-                          selectedGameId={votes[selectedEditionId]?.[category.id]}
-                          onVote={(gameId) => handleGameSelection(category.id, gameId)}
+
+                        {/* Botões de navegação */}
+                        <div className="px-4 pb-4 flex flex-col gap-4">
+                          <div className="flex items-center justify-between gap-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-10 w-10 bg-background hover:bg-muted"
+                              onClick={() => navigateToCategory("prev")}
+                              disabled={currentCategoryIndex === 0}
+                              aria-label="Categoria anterior"
+                            >
+                              <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+                            </Button>
+
+                            <Button
+                              onClick={handleSubmitVotesInUIWithCleanup}
+                              disabled={isSubmitting || !isAllCategoriesVoted()}
+                              className="flex-1 h-10 text-primary-foreground bg-gradient-to-r from-chart-1 to-success hover:from-chart-1 hover:to-success-foreground shadow-lg hover:shadow-success/25 hover:text-secondary-foreground transition-all duration-300"
+                              aria-live="polite"
+                            >
+                              {isSubmitting ? (
+                                <div className="flex items-center justify-center">
+                                  <div
+                                    className="w-5 h-5 border-2 border-t-transparent border-primary-foreground rounded-full animate-spin mr-2"
+                                    aria-hidden="true"
+                                  ></div>
+                                  <span className="text-sm">Processando...</span>
+                                </div>
+                              ) : (
+                                <span className="text-sm">Enviar Votos</span>
+                              )}
+                            </Button>
+
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-10 w-10 bg-background hover:bg-muted"
+                              onClick={() => navigateToCategory("next")}
+                              disabled={currentCategoryIndex === categories.length - 1}
+                              aria-label="Próxima categoria"
+                            >
+                              <ArrowRight className="h-5 w-5" aria-hidden="true" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  // Desktop view with improved accessibility
+                  <div className="hidden md:block mb-6">
+                    <Tabs 
+                      value={localActiveCategory} 
+                      onValueChange={(newValue) => handleCategoryClick(newValue)} 
+                      className="w-full"
+                    >
+                      <div
+                        ref={tabsListRef}
+                        className={`w-full ${
+                          isSticky
+                            ? "fixed top-0 left-0 right-0 z-10 bg-background px-4 py-2 shadow-md mt-12 max-w-4xl mx-auto"
+                            : ""
+                        }`}
+                      >
+                        <CategorySelector
+                          categories={getCurrentEditionCategories()
+                            .slice()
+                            .sort((a, b) => {
+                              const hasVoteA = Boolean(votes[selectedEditionId]?.[a.id])
+                              const hasVoteB = Boolean(votes[selectedEditionId]?.[b.id])
+                              if (hasVoteA === hasVoteB) {
+                                return 0
+                              }
+                              return hasVoteA ? 1 : -1
+                            })}
+                          selectedCategoryId={localActiveCategory}
+                          votes={votes[selectedEditionId] || {}}
+                          onCategoryChange={handleCategoryClick}
                         />
-                      </TabsContent>
-                    ))}
-                  </Tabs>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </main>
-      <Footer />
-    </div>
+                      </div>
+
+                      {isSticky && <div style={{ height: "3rem", marginBottom: "1rem" }}></div>}
+
+                      {getCurrentEditionCategories().map((category) => (
+                        <TabsContent
+                          key={category.id}
+                          value={category.id}
+                          className="mt-4"
+                          role="tabpanel"
+                          aria-labelledby={`tab-${category.id}`}
+                        >
+                          <div 
+                            className="mb-3 text-center" 
+                            id={`category-header-${category.id}`}
+                          >
+                            <h2 className="text-xl font-bold text-primary mb-1 scroll-mt-20">{category.name}</h2>
+                            <p className="text-sm text-muted-foreground">{category.description}</p>
+                          </div>
+                          <CategorySection
+                            category={category}
+                            selectedGameId={votes[selectedEditionId]?.[category.id]}
+                            onVote={(gameId) => handleGameSelection(category.id, gameId)}
+                          />
+                        </TabsContent>
+                      ))}
+                    </Tabs>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </main>
+        <Footer />
+      </div>
+    </>
   )
 }

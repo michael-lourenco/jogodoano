@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Footer } from "@/components/Footer"
-import { CheckCircle2, ArrowRight, Trophy } from "lucide-react"
+import { CheckCircle2, ArrowRight, Trophy, ArrowLeft } from "lucide-react"
 import { UserInfo } from "@/components/UserInfo"
 import { CategorySection } from "@/components/voting/CategorySection"
 import { EditionsSelector } from "@/components/voting/EditionsSelector"
@@ -726,45 +726,48 @@ export function VotingInterface({
 
                       {/* Botões de navegação */}
                       <div className="px-4 pb-4 flex flex-col gap-4">
-                        <div className="flex justify-between items-center gap-4">
+                        <div className="flex items-center justify-between gap-2">
                           <Button
                             variant="outline"
-                            className="flex-1 bg-background hover:bg-muted"
+                            size="icon"
+                            className="h-10 w-10 bg-background hover:bg-muted"
                             onClick={() => navigateToCategory("prev")}
                             disabled={currentCategoryIndex === 0}
+                            aria-label="Categoria anterior"
                           >
-                            Anterior
+                            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
                           </Button>
+
+                          <Button
+                            onClick={handleSubmitVotesInUI}
+                            disabled={isSubmitting || !isAllCategoriesVoted()}
+                            className="flex-1 h-10 text-primary-foreground bg-gradient-to-r from-chart-1 to-success hover:from-chart-1 hover:to-success-foreground shadow-lg hover:shadow-success/25 hover:text-secondary-foreground transition-all duration-300"
+                            aria-live="polite"
+                          >
+                            {isSubmitting ? (
+                              <div className="flex items-center justify-center">
+                                <div
+                                  className="w-5 h-5 border-2 border-t-transparent border-primary-foreground rounded-full animate-spin mr-2"
+                                  aria-hidden="true"
+                                ></div>
+                                <span className="text-sm">Processando...</span>
+                              </div>
+                            ) : (
+                              <span className="text-sm">Enviar Votos</span>
+                            )}
+                          </Button>
+
                           <Button
                             variant="outline"
-                            className="flex-1 bg-background hover:bg-muted"
+                            size="icon"
+                            className="h-10 w-10 bg-background hover:bg-muted"
                             onClick={() => navigateToCategory("next")}
                             disabled={currentCategoryIndex === categories.length - 1}
+                            aria-label="Próxima categoria"
                           >
-                            Próximo
+                            <ArrowRight className="h-5 w-5" aria-hidden="true" />
                           </Button>
                         </div>
-
-                        {/* Botão de enviar votos */}
-                        <Button
-                          onClick={handleSubmitVotesInUI}
-                          disabled={isSubmitting || !isAllCategoriesVoted()}
-                          className="w-full h-12 text-primary-foreground bg-gradient-to-r from-chart-1 to-success hover:from-chart-1 hover:to-success-foreground shadow-lg hover:shadow-success/25 hover:text-secondary-foreground transition-all duration-300"
-                          size="lg"
-                          aria-live="polite"
-                        >
-                          {isSubmitting ? (
-                            <div className="flex items-center">
-                              <div
-                                className="w-5 h-5 border-2 border-t-transparent border-primary-foreground rounded-full animate-spin mr-2"
-                                aria-hidden="true"
-                              ></div>
-                              Processando...
-                            </div>
-                          ) : (
-                            <>Enviar Todos os Votos</>
-                          )}
-                        </Button>
                       </div>
                     </div>
                   </div>

@@ -748,24 +748,21 @@ export function VotingInterface({
 
                     {/* Category heading and description */}
                     <div 
-                      className="mb-6 text-center relative z-10" 
+                      className="mb-6 text-center" 
                       id={`category-header-${currentCategory?.id}`}
                       data-category-header="true"
                       style={{ 
                         scrollMarginTop: '120px',
-                        paddingTop: isSticky ? '4rem' : '0',
-                        transition: 'padding-top 0.2s ease-out'
+                        paddingTop: isSticky ? '4rem' : '0'
                       }}
                     >
-                      <div className="bg-background">
-                        <h2 className="text-xl font-bold text-primary mb-2">{currentCategory?.name}</h2>
-                        <p className="text-sm text-muted-foreground max-w-2xl mx-auto">{currentCategory?.description}</p>
-                      </div>
+                      <h2 className="text-xl font-bold text-primary mb-2">{currentCategory?.name}</h2>
+                      <p className="text-sm text-muted-foreground max-w-2xl mx-auto">{currentCategory?.description}</p>
                     </div>
 
                     {/* Swipeable content area */}
                     <div
-                      className="border border-muted rounded-md shadow-sm mb-32 relative z-0"
+                      className="border border-muted rounded-md shadow-sm mb-32"
                       onTouchStart={handleTouchStart}
                       onTouchMove={handleTouchMove}
                       onTouchEnd={handleTouchEnd}

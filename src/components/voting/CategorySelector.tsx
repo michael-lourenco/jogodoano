@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react"
 import type { Category } from "@/types/types"
 import type { CategoryVotes } from "@/types/voting/interfaces"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface CategorySelectorProps {
   categories: Category[]
@@ -22,6 +23,7 @@ export function CategorySelector({
   const containerRef = useRef<HTMLDivElement>(null)
   const [showLeftArrow, setShowLeftArrow] = useState(false)
   const [showRightArrow, setShowRightArrow] = useState(false)
+  const isMobile = useIsMobile()
 
   const checkScroll = () => {
     if (containerRef.current) {
@@ -30,6 +32,25 @@ export function CategorySelector({
       setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1)
     }
   }
+
+  // Efeito para centralizar a categoria selecionada
+  useEffect(() => {
+    if (containerRef.current && isMobile) {
+      const selectedElement = containerRef.current.querySelector(`[data-category-id="${selectedCategoryId}"]`)
+      if (selectedElement) {
+        const containerWidth = containerRef.current.clientWidth
+        const elementWidth = selectedElement.clientWidth
+        const elementLeft = selectedElement.getBoundingClientRect().left
+        const containerLeft = containerRef.current.getBoundingClientRect().left
+        const scrollLeft = elementLeft - containerLeft - (containerWidth / 2) + (elementWidth / 2)
+        
+        containerRef.current.scrollTo({
+          left: scrollLeft,
+          behavior: 'smooth'
+        })
+      }
+    }
+  }, [selectedCategoryId, isMobile])
 
   useEffect(() => {
     checkScroll()
@@ -62,13 +83,24 @@ export function CategorySelector({
         <div
           ref={containerRef}
           onScroll={checkScroll}
-          className="flex overflow-x-auto scrollbar-hide py-1.5 px-[calc(50%-60px)]"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          className={`flex overflow-x-auto scrollbar-hide py-1.5 ${
+            isMobile ? 'px-[calc(50%-60px)]' : ''
+          }`}
+          style={{ 
+            scrollbarWidth: "none", 
+            msOverflowStyle: "none",
+            ...(isMobile && {
+              scrollSnapType: "x mandatory",
+              WebkitOverflowScrolling: "touch"
+            })
+          }}
         >
           {categories.map((category) => (
             <div
               key={category.id}
+              data-category-id={category.id}
               className="flex-shrink-0 px-1.5"
+              style={isMobile ? { scrollSnapAlign: "center" } : undefined}
             >
               <Button
                 variant={selectedCategoryId === category.id ? "default" : "outline"}

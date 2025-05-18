@@ -888,6 +888,11 @@ export function VotingInterface({
                           <h2 className="text-xl font-bold text-primary mb-1 scroll-mt-20">{category.name}</h2>
                           <p className="text-sm text-muted-foreground">{category.description}</p>
                         </div>
+                        <CategorySection
+                          category={category}
+                          selectedGameId={votes[selectedEditionId]?.[category.id]}
+                          onVote={(gameId) => handleGameSelection(category.id, gameId)}
+                        />
                       </TabsContent>
                     ))}
                   </Tabs>

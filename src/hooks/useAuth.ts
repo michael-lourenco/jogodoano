@@ -38,7 +38,16 @@ export function useAuth() {
   const [db, setDb] = useState<any>(null);
 
   const handleLogin = async () => {
-    await signInWithGoogle();
+    try {
+      // Garantir que estamos no lado do cliente
+      if (typeof window !== "undefined") {
+        // Salvar a URL atual antes do login
+        sessionStorage.setItem("loginRedirectUrl", window.location.pathname);
+      }
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Erro durante o login:", error);
+    }
   };
 
   const handleLogout = async () => {

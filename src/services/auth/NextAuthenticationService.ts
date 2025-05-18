@@ -54,7 +54,15 @@ let globalUser: UserData | null = null;
 
 async function signInWithGoogle(): Promise<void> {
   try {
-    await signIn("google", { callbackUrl: "/player" });
+    if (typeof window === "undefined") {
+      await signIn("google", { callbackUrl: "/" });
+      return;
+    }
+
+    const redirectUrl = sessionStorage.getItem("loginRedirectUrl") || window.location.pathname;
+    await signIn("google", { callbackUrl: redirectUrl });
+    
+    sessionStorage.removeItem("loginRedirectUrl");
   } catch (error) {
     console.error("Error during sign in:", error);
     throw error;

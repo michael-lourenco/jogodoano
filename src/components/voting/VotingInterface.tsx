@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Footer } from "@/components/Footer"
-import { CheckCircle2, ArrowRight, Trophy, ArrowLeft } from "lucide-react"
+import { CheckCircle2, ArrowRight, Trophy, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react"
 import { UserInfo } from "@/components/UserInfo"
 import { CategorySection } from "@/components/voting/CategorySection"
 import { EditionsSelector } from "@/components/voting/EditionsSelector"
@@ -19,6 +19,8 @@ import type { VotingInterfaceProps } from "@/types/voting/interfaces"
 import { CategorySelector } from "@/components/voting/CategorySelector"
 import { useLocalVotes } from "@/stores/useLocalVotes"
 import { CategoryStepper } from "@/components/voting/CategoryStepper"
+import { cn } from "@/lib/utils"
+import { motion } from "framer-motion"
 
 export function VotingInterface({
   user,
@@ -222,7 +224,47 @@ export function VotingInterface({
 
   // Estado para controlar a posição de rolagem do usuário
   const [scrollPosition, setScrollPosition] = useState<'top' | 'middle' | 'bottom'>('top')
-  
+  const containerRef = useRef<HTMLDivElement>(null)
+  const currentIndex = getCurrentEditionCategories().findIndex(cat => cat.id === localActiveCategory)
+
+  // Função para calcular o índice real considerando o array circular
+  const getCircularIndex = (index: number) => {
+    const categories = getCurrentEditionCategories()
+    return (index + categories.length) % categories.length
+  }
+
+  // Array com os 5 índices que queremos mostrar (2 antes, atual, 2 depois)
+  const visibleIndices = [
+    getCircularIndex(currentIndex - 2),
+    getCircularIndex(currentIndex - 1),
+    currentIndex,
+    getCircularIndex(currentIndex + 1),
+    getCircularIndex(currentIndex + 2)
+  ]
+
+  // Função para lidar com o evento de wheel
+  const handleWheel = (e: WheelEvent) => {
+    if (!isMobile) return
+
+    e.preventDefault()
+    const delta = Math.sign(e.deltaY)
+    
+    if (delta > 0) {
+      handleCategoryClick(getCurrentEditionCategories()[getCircularIndex(currentIndex + 1)].id)
+    } else {
+      handleCategoryClick(getCurrentEditionCategories()[getCircularIndex(currentIndex - 1)].id)
+    }
+  }
+
+  // Adiciona e remove o evento de wheel
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    container.addEventListener('wheel', handleWheel, { passive: false })
+    return () => container.removeEventListener('wheel', handleWheel)
+  }, [currentIndex, isMobile])
+
   // Função para verificar a posição de scroll
   const checkScrollPosition = useCallback(() => {
     if (contentContainerRef.current) {
@@ -715,37 +757,106 @@ export function VotingInterface({
                     {/* Category selector tabs */}
                     <div
                       ref={categoryTabsRef}
-                      className={`overflow-x-auto ${
+                      className={cn(
+                        "relative",
                         isSticky 
                           ? "fixed top-0 left-0 right-0 z-20 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm mt-[var(--editions-height,0px)]" 
                           : "mb-4"
-                      }`}
+                      )}
                     >
-                      <div className={`flex space-x-2 p-2 ${isSticky ? "max-w-4xl mx-auto" : ""}`}>
-                        {getCurrentEditionCategories().map((category) => (
-                          <button
-                            key={category.id}
-                            onClick={() => handleCategoryClick(category.id)}
-                            className={`px-3 py-2 text-sm whitespace-nowrap rounded-md flex items-center transition-all duration-200 ${
-                              localActiveCategory === category.id 
-                                ? "bg-primary text-primary-foreground scale-105" 
-                                : "bg-muted/30 hover:bg-muted/50"
-                            } ${votes[selectedEditionId]?.[category.id] ? "text-success" : ""}`}
-                            aria-pressed={localActiveCategory === category.id}
-                            aria-label={`Categoria ${category.name} ${votes[selectedEditionId]?.[category.id] ? "(votada)" : ""}`}
-                          >
-                            {category.name.split(" ").pop()}
-                            {votes[selectedEditionId]?.[category.id] && (
-                              <CheckCircle2 className="ml-1 h-3 w-3 inline-block" aria-hidden="true" />
-                            )}
-                          </button>
-                        ))}
+                      <div className={cn(
+                        "relative flex items-center justify-center py-2",
+                        isSticky ? "max-w-4xl mx-auto" : ""
+                      )}>
+                        {/* Botão Anterior */}
+                        <button
+                          onClick={() => handleCategoryClick(getCurrentEditionCategories()[getCircularIndex(currentIndex - 1)].id)}
+                          className={cn(
+                            "absolute left-0 z-20 rounded-full hover:bg-muted/50 transition-colors",
+                            isMobile ? "p-1" : "p-1.5"
+                          )}
+                          aria-label="Categoria anterior"
+                        >
+                          <ChevronLeft className={cn(isMobile ? "w-4 h-4" : "w-5 h-5")} />
+                        </button>
+
+                        {/* Container do Carrossel */}
+                        <div 
+                          ref={containerRef}
+                          className={cn(
+                            "relative w-full overflow-hidden",
+                            isMobile ? "max-w-[240px]" : "max-w-[280px]"
+                          )}
+                        >
+                          <div className="flex items-center justify-center gap-0.5">
+                            {visibleIndices.map((index, position) => {
+                              const category = getCurrentEditionCategories()[index]
+                              const isActive = category.id === localActiveCategory
+                              const isVoted = votes[selectedEditionId]?.[category.id]
+
+                              return (
+                                <motion.button
+                                  key={category.id}
+                                  onClick={() => handleCategoryClick(category.id)}
+                                  className={cn(
+                                    "relative flex items-center justify-center transition-all duration-200 group",
+                                    isMobile ? "w-5 h-5" : "w-8 h-8"
+                                  )}
+                                  initial={false}
+                                  animate={{
+                                    scale: isActive ? 1.1 : 1,
+                                    opacity: isActive ? 1 : 0.7,
+                                    x: `${(position - 2) * (isMobile ? 20 : 32)}px`
+                                  }}
+                                  transition={{
+                                    type: "spring",
+                                    stiffness: 300,
+                                    damping: 30
+                                  }}
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                >
+                                  <Button
+                                    variant={isActive ? "default" : "outline"}
+                                    className={cn(
+                                      "transition-all duration-200",
+                                      isMobile 
+                                        ? "w-[90px] h-7 text-xs px-2" 
+                                        : "w-[120px] h-8 text-sm",
+                                      isActive
+                                        ? "bg-gradient-to-r from-chart-2 to-chart-5 text-primary-foreground shadow-lg"
+                                        : isVoted
+                                          ? "text-success border-success/30 hover:border-success/50"
+                                          : "hover:bg-muted/50"
+                                    )}
+                                  >
+                                    <span className="truncate">{category.name.split(" ").pop()}</span>
+                                    {isVoted && (
+                                      <CheckCircle2 className={cn(
+                                        "ml-1 flex-shrink-0",
+                                        isMobile ? "h-2.5 w-2.5" : "h-3 w-3"
+                                      )} />
+                                    )}
+                                  </Button>
+                                </motion.button>
+                              )
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Botão Próximo */}
+                        <button
+                          onClick={() => handleCategoryClick(getCurrentEditionCategories()[getCircularIndex(currentIndex + 1)].id)}
+                          className={cn(
+                            "absolute right-0 z-20 rounded-full hover:bg-muted/50 transition-colors",
+                            isMobile ? "p-1" : "p-1.5"
+                          )}
+                          aria-label="Próxima categoria"
+                        >
+                          <ChevronRight className={cn(isMobile ? "w-4 h-4" : "w-5 h-5")} />
+                        </button>
                       </div>
                     </div>
-
-                    {isSticky && categoryTabsRef.current && (
-                      <div style={{ height: categoryTabsHeight.current + 64, marginBottom: "1rem" }}></div>
-                    )}
 
                     {/* Category heading and description */}
                     <div 

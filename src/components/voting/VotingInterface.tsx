@@ -827,17 +827,6 @@ export function VotingInterface({
                         <div className="px-4 pb-4 flex flex-col gap-4">
                           <div className="flex items-center justify-between gap-2">
                             <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-10 w-10 bg-background hover:bg-muted"
-                              onClick={() => navigateToCategory("prev")}
-                              disabled={currentCategoryIndex === 0}
-                              aria-label="Categoria anterior"
-                            >
-                              <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-                            </Button>
-
-                            <Button
                               onClick={handleSubmitVotesInUIWithCleanup}
                               disabled={isSubmitting || !isAllCategoriesVoted()}
                               className="flex-1 h-10 text-primary-foreground bg-gradient-to-r from-chart-1 to-success hover:from-chart-1 hover:to-success-foreground shadow-lg hover:shadow-success/25 hover:text-secondary-foreground transition-all duration-300"
@@ -854,17 +843,6 @@ export function VotingInterface({
                               ) : (
                                 <span className="text-sm">Enviar Votos</span>
                               )}
-                            </Button>
-
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-10 w-10 bg-background hover:bg-muted"
-                              onClick={() => navigateToCategory("next")}
-                              disabled={currentCategoryIndex === categories.length - 1}
-                              aria-label="Próxima categoria"
-                            >
-                              <ArrowRight className="h-5 w-5" aria-hidden="true" />
                             </Button>
                           </div>
                         </div>

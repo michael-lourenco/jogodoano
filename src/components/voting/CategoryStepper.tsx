@@ -24,20 +24,21 @@ export function CategoryStepper({
   return (
     <div className={cn(
       "flex items-center justify-center gap-1.5 py-2",
-      isMobile ? "overflow-x-auto px-4" : "px-2"
+      isMobile ? "overflow-x-auto px-4 scrollbar-none" : "px-2"
     )}>
       {categories.map((category, index) => {
         const isActive = category.id === currentCategoryId
         const isVoted = votes[category.id]
         const isPast = index < currentIndex
+        const isPastAndVoted = isPast && isVoted
 
         return (
           <motion.button
             key={category.id}
             onClick={() => onStepClick(category.id)}
             className={cn(
-              "relative flex items-center justify-center transition-all duration-200",
-              isMobile ? "w-8 h-8" : "w-10 h-10"
+              "relative flex items-center justify-center transition-all duration-200 group",
+              isMobile ? "w-7 h-7" : "w-10 h-10"
             )}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
@@ -47,7 +48,7 @@ export function CategoryStepper({
               <div 
                 className={cn(
                   "absolute top-1/2 -right-1/2 h-0.5 w-full -translate-y-1/2",
-                  isPast ? "bg-success" : "bg-muted"
+                  isPastAndVoted ? "bg-success" : "bg-muted"
                 )}
               />
             )}
@@ -58,17 +59,17 @@ export function CategoryStepper({
                 "relative z-10 flex items-center justify-center rounded-full border-2 transition-all duration-200",
                 isActive 
                   ? "border-primary bg-primary text-primary-foreground scale-110" 
-                  : isPast 
+                  : isVoted
                     ? "border-success bg-success text-success-foreground"
                     : "border-muted bg-background hover:border-primary/50",
-                isMobile ? "w-6 h-6 text-xs" : "w-8 h-8 text-sm"
+                isMobile ? "w-5 h-5 text-xs" : "w-8 h-8 text-sm"
               )}
             >
               {isVoted ? (
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="text-success"
+                  className="text-success-foreground"
                 >
                   ✓
                 </motion.div>

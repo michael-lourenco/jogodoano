@@ -743,16 +743,8 @@ export function VotingInterface({
                       </div>
                     </div>
 
-                    {/* Adicionar o CategoryStepper */}
-                    <CategoryStepper
-                      categories={categories}
-                      currentCategoryId={localActiveCategory}
-                      onStepClick={handleCategoryClick}
-                      votes={votes[selectedEditionId] || {}}
-                    />
-
                     {isSticky && categoryTabsRef.current && (
-                      <div style={{ height: categoryTabsHeight.current, marginBottom: "1rem" }}></div>
+                      <div style={{ height: categoryTabsHeight.current + 64, marginBottom: "1rem" }}></div>
                     )}
 
                     {/* Category heading and description */}
@@ -761,7 +753,7 @@ export function VotingInterface({
                       id={`category-header-${currentCategory?.id}`}
                       data-category-header="true"
                       style={{ 
-                        scrollMarginTop: '120px',
+                        scrollMarginTop: '180px',
                         paddingTop: isSticky ? '4rem' : '0'
                       }}
                     >
@@ -821,12 +813,13 @@ export function VotingInterface({
                           zIndex: footerState.isExpanded ? 20 : 50
                         }}
                       >
-                        {/* Progress bar */}
+                        {/* Category Stepper */}
                         <div className="px-4 py-2">
-                          <VotingProgress
+                          <CategoryStepper
                             categories={categories}
+                            currentCategoryId={localActiveCategory}
+                            onStepClick={handleCategoryClick}
                             votes={votes[selectedEditionId] || {}}
-                            editionId={selectedEditionId}
                           />
                         </div>
 

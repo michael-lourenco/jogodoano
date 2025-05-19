@@ -103,7 +103,42 @@ export const votingEditions: VotingEdition[] = [
           "metroidprime4",
           "mafiaoldcountry",
         ],
-      }
+      },
+      {
+        id: "multiplayer1",
+        name: "Melhor Multiplayer",
+        description:
+          "Jogos com experiências multijogador excepcionais, cooperativas ou competitivas",
+        gameIds: ["marvelrivals","monsterhunterwilds", "splitfiction","killing-floor-3"],
+      },
+      {
+        id: "multiplayer2",
+        name: "Melhor Multiplayer",
+        description:
+          "Jogos com experiências multijogador excepcionais, cooperativas ou competitivas",
+        gameIds: ["marvelrivals","monsterhunterwilds", "splitfiction","killing-floor-3"],
+      },
+            {
+        id: "multiplayer3",
+        name: "Melhor Multiplayer",
+        description:
+          "Jogos com experiências multijogador excepcionais, cooperativas ou competitivas",
+        gameIds: ["marvelrivals","monsterhunterwilds", "splitfiction","killing-floor-3"],
+      },
+            {
+        id: "multiplayer4",
+        name: "Melhor Multiplayer",
+        description:
+          "Jogos com experiências multijogador excepcionais, cooperativas ou competitivas",
+        gameIds: ["marvelrivals","monsterhunterwilds", "splitfiction","killing-floor-3"],
+      },
+            {
+        id: "multiplayer5",
+        name: "Melhor Multiplayer",
+        description:
+          "Jogos com experiências multijogador excepcionais, cooperativas ou competitivas",
+        gameIds: ["marvelrivals","monsterhunterwilds", "splitfiction","killing-floor-3"],
+      },
     ],
   },
   {

@@ -854,16 +854,6 @@ export function VotingInterface({
                         {/* Botões de navegação */}
                         <div className="px-4 pb-4 flex flex-col gap-4">
                           <div className="flex items-center justify-between gap-2">
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-10 w-10 bg-background hover:bg-muted"
-                              onClick={() => navigateToCategory("prev")}
-                              disabled={currentCategoryIndex === 0}
-                              aria-label="Categoria anterior"
-                            >
-                              <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-                            </Button>
 
                             <Button
                               onClick={handleSubmitVotesInUIWithCleanup}
@@ -882,17 +872,6 @@ export function VotingInterface({
                               ) : (
                                 <span className="text-sm">Enviar Votos</span>
                               )}
-                            </Button>
-
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-10 w-10 bg-background hover:bg-muted"
-                              onClick={() => navigateToCategory("next")}
-                              disabled={currentCategoryIndex === categories.length - 1}
-                              aria-label="Próxima categoria"
-                            >
-                              <ArrowRight className="h-5 w-5" aria-hidden="true" />
                             </Button>
                           </div>
                         </div>

@@ -22,6 +22,7 @@ import { CategoryStepper } from "@/components/voting/CategoryStepper"
 import { cn } from "@/lib/utils"
 import { useVotingManager } from "@/hooks/useVotingManager"
 import { useFooterState } from "@/hooks/useFooterState"
+import { useScrollPosition } from "@/hooks/useScrollPosition"
 
 export function VotingInterface({
   user,
@@ -41,7 +42,6 @@ export function VotingInterface({
 }: VotingInterfaceProps) {
   const isMobile = useIsMobile()
   const [showConfirmation, setShowConfirmation] = useState(false)
-  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false)
   const contentContainerRef = useRef<HTMLDivElement>(null)
   const [selectedGameElementId, setSelectedGameElementId] = useState<string | null>(null)
   const mobileMainContainerRef = useRef<HTMLDivElement>(null)
@@ -95,6 +95,10 @@ export function VotingInterface({
 
   const footerState = useFooterState()
 
+  const { scrollPosition, isScrolledToBottom, checkScrollPosition } = useScrollPosition({
+    containerRef: contentContainerRef
+  })
+
   // Atualiza o jogo selecionado quando a categoria muda
   useEffect(() => {
     if (selectedGame) {
@@ -114,8 +118,6 @@ export function VotingInterface({
     }
   }, [selectedEditionId, getCurrentEditionCategories, localActiveCategory, setLocalActiveCategory, setActiveCategory])
 
-  // Estado para controlar a posição de rolagem do usuário
-  const [scrollPosition, setScrollPosition] = useState<'top' | 'middle' | 'bottom'>('top')
   const containerRef = useRef<HTMLDivElement>(null)
   const currentIndex = getCurrentEditionCategories().findIndex(cat => cat.id === localActiveCategory)
 
@@ -163,44 +165,6 @@ export function VotingInterface({
     container.addEventListener('wheel', handleWheel, { passive: false })
     return () => container.removeEventListener('wheel', handleWheel)
   }, [currentIndex, isMobile])
-
-  // Função para verificar a posição de scroll
-  const checkScrollPosition = useCallback(() => {
-    if (contentContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = contentContainerRef.current
-      const scrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100
-      
-      // Determinar a posição de rolagem
-      let position: 'top' | 'middle' | 'bottom' = 'top'
-      
-      if (scrollPercentage < 20) {
-        position = 'top'
-      } else if (scrollPercentage > 80) {
-        position = 'bottom'
-      } else {
-        position = 'middle'
-      }
-      
-      setScrollPosition(position)
-      
-      // Manter a verificação de scroll até o fim para compatibilidade
-      const isBottom = scrollTop + clientHeight >= scrollHeight - 20 // 20px de tolerância
-      setIsScrolledToBottom(isBottom)
-    }
-  }, [])
-
-  // Configurar o listener de scroll
-  useEffect(() => {
-    const container = contentContainerRef.current
-    if (container) {
-      container.addEventListener('scroll', checkScrollPosition)
-      checkScrollPosition() // Verificar posição inicial
-      
-      return () => {
-        container.removeEventListener('scroll', checkScrollPosition)
-      }
-    }
-  }, [checkScrollPosition, localActiveCategory])
 
   // Função para calcular a posição vertical ideal do botão com base no jogo selecionado
   const calculateButtonPosition = useCallback(() => {

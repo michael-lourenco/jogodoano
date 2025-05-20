@@ -12,6 +12,34 @@ export function useScrollPosition({ containerRef, onScrollPositionChange }: UseS
   const [scrollPosition, setScrollPosition] = useState<ScrollPosition>('top')
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(false)
 
+  const resetScroll = useCallback((categoryId: string) => {
+    if (containerRef.current) {
+      const headerElement = document.getElementById(`category-header-${categoryId}`)
+      
+      if (headerElement) {
+        headerElement.scrollIntoView({ 
+          block: 'start', 
+          inline: 'nearest',
+          behavior: 'auto'
+        })
+        
+        containerRef.current.scrollTop = 0
+        
+        setTimeout(() => {
+          const headerRect = headerElement.getBoundingClientRect()
+          
+          if (headerRect.top > 100) {
+            headerElement.scrollIntoView({ 
+              block: 'start', 
+              inline: 'nearest',
+              behavior: 'auto'
+            })
+          }
+        }, 50)
+      }
+    }
+  }, [containerRef])
+
   const checkScrollPosition = useCallback(() => {
     if (containerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = containerRef.current
@@ -55,6 +83,7 @@ export function useScrollPosition({ containerRef, onScrollPositionChange }: UseS
   return {
     scrollPosition,
     isScrolledToBottom,
-    checkScrollPosition
+    checkScrollPosition,
+    resetScroll
   }
 } 

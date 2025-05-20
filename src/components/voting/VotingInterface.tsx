@@ -97,7 +97,7 @@ export function VotingInterface({
 
   const footerState = useFooterState()
 
-  const { scrollPosition, isScrolledToBottom, checkScrollPosition } = useScrollPosition({
+  const { scrollPosition, isScrolledToBottom, checkScrollPosition, resetScroll } = useScrollPosition({
     containerRef: contentContainerRef
   })
 
@@ -157,12 +157,9 @@ export function VotingInterface({
   // Efeito para atualizar a referência quando o ID do elemento mudar
   useEffect(() => {
     if (selectedGameElementId) {
-      // Dar tempo para a DOM atualizar
       setTimeout(() => {
         const selectedGameElement = document.getElementById(selectedGameElementId)
         if (selectedGameElement) {
-          // Não atribuímos diretamente à propriedade current
-          // Em vez disso, usamos o elemento para realizar as ações necessárias
           checkScrollPosition()
         }
       }, 100)

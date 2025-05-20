@@ -21,6 +21,7 @@ import { useLocalVotes } from "@/stores/useLocalVotes"
 import { CategoryStepper } from "@/components/voting/CategoryStepper"
 import { cn } from "@/lib/utils"
 import { useVotingManager } from "@/hooks/useVotingManager"
+import { useFooterState } from "@/hooks/useFooterState"
 
 export function VotingInterface({
   user,
@@ -44,7 +45,6 @@ export function VotingInterface({
   const contentContainerRef = useRef<HTMLDivElement>(null)
   const [selectedGameElementId, setSelectedGameElementId] = useState<string | null>(null)
   const mobileMainContainerRef = useRef<HTMLDivElement>(null)
-  const [footerState, setFooterState] = useState({ height: 64, isExpanded: true })
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({})
   
   const { setVote, getVotes, clearVotes } = useLocalVotes()
@@ -92,6 +92,8 @@ export function VotingInterface({
     handleSubmitVotesInUI,
     userEmail: user?.email
   })
+
+  const footerState = useFooterState()
 
   // Atualiza o jogo selecionado quando a categoria muda
   useEffect(() => {
@@ -324,33 +326,6 @@ export function VotingInterface({
       document.documentElement.style.setProperty('--editions-height', `${height}px`);
     }
   }, [isSticky]);
-
-  // Efeito para observar o estado do footer
-  useEffect(() => {
-    const footer = document.querySelector('footer')
-    if (!footer) return
-
-    const observer = new MutationObserver(() => {
-      const isExpanded = footer.classList.contains('h-16')
-      setFooterState({
-        height: footer.offsetHeight,
-        isExpanded
-      })
-    })
-
-    observer.observe(footer, {
-      attributes: true,
-      attributeFilter: ['class']
-    })
-
-    // Configurar estado inicial
-    setFooterState({
-      height: footer.offsetHeight,
-      isExpanded: footer.classList.contains('h-16')
-    })
-
-    return () => observer.disconnect()
-  }, [])
 
   const styles = `
     @keyframes fadeInDown {

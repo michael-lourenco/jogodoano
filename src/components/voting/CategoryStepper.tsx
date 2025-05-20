@@ -44,7 +44,10 @@ export function CategoryStepper({
     currentIndex,
     getCircularIndex(currentIndex + 1),
     getCircularIndex(currentIndex + 2)
-  ]
+  ].filter(index => {
+    // Garantir que o índice é válido e a categoria existe
+    return index >= 0 && index < categories.length && categories[index]?.id
+  })
 
   return (
     <div className="relative flex items-center justify-center py-2">
@@ -62,6 +65,9 @@ export function CategoryStepper({
         <div className="flex items-center justify-center gap-1">
           {visibleIndices.map((index, position) => {
             const category = categories[index]
+            // Verificação adicional de segurança
+            if (!category?.id) return null
+
             const isActive = category.id === currentCategoryId
             const isVoted = votes[category.id]
 

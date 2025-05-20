@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Footer } from "@/components/Footer"
-import { CheckCircle2, ArrowRight, Trophy, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react"
+import { CheckCircle2, ArrowRight, Trophy, ArrowLeft } from "lucide-react"
 import { UserInfo } from "@/components/UserInfo"
 import { CategorySection } from "@/components/voting/CategorySection"
 import { EditionsSelector } from "@/components/voting/EditionsSelector"
@@ -19,8 +19,6 @@ import type { VotingInterfaceProps } from "@/types/voting/interfaces"
 import { CategorySelector } from "@/components/voting/CategorySelector"
 import { useLocalVotes } from "@/stores/useLocalVotes"
 import { CategoryStepper } from "@/components/voting/CategoryStepper"
-import { cn } from "@/lib/utils"
-import { motion } from "framer-motion"
 
 export function VotingInterface({
   user,
@@ -222,6 +220,18 @@ export function VotingInterface({
     setSelectedGame(votes[selectedEditionId]?.[localActiveCategory] || null)
   }, [localActiveCategory, votes, selectedEditionId])
 
+  // Atualiza o localActiveCategory quando a edição muda
+  useEffect(() => {
+    const categories = getCurrentEditionCategories()
+    // Se não houver categorias ou a categoria atual não existe na nova edição
+    if (!categories.length || !categories.some(cat => cat.id === localActiveCategory)) {
+      // Seleciona a primeira categoria disponível
+      const newCategoryId = categories[0]?.id || ''
+      setLocalActiveCategory(newCategoryId)
+      setActiveCategory(newCategoryId)
+    }
+  }, [selectedEditionId, getCurrentEditionCategories, localActiveCategory, setLocalActiveCategory, setActiveCategory])
+
   // Estado para controlar a posição de rolagem do usuário
   const [scrollPosition, setScrollPosition] = useState<'top' | 'middle' | 'bottom'>('top')
   const containerRef = useRef<HTMLDivElement>(null)
@@ -230,6 +240,7 @@ export function VotingInterface({
   // Função para calcular o índice real considerando o array circular
   const getCircularIndex = (index: number) => {
     const categories = getCurrentEditionCategories()
+    if (!categories.length) return 0
     return (index + categories.length) % categories.length
   }
 
@@ -240,19 +251,25 @@ export function VotingInterface({
     currentIndex,
     getCircularIndex(currentIndex + 1),
     getCircularIndex(currentIndex + 2)
-  ]
+  ].filter(index => {
+    const categories = getCurrentEditionCategories()
+    return index >= 0 && index < categories.length && categories[index]
+  })
 
   // Função para lidar com o evento de wheel
   const handleWheel = (e: WheelEvent) => {
     if (!isMobile) return
 
     e.preventDefault()
+    const categories = getCurrentEditionCategories()
+    if (!categories.length) return
+
     const delta = Math.sign(e.deltaY)
     
     if (delta > 0) {
-      handleCategoryClick(getCurrentEditionCategories()[getCircularIndex(currentIndex + 1)].id)
+      handleCategoryClick(categories[getCircularIndex(currentIndex + 1)].id)
     } else {
-      handleCategoryClick(getCurrentEditionCategories()[getCircularIndex(currentIndex - 1)].id)
+      handleCategoryClick(categories[getCircularIndex(currentIndex - 1)].id)
     }
   }
 
@@ -541,98 +558,67 @@ export function VotingInterface({
   // Adicionar estado para controlar a animação de saída do botão
   const [isButtonExiting, setIsButtonExiting] = useState(false);
 
-  // Modificar a função navigateToCategory para incluir a animação de saída
-  const navigateToCategory = (direction: "prev" | "next") => {
-    const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
-
-    if (direction === "prev" && currentCategoryIndex > 0) {
-      const prevCategory = categories[currentCategoryIndex - 1]
-      
-      // Começar a transição visual
-      handleCategoryTransition(localActiveCategory, prevCategory.id)
-      
-      // Atualizar estados logo em seguida
-      setLocalActiveCategory(prevCategory.id)
-      setActiveCategory(prevCategory.id)
-      
-      // Dar tempo para os estados serem atualizados antes de tentar rolar
-      console.log(`Navegando para categoria anterior: ${prevCategory.id}`);
-      setTimeout(() => {
-        if (isMobile) {
-          // Para mobile, tentar várias abordagens para garantir que o cabeçalho seja visível
-          ensureHeaderVisible(prevCategory.id);
-        } else {
-          // Para desktop, a abordagem atual já funciona bem
-          scrollToCategoryTop();
-        }
-      }, 100);
-      
-    } else if (direction === "next" && currentCategoryIndex < categories.length - 1) {
-      const nextCategory = categories[currentCategoryIndex + 1]
-      
-      // Animar a saída do botão antes da transição
-      if (isMobile && isNextButtonVisible(localActiveCategory)) {
-        setIsButtonExiting(true);
-        
-        // Esperar a animação terminar antes de mudar de categoria
-        setTimeout(() => {
-          // Começar a transição visual
-          handleCategoryTransition(localActiveCategory, nextCategory.id);
-          
-          // Atualizar estados logo em seguida
-          setLocalActiveCategory(nextCategory.id);
-          setActiveCategory(nextCategory.id);
-          
-          // Resetar o estado do botão
-          setIsButtonExiting(false);
-          
-          // Dar tempo para os estados serem atualizados antes de tentar rolar
-          setTimeout(() => {
-            if (isMobile) {
-              ensureHeaderVisible(nextCategory.id);
-            } else {
-              scrollToCategoryTop();
-            }
-          }, 100);
-        }, 300); // Tempo igual à duração da animação slide-down
-      } else {
-        // Comportamento padrão (sem animação)
-        handleCategoryTransition(localActiveCategory, nextCategory.id);
-        setLocalActiveCategory(nextCategory.id);
-        setActiveCategory(nextCategory.id);
-        
-        setTimeout(() => {
-          if (isMobile) {
-            ensureHeaderVisible(nextCategory.id);
-          } else {
-            scrollToCategoryTop();
-          }
-        }, 100);
-      }
-    }
-  }
-
   // Ajuste no comportamento do clique nos seletores de categoria na versão mobile
   const handleCategoryClick = (categoryId: string) => {
-    if (categoryId === localActiveCategory) return;
+    const categories = getCurrentEditionCategories()
+    if (!categories.length || !categories.some(cat => cat.id === categoryId)) return
+    
+    if (categoryId === localActiveCategory) return
     
     // Começar a transição visual
-    handleCategoryTransition(localActiveCategory, categoryId);
+    handleCategoryTransition(localActiveCategory, categoryId)
     
     // Atualizar estados logo em seguida
-    setLocalActiveCategory(categoryId);
-    setActiveCategory(categoryId);
+    setLocalActiveCategory(categoryId)
+    setActiveCategory(categoryId)
     
     // Dar tempo para os estados serem atualizados
-    console.log(`Clicou na categoria: ${categoryId}`);
+    console.log(`Clicou na categoria: ${categoryId}`)
     setTimeout(() => {
       if (isMobile) {
-        ensureHeaderVisible(categoryId);
+        ensureHeaderVisible(categoryId)
       } else {
-        scrollToCategoryTop();
+        scrollToCategoryTop()
       }
-    }, 100);
-  };
+    }, 100)
+  }
+
+  const navigateToCategory = (direction: "prev" | "next") => {
+    const categories = getCurrentEditionCategories()
+    if (!categories.length) return
+
+    const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
+    if (currentCategoryIndex === -1) return
+
+    let nextCategoryId: string | undefined
+
+    if (direction === "prev") {
+      const prevIndex = (currentCategoryIndex - 1 + categories.length) % categories.length
+      nextCategoryId = categories[prevIndex]?.id
+    } else {
+      const nextIndex = (currentCategoryIndex + 1) % categories.length
+      nextCategoryId = categories[nextIndex]?.id
+    }
+
+    if (!nextCategoryId) return
+
+    // Começar a transição visual
+    handleCategoryTransition(localActiveCategory, nextCategoryId)
+    
+    // Atualizar estados logo em seguida
+    setLocalActiveCategory(nextCategoryId)
+    setActiveCategory(nextCategoryId)
+    
+    // Dar tempo para os estados serem atualizados antes de tentar rolar
+    console.log(`Navegando para categoria ${direction}: ${nextCategoryId}`)
+    setTimeout(() => {
+      if (isMobile) {
+        ensureHeaderVisible(nextCategoryId)
+      } else {
+        scrollToCategoryTop()
+      }
+    }, 100)
+  }
 
   const navigateToNextCategory = () => {
     const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
@@ -757,106 +743,37 @@ export function VotingInterface({
                     {/* Category selector tabs */}
                     <div
                       ref={categoryTabsRef}
-                      className={cn(
-                        "relative",
+                      className={`overflow-x-auto ${
                         isSticky 
                           ? "fixed top-0 left-0 right-0 z-20 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm mt-[var(--editions-height,0px)]" 
                           : "mb-4"
-                      )}
+                      }`}
                     >
-                      <div className={cn(
-                        "relative flex items-center justify-center py-2",
-                        isSticky ? "max-w-4xl mx-auto" : ""
-                      )}>
-                        {/* Botão Anterior */}
-                        <button
-                          onClick={() => handleCategoryClick(getCurrentEditionCategories()[getCircularIndex(currentIndex - 1)].id)}
-                          className={cn(
-                            "absolute left-0 z-20 rounded-full hover:bg-muted/50 transition-colors",
-                            isMobile ? "p-1" : "p-1.5"
-                          )}
-                          aria-label="Categoria anterior"
-                        >
-                          <ChevronLeft className={cn(isMobile ? "w-4 h-4" : "w-5 h-5")} />
-                        </button>
-
-                        {/* Container do Carrossel */}
-                        <div 
-                          ref={containerRef}
-                          className={cn(
-                            "relative w-full overflow-hidden",
-                            isMobile ? "max-w-[240px]" : "max-w-[280px]"
-                          )}
-                        >
-                          <div className="flex items-center justify-center gap-0.5">
-                            {visibleIndices.map((index, position) => {
-                              const category = getCurrentEditionCategories()[index]
-                              const isActive = category.id === localActiveCategory
-                              const isVoted = votes[selectedEditionId]?.[category.id]
-
-                              return (
-                                <motion.button
-                                  key={category.id}
-                                  onClick={() => handleCategoryClick(category.id)}
-                                  className={cn(
-                                    "relative flex items-center justify-center transition-all duration-200 group",
-                                    isMobile ? "w-5 h-5" : "w-8 h-8"
-                                  )}
-                                  initial={false}
-                                  animate={{
-                                    scale: isActive ? 1.1 : 1,
-                                    opacity: isActive ? 1 : 0.7,
-                                    x: `${(position - 2) * (isMobile ? 20 : 32)}px`
-                                  }}
-                                  transition={{
-                                    type: "spring",
-                                    stiffness: 300,
-                                    damping: 30
-                                  }}
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                >
-                                  <Button
-                                    variant={isActive ? "default" : "outline"}
-                                    className={cn(
-                                      "transition-all duration-200",
-                                      isMobile 
-                                        ? "w-[90px] h-7 text-xs px-2" 
-                                        : "w-[120px] h-8 text-sm",
-                                      isActive
-                                        ? "bg-gradient-to-r from-chart-2 to-chart-5 text-primary-foreground shadow-lg"
-                                        : isVoted
-                                          ? "text-success border-success/30 hover:border-success/50"
-                                          : "hover:bg-muted/50"
-                                    )}
-                                  >
-                                    <span className="truncate">{category.name.split(" ").pop()}</span>
-                                    {isVoted && (
-                                      <CheckCircle2 className={cn(
-                                        "ml-1 flex-shrink-0",
-                                        isMobile ? "h-2.5 w-2.5" : "h-3 w-3"
-                                      )} />
-                                    )}
-                                  </Button>
-                                </motion.button>
-                              )
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Botão Próximo */}
-                        <button
-                          onClick={() => handleCategoryClick(getCurrentEditionCategories()[getCircularIndex(currentIndex + 1)].id)}
-                          className={cn(
-                            "absolute right-0 z-20 rounded-full hover:bg-muted/50 transition-colors",
-                            isMobile ? "p-1" : "p-1.5"
-                          )}
-                          aria-label="Próxima categoria"
-                        >
-                          <ChevronRight className={cn(isMobile ? "w-4 h-4" : "w-5 h-5")} />
-                        </button>
+                      <div className={`flex space-x-2 p-2 ${isSticky ? "max-w-4xl mx-auto" : ""}`}>
+                        {getCurrentEditionCategories().map((category) => (
+                          <button
+                            key={category.id}
+                            onClick={() => handleCategoryClick(category.id)}
+                            className={`px-3 py-2 text-sm whitespace-nowrap rounded-md flex items-center transition-all duration-200 ${
+                              localActiveCategory === category.id 
+                                ? "bg-primary text-primary-foreground scale-105" 
+                                : "bg-muted/30 hover:bg-muted/50"
+                            } ${votes[selectedEditionId]?.[category.id] ? "text-success" : ""}`}
+                            aria-pressed={localActiveCategory === category.id}
+                            aria-label={`Categoria ${category.name} ${votes[selectedEditionId]?.[category.id] ? "(votada)" : ""}`}
+                          >
+                            {category.name.split(" ").pop()}
+                            {votes[selectedEditionId]?.[category.id] && (
+                              <CheckCircle2 className="ml-1 h-3 w-3 inline-block" aria-hidden="true" />
+                            )}
+                          </button>
+                        ))}
                       </div>
                     </div>
+
+                    {isSticky && categoryTabsRef.current && (
+                      <div style={{ height: categoryTabsHeight.current + 64, marginBottom: "1rem" }}></div>
+                    )}
 
                     {/* Category heading and description */}
                     <div 
@@ -938,6 +855,17 @@ export function VotingInterface({
                         <div className="px-4 pb-4 flex flex-col gap-4">
                           <div className="flex items-center justify-between gap-2">
                             <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-10 w-10 bg-background hover:bg-muted"
+                              onClick={() => navigateToCategory("prev")}
+                              disabled={currentCategoryIndex === 0}
+                              aria-label="Categoria anterior"
+                            >
+                              <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+                            </Button>
+
+                            <Button
                               onClick={handleSubmitVotesInUIWithCleanup}
                               disabled={isSubmitting || !isAllCategoriesVoted()}
                               className="flex-1 h-10 text-primary-foreground bg-gradient-to-r from-chart-1 to-success hover:from-chart-1 hover:to-success-foreground shadow-lg hover:shadow-success/25 hover:text-secondary-foreground transition-all duration-300"
@@ -954,6 +882,17 @@ export function VotingInterface({
                               ) : (
                                 <span className="text-sm">Enviar Votos</span>
                               )}
+                            </Button>
+
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-10 w-10 bg-background hover:bg-muted"
+                              onClick={() => navigateToCategory("next")}
+                              disabled={currentCategoryIndex === categories.length - 1}
+                              aria-label="Próxima categoria"
+                            >
+                              <ArrowRight className="h-5 w-5" aria-hidden="true" />
                             </Button>
                           </div>
                         </div>

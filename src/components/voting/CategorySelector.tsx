@@ -29,17 +29,26 @@ export function CategorySelector({
   const containerRef = useRef<HTMLDivElement>(null)
 
   const handlePrevious = () => {
+    if (currentIndex === -1 || !categories.length) return
     const previousIndex = (currentIndex - 1 + categories.length) % categories.length
-    onCategoryChange(categories[previousIndex].id)
+    const previousCategory = categories[previousIndex]
+    if (previousCategory?.id) {
+      onCategoryChange(previousCategory.id)
+    }
   }
 
   const handleNext = () => {
+    if (currentIndex === -1 || !categories.length) return
     const nextIndex = (currentIndex + 1) % categories.length
-    onCategoryChange(categories[nextIndex].id)
+    const nextCategory = categories[nextIndex]
+    if (nextCategory?.id) {
+      onCategoryChange(nextCategory.id)
+    }
   }
 
   // Função para calcular o índice real considerando o array circular
   const getCircularIndex = (index: number) => {
+    if (!categories.length) return 0
     return (index + categories.length) % categories.length
   }
 
@@ -50,7 +59,7 @@ export function CategorySelector({
     currentIndex,
     getCircularIndex(currentIndex + 1),
     getCircularIndex(currentIndex + 2)
-  ]
+  ].filter(index => index >= 0 && index < categories.length)
 
   const isCategoryVoted = (categoryId: string) => {
     return votes[categoryId] !== undefined
@@ -113,6 +122,8 @@ export function CategorySelector({
           <div className="flex items-center justify-center gap-0.5">
             {visibleIndices.map((index, position) => {
               const category = categories[index]
+              if (!category?.id) return null
+
               const isActive = category.id === selectedCategoryId
               const isVoted = isCategoryVoted(category.id)
 

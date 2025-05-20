@@ -551,6 +551,45 @@ export function VotingInterface({
                             selectedGameId={votes[selectedEditionId]?.[category.id]}
                             onVote={(gameId) => handleGameSelection(category.id, gameId)}
                           />
+
+                          {/* Botões de navegação - Desktop */}
+                          <div className="mt-6 px-4 pb-4 flex flex-col gap-4">
+                            <div className="flex items-center justify-between gap-2">
+                              {isAllCategoriesVoted(categories) ? (
+                                <Button
+                                  onClick={handleSubmitVotes}
+                                  disabled={isSubmittingVotes}
+                                  className="flex-1 h-10 text-primary-foreground bg-gradient-to-r from-chart-1 to-success hover:from-chart-1 hover:to-success-foreground shadow-lg hover:shadow-success/25 hover:text-secondary-foreground transition-all duration-300"
+                                  aria-live="polite"
+                                >
+                                  {isSubmittingVotes ? (
+                                    <div className="flex items-center justify-center">
+                                      <div
+                                        className="w-5 h-5 border-2 border-t-transparent border-primary-foreground rounded-full animate-spin mr-2"
+                                        aria-hidden="true"
+                                      ></div>
+                                      <span className="text-sm">Processando...</span>
+                                    </div>
+                                  ) : (
+                                    <span className="text-sm">Enviar Votos</span>
+                                  )}
+                                </Button>
+                              ) : (
+                                <Button
+                                  onClick={navigateToNextCategory}
+                                  disabled={!votes[selectedEditionId]?.[category.id]}
+                                  className={cn(
+                                    "flex-1 h-10 transition-all duration-300",
+                                    votes[selectedEditionId]?.[category.id]
+                                      ? "text-primary-foreground bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-primary/25"
+                                      : "text-muted-foreground bg-muted/50 cursor-not-allowed"
+                                  )}
+                                >
+                                  <span className="text-sm">Vote & Continue</span>
+                                </Button>
+                              )}
+                            </div>
+                          </div>
                         </TabsContent>
                       ))}
                     </Tabs>

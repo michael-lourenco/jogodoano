@@ -386,7 +386,7 @@ export function VotingInterface({
 
                     {/* Swipeable content area */}
                     <div
-                      className="border border-muted rounded-md shadow-sm mb-32"
+                      className="border border-muted rounded-md shadow-sm"
                       onTouchStart={handleTouchStart}
                       onTouchMove={handleTouchMove}
                       onTouchEnd={handleTouchEnd}
@@ -416,7 +416,7 @@ export function VotingInterface({
                             aria-labelledby={`tab-${category.id}`}
                             tabIndex={localActiveCategory === category.id ? 0 : -1}
                           >
-                            <div className="p-4">
+                            <div className="p-4 pb-24">
                               <CategorySection
                                 category={category}
                                 selectedGameId={votes[selectedEditionId]?.[category.id]}

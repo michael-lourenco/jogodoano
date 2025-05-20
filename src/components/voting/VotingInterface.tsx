@@ -20,6 +20,7 @@ import { CategorySelector } from "@/components/voting/CategorySelector"
 import { useLocalVotes } from "@/stores/useLocalVotes"
 import { CategoryStepper } from "@/components/voting/CategoryStepper"
 import { cn } from "@/lib/utils"
+import { useVotingManager } from "@/hooks/useVotingManager"
 
 export function VotingInterface({
   user,
@@ -77,6 +78,21 @@ export function VotingInterface({
     useStickyHeader()
 
   const categories = getCurrentEditionCategories()
+
+  const {
+    isSubmitting: isSubmittingVotes,
+    selectedGame: votingSelectedGame,
+    handleGameSelection: votingHandleGameSelection,
+    handleSubmitVotes,
+    loadLocalVotes,
+    isAllCategoriesVoted
+  } = useVotingManager({
+    selectedEditionId,
+    votes,
+    handleVoteInUI,
+    handleSubmitVotesInUI,
+    userEmail: user?.email
+  })
 
   // Atualiza o jogo selecionado quando a categoria muda
   useEffect(() => {
@@ -244,46 +260,8 @@ export function VotingInterface({
 
   // Carregar votos locais ao entrar na edição
   useEffect(() => {
-    if (selectedEditionId) {
-      const localVotes = getVotes(selectedEditionId)
-      if (localVotes) {
-        // Atualizar o estado local com os votos salvos
-        Object.entries(localVotes).forEach(([categoryId, gameId]) => {
-          handleVoteInUI(categoryId, gameId as string)
-        })
-      }
-    }
-  }, [selectedEditionId, getVotes, handleVoteInUI])
-
-  // Modificar handleGameSelection para salvar votos localmente
-  const handleGameSelection = useCallback((categoryId: string, gameId: string) => {
-    // Verificar se o voto já está definido para este jogo
-    const currentVote = votes[selectedEditionId]?.[categoryId];
-    
-    // Só atualizar se o voto for diferente
-    if (currentVote !== gameId) {
-      // Registra o voto no sistema
-      handleVoteInUI(categoryId, gameId);
-      
-      // Salvar voto localmente
-      setVote(selectedEditionId, categoryId, gameId, user?.email);
-      
-      // Atualizar o estado local e a referência
-      setSelectedGame(gameId);
-      updateSelectedGameRef(categoryId, gameId);
-    }
-  }, [votes, selectedEditionId, handleVoteInUI, setSelectedGame, updateSelectedGameRef, setVote, user?.email]);
-
-  // Modificar handleSubmitVotesInUI para limpar votos locais após envio bem-sucedido
-  const handleSubmitVotesInUIWithCleanup = useCallback(async () => {
-    try {
-      await handleSubmitVotesInUI();
-      // Limpar votos locais após envio bem-sucedido
-      clearVotes(selectedEditionId);
-    } catch (error) {
-      console.error('Erro ao enviar votos:', error);
-    }
-  }, [handleSubmitVotesInUI, clearVotes, selectedEditionId]);
+    loadLocalVotes()
+  }, [loadLocalVotes])
 
   // Adicionar uma função específica para resetar o scroll mobile
   const resetMobileScroll = useCallback(() => {
@@ -328,10 +306,6 @@ export function VotingInterface({
     if (currentCategoryIndex < categories.length - 1) {
       navigateToCategory("next")
     }
-  }
-
-  const isAllCategoriesVoted = () => {
-    return categories.every(category => !!votes[selectedEditionId]?.[category.id])
   }
 
   const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
@@ -530,7 +504,7 @@ export function VotingInterface({
                               <CategorySection
                                 category={category}
                                 selectedGameId={votes[selectedEditionId]?.[category.id]}
-                                onVote={(gameId) => handleGameSelection(category.id, gameId)}
+                                onVote={(gameId) => votingHandleGameSelection(category.id, gameId)}
                               />
                             </div>
                           </div>
@@ -561,12 +535,12 @@ export function VotingInterface({
                           <div className="flex items-center justify-between gap-2">
 
                             <Button
-                              onClick={handleSubmitVotesInUIWithCleanup}
-                              disabled={isSubmitting || !isAllCategoriesVoted()}
+                              onClick={handleSubmitVotes}
+                              disabled={isSubmittingVotes || !isAllCategoriesVoted(categories)}
                               className="flex-1 h-10 text-primary-foreground bg-gradient-to-r from-chart-1 to-success hover:from-chart-1 hover:to-success-foreground shadow-lg hover:shadow-success/25 hover:text-secondary-foreground transition-all duration-300"
                               aria-live="polite"
                             >
-                              {isSubmitting ? (
+                              {isSubmittingVotes ? (
                                 <div className="flex items-center justify-center">
                                   <div
                                     className="w-5 h-5 border-2 border-t-transparent border-primary-foreground rounded-full animate-spin mr-2"
@@ -645,7 +619,7 @@ export function VotingInterface({
                           <CategorySection
                             category={category}
                             selectedGameId={votes[selectedEditionId]?.[category.id]}
-                            onVote={(gameId) => handleGameSelection(category.id, gameId)}
+                            onVote={(gameId) => votingHandleGameSelection(category.id, gameId)}
                           />
                         </TabsContent>
                       ))}

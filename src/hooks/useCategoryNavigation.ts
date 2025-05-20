@@ -1,5 +1,5 @@
 "use client"
-import { useCallback } from 'react'
+import { useCallback, useEffect, RefObject } from 'react'
 import { Category } from '@/types/types'
 
 interface UseCategoryNavigationProps {
@@ -8,6 +8,8 @@ interface UseCategoryNavigationProps {
   setLocalActiveCategory: (categoryId: string) => void
   setActiveCategory: (categoryId: string) => void
   handleCategoryTransition: (fromCategoryId: string, toCategoryId: string) => void
+  isMobile: boolean
+  containerRef: RefObject<HTMLDivElement>
 }
 
 export function useCategoryNavigation({
@@ -15,7 +17,9 @@ export function useCategoryNavigation({
   localActiveCategory,
   setLocalActiveCategory,
   setActiveCategory,
-  handleCategoryTransition
+  handleCategoryTransition,
+  isMobile,
+  containerRef
 }: UseCategoryNavigationProps) {
   const handleCategoryClick = useCallback((categoryId: string) => {
     const categories = getCurrentEditionCategories()
@@ -64,6 +68,33 @@ export function useCategoryNavigation({
       headerElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }, [localActiveCategory])
+
+  // Função para lidar com o evento de wheel
+  const handleWheel = useCallback((e: WheelEvent) => {
+    if (!isMobile) return
+
+    e.preventDefault()
+    const categories = getCurrentEditionCategories()
+    if (!categories.length) return
+
+    const currentIndex = categories.findIndex(cat => cat.id === localActiveCategory)
+    const delta = Math.sign(e.deltaY)
+    
+    if (delta > 0) {
+      handleCategoryClick(categories[(currentIndex + 1) % categories.length].id)
+    } else {
+      handleCategoryClick(categories[(currentIndex - 1 + categories.length) % categories.length].id)
+    }
+  }, [isMobile, getCurrentEditionCategories, localActiveCategory, handleCategoryClick])
+
+  // Adiciona e remove o evento de wheel
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    container.addEventListener('wheel', handleWheel, { passive: false })
+    return () => container.removeEventListener('wheel', handleWheel)
+  }, [containerRef, handleWheel])
 
   return {
     handleCategoryClick,

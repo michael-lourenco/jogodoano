@@ -70,7 +70,9 @@ export function VotingInterface({
     localActiveCategory,
     setLocalActiveCategory,
     setActiveCategory,
-    handleCategoryTransition
+    handleCategoryTransition,
+    isMobile,
+    containerRef: contentContainerRef
   })
 
   const { isSticky, editionsSelectorRef, editionsSelectorHeight, categoryTabsRef, categoryTabsHeight } =
@@ -139,32 +141,6 @@ export function VotingInterface({
     const categories = getCurrentEditionCategories()
     return index >= 0 && index < categories.length && categories[index]
   })
-
-  // Função para lidar com o evento de wheel
-  const handleWheel = (e: WheelEvent) => {
-    if (!isMobile) return
-
-    e.preventDefault()
-    const categories = getCurrentEditionCategories()
-    if (!categories.length) return
-
-    const delta = Math.sign(e.deltaY)
-    
-    if (delta > 0) {
-      handleCategoryClick(categories[getCircularIndex(currentIndex + 1)].id)
-    } else {
-      handleCategoryClick(categories[getCircularIndex(currentIndex - 1)].id)
-    }
-  }
-
-  // Adiciona e remove o evento de wheel
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    container.addEventListener('wheel', handleWheel, { passive: false })
-    return () => container.removeEventListener('wheel', handleWheel)
-  }, [currentIndex, isMobile])
 
   // Função para calcular a posição vertical ideal do botão com base no jogo selecionado
   const calculateButtonPosition = useCallback(() => {

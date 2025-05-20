@@ -40,7 +40,6 @@ export function VotingInterface({
 }: VotingInterfaceProps) {
   const isMobile = useIsMobile()
   const [showConfirmation, setShowConfirmation] = useState(false)
-  const [selectedGame, setSelectedGame] = useState<string | null>(null)
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(false)
   const contentContainerRef = useRef<HTMLDivElement>(null)
   const [selectedGameElementId, setSelectedGameElementId] = useState<string | null>(null)
@@ -81,8 +80,8 @@ export function VotingInterface({
 
   const {
     isSubmitting: isSubmittingVotes,
-    selectedGame: votingSelectedGame,
-    handleGameSelection: votingHandleGameSelection,
+    selectedGame,
+    handleGameSelection,
     handleSubmitVotes,
     loadLocalVotes,
     isAllCategoriesVoted
@@ -96,8 +95,10 @@ export function VotingInterface({
 
   // Atualiza o jogo selecionado quando a categoria muda
   useEffect(() => {
-    setSelectedGame(votes[selectedEditionId]?.[localActiveCategory] || null)
-  }, [localActiveCategory, votes, selectedEditionId])
+    if (selectedGame) {
+      updateSelectedGameRef(localActiveCategory, selectedGame)
+    }
+  }, [localActiveCategory, selectedGame])
 
   // Atualiza o localActiveCategory quando a edição muda
   useEffect(() => {
@@ -504,7 +505,7 @@ export function VotingInterface({
                               <CategorySection
                                 category={category}
                                 selectedGameId={votes[selectedEditionId]?.[category.id]}
-                                onVote={(gameId) => votingHandleGameSelection(category.id, gameId)}
+                                onVote={(gameId) => handleGameSelection(category.id, gameId)}
                               />
                             </div>
                           </div>
@@ -619,7 +620,7 @@ export function VotingInterface({
                           <CategorySection
                             category={category}
                             selectedGameId={votes[selectedEditionId]?.[category.id]}
-                            onVote={(gameId) => votingHandleGameSelection(category.id, gameId)}
+                            onVote={(gameId) => handleGameSelection(category.id, gameId)}
                           />
                         </TabsContent>
                       ))}

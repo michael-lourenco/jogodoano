@@ -49,3 +49,10 @@ Incluir, se possível, qual princípio ou padrão de projeto justifica essa muda
 Quero seguir com a refatoração de forma gradual. Portanto, me retorne APENAS UMA MUDANÇA DESTA VEZ.
 Não altere o comportamento da aplicação — apenas melhore a estrutura interna para facilitar futuras manutenções e testes.
 
+Antes de criar um nome de arquivo, verifique se ele já existe na estrutura de arquivos, pois das ultimas vezes que pedi, vc me sugeriu um nome de arquivo que ja existia, então nao podemos substituir este arquivo para nao perder funcionalidades.
+
+voce está pegando a Category em @/types/voting/interfaces, quando na verdade ela está em @/types/types
+
+Verifique se a solução que voce propoe ja existe no codigo.
+Caso exista apenas aplique a mesma, nao precisa criar novamente.
+

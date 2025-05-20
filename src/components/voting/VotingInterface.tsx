@@ -45,8 +45,8 @@ export function VotingInterface({
   const [selectedGameElementId, setSelectedGameElementId] = useState<string | null>(null)
   const mobileMainContainerRef = useRef<HTMLDivElement>(null)
   const [footerState, setFooterState] = useState({ height: 64, isExpanded: true })
+  const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({})
   
-  // Adicionar hook para gerenciar votos locais
   const { setVote, getVotes, clearVotes } = useLocalVotes()
 
   const { tabsListRef, localActiveCategory, setLocalActiveCategory } = useVotingInterface({
@@ -57,158 +57,20 @@ export function VotingInterface({
     selectedEditionId,
   })
 
-  const { categoryRefs } = useCategoryNavigation()
-  
-  // 1. Primeiro, declaramos a função applyHeaderHighlight que não depende de nada
-  const applyHeaderHighlight = useCallback((headerElement: HTMLElement) => {
-    headerElement.classList.add('bg-primary/20');
-    headerElement.style.transition = 'all 0.4s ease';
-    headerElement.style.transform = 'scale(1.05)';
-    
-    // Destacar o título dentro do cabeçalho
-    const titleElement = headerElement.querySelector('h2');
-    if (titleElement) {
-      titleElement.style.fontSize = '1.3em';
-      titleElement.style.color = 'var(--primary)';
-      titleElement.style.fontWeight = 'bold';
-    }
-    
-    // Remover os efeitos visuais após um tempo
-    setTimeout(() => {
-      headerElement.classList.remove('bg-primary/20');
-      headerElement.style.transform = '';
-      
-      if (titleElement) {
-        titleElement.style.fontSize = '';
-        titleElement.style.color = '';
-        titleElement.style.fontWeight = '';
-      }
-    }, 1200);
-  }, []);
-  
-  // 2. Em seguida, declaramos proceedWithNormalScrollMethods que depende de applyHeaderHighlight
-  const proceedWithNormalScrollMethods = useCallback((categoryId: string) => {
-    // Esperar um momento para garantir que a DOM está atualizada
-    setTimeout(() => {
-      // Primeiro, vamos garantir que o cabeçalho existe
-      const headerElement = document.getElementById(`category-header-${categoryId}`);
-      console.log("Elemento do cabeçalho encontrado:", !!headerElement);
-      
-      if (!headerElement) {
-        console.warn(`Cabeçalho da categoria ${categoryId} não encontrado!`);
-        return;
-      }
-      
-      if (headerElement && mobileMainContainerRef.current) {
-        // Obter a posição do cabeçalho em relação ao viewport
-        const headerRect = headerElement.getBoundingClientRect();
-        const containerRect = mobileMainContainerRef.current.getBoundingClientRect();
-        
-        console.log("Posições e dimensões:", {
-          header: {
-            top: headerRect.top,
-            bottom: headerRect.bottom,
-            height: headerRect.height,
-          },
-          container: {
-            top: containerRect.top,
-            scrollTop: mobileMainContainerRef.current.scrollTop,
-          },
-          window: {
-            scrollY: window.scrollY,
-            innerHeight: window.innerHeight,
-          }
-        });
-        
-        // Métodos diferentes para garantir que o cabeçalho seja visível
-        
-        // Método 1: ScrollIntoView direto
-        console.log("Aplicando scrollIntoView no cabeçalho");
-        headerElement.scrollIntoView({
-          behavior: 'auto',
-          block: 'start'
-        });
-        
-        // Método 2: Scroll para a posição calculada
-        const targetPosition = window.scrollY + headerRect.top - 100; // 100px de offset
-        console.log(`Aplicando window.scrollTo para posição ${targetPosition}`);
-        window.scrollTo({
-          top: targetPosition,
-          behavior: 'auto'
-        });
-        
-        // Método 3: Se os métodos anteriores não funcionarem, tentar usando o scroll do container
-        if (contentContainerRef.current) {
-          console.log("Resetando scrollTop do contentContainer para 0");
-          contentContainerRef.current.scrollTop = 0;
-        }
-        
-        // Destacar visualmente o cabeçalho com uma borda mais evidente para debug
-        headerElement.style.border = '2px solid var(--primary)';
-        
-        // Aplicar destaque visual normal
-        applyHeaderHighlight(headerElement);
-        
-        // Remover a borda de debug após um tempo
-        setTimeout(() => {
-          headerElement.style.border = '';
-        }, 1500);
-      }
-    }, 100);
-  }, [applyHeaderHighlight]);
-  
-  // 3. Por fim, declaramos ensureHeaderVisible que depende de proceedWithNormalScrollMethods
-  const ensureHeaderVisible = useCallback((categoryId: string) => {
-    // Esta função foca especificamente em garantir que o cabeçalho esteja visível na versão mobile
-    if (!isMobile) return; // Só precisamos disso no mobile
-    
-    console.log(`Tentando garantir que o cabeçalho da categoria ${categoryId} seja visível`);
-    
-    // Método alternativo: usar location.hash para forçar o scroll diretamente para o elemento
-    // Este é um método mais agressivo, mas pode funcionar quando outros falham
-    if (categoryId) {
-      const currentHash = window.location.hash;
-      
-      // Usar um setTimeout para permitir que a renderização ocorra primeiro
-      setTimeout(() => {
-        // Definir o hash para o ID do cabeçalho
-        window.location.hash = `category-header-${categoryId}`;
-        
-        // Usar um timeout adicional para garantir que o scroll aconteça
-        setTimeout(() => {
-          // Restaurar o hash original, se necessário
-          if (currentHash) {
-            history.replaceState(null, '', currentHash);
-          } else {
-            history.replaceState(null, '', window.location.pathname + window.location.search);
-          }
-          
-          // Agora proceder com os métodos normais
-          proceedWithNormalScrollMethods(categoryId);
-        }, 50);
-      }, 50);
-    } else {
-      proceedWithNormalScrollMethods(categoryId);
-    }
-  }, [isMobile, proceedWithNormalScrollMethods]);
-  
-  // 4. Agora podemos usar a função no hook
-  const { handleTouchStart, handleTouchMove, handleTouchEnd, handleCategoryTransition, transitionDuration } = useSwipeNavigation({
+  const { handleTouchStart, handleTouchMove, handleTouchEnd, handleCategoryTransition } = useSwipeNavigation({
     getCurrentEditionCategories,
     localActiveCategory,
     setLocalActiveCategory,
     setActiveCategory,
     categoryRefs,
-    onCategoryChange: ensureHeaderVisible, // Agora a função já está declarada antes de ser usada
   })
 
-  // Add keyboard navigation
-  useKeyboardNavigation({
+  const { handleCategoryClick, navigateToCategory, scrollToCategoryTop } = useCategoryNavigation({
+    getCurrentEditionCategories,
     localActiveCategory,
     setLocalActiveCategory,
     setActiveCategory,
-    getCurrentEditionCategories,
-    handleCategoryTransition,
+    handleCategoryTransition
   })
 
   const { isSticky, editionsSelectorRef, editionsSelectorHeight, categoryTabsRef, categoryTabsHeight } =
@@ -423,104 +285,6 @@ export function VotingInterface({
     }
   }, [handleSubmitVotesInUI, clearVotes, selectedEditionId]);
 
-  // Função aprimorada para rolar para o topo da categoria
-  const scrollToCategoryTop = useCallback(() => {
-    setTimeout(() => {
-      // Encontrar o cabeçalho da categoria atual com base no ID
-      const headerElement = document.getElementById(`category-header-${localActiveCategory}`);
-      
-      if (isMobile && contentContainerRef.current) {
-        // Na versão mobile, além de rolar para o topo, também destacamos visualmente o cabeçalho
-        
-        // Verificar se o headerElement está dentro do contentContainerRef
-        // Se estiver, usamos o scrollTop para manipular diretamente
-        if (headerElement) {
-          // Destacar visualmente o cabeçalho
-          headerElement.classList.add('bg-primary/10');
-          headerElement.style.transition = 'all 0.4s ease';
-          headerElement.style.transform = 'scale(1.05)';
-          headerElement.style.boxShadow = '0 0 15px rgba(var(--primary), 0.3)';
-          
-          // Garantir que o cabeçalho esteja no topo visível
-          contentContainerRef.current.scrollTop = 0;
-          
-          // Encontrar o título dentro do cabeçalho para destacá-lo
-          const titleElement = headerElement.querySelector('h2');
-          if (titleElement) {
-            titleElement.style.transition = 'all 0.4s ease';
-            titleElement.style.textShadow = '0 0 5px rgba(var(--primary), 0.5)';
-            titleElement.style.fontSize = '1.3em';  // Aumentar temporariamente o tamanho da fonte
-          }
-          
-          setTimeout(() => {
-            headerElement.classList.remove('bg-primary/10');
-            headerElement.style.transform = '';
-            headerElement.style.boxShadow = '';
-            
-            if (titleElement) {
-              titleElement.style.textShadow = '';
-              titleElement.style.fontSize = '';
-            }
-          }, 1000);
-        }
-      } else {
-        // Na versão desktop, usar o scrollIntoView para uma rolagem mais precisa
-        if (headerElement) {
-          // Calcular o offset para considerar elementos fixos no topo
-          let offsetTop = 0;
-          
-          if (isSticky && editionsSelectorHeight.current) {
-            offsetTop += editionsSelectorHeight.current;
-          }
-          
-          if (tabsListRef.current) {
-            offsetTop += tabsListRef.current.offsetHeight;
-          }
-          
-          // Adicionar um efeito visual de destaque ao cabeçalho
-          headerElement.classList.add('bg-primary/10');
-          headerElement.style.transition = 'all 0.4s ease';
-          headerElement.style.transform = 'scale(1.05)';
-          headerElement.style.boxShadow = '0 0 15px rgba(var(--primary), 0.3)';
-          
-          // Encontrar o título dentro do cabeçalho para destacá-lo
-          const titleElement = headerElement.querySelector('h2');
-          if (titleElement) {
-            titleElement.style.transition = 'all 0.4s ease';
-            titleElement.style.textShadow = '0 0 5px rgba(var(--primary), 0.5)';
-            titleElement.style.fontSize = '1.3em';  // Aumentar temporariamente o tamanho da fonte
-          }
-          
-          setTimeout(() => {
-            headerElement.classList.remove('bg-primary/10');
-            headerElement.style.transform = '';
-            headerElement.style.boxShadow = '';
-            
-            if (titleElement) {
-              titleElement.style.textShadow = '';
-              titleElement.style.fontSize = '';
-            }
-          }, 1000);
-          
-          // Rolar para a posição do elemento menos o offset
-          const headerRect = headerElement.getBoundingClientRect();
-          const targetPosition = window.scrollY + headerRect.top - offsetTop - 20; // 20px extra de margem
-          
-          window.scrollTo({
-            top: targetPosition,
-            behavior: 'smooth'
-          });
-        } else {
-          // Fallback: rolar para o topo se não encontrar o elemento
-          window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-          });
-        }
-      }
-    }, 150); // Delay para garantir que os elementos estejam renderizados
-  }, [isMobile, isSticky, localActiveCategory, editionsSelectorHeight, tabsListRef]);
-
   // Adicionar uma função específica para resetar o scroll mobile
   const resetMobileScroll = useCallback(() => {
     if (contentContainerRef.current) {
@@ -558,68 +322,6 @@ export function VotingInterface({
 
   // Adicionar estado para controlar a animação de saída do botão
   const [isButtonExiting, setIsButtonExiting] = useState(false);
-
-  // Ajuste no comportamento do clique nos seletores de categoria na versão mobile
-  const handleCategoryClick = (categoryId: string) => {
-    const categories = getCurrentEditionCategories()
-    if (!categories.length || !categories.some(cat => cat.id === categoryId)) return
-    
-    if (categoryId === localActiveCategory) return
-    
-    // Começar a transição visual
-    handleCategoryTransition(localActiveCategory, categoryId)
-    
-    // Atualizar estados logo em seguida
-    setLocalActiveCategory(categoryId)
-    setActiveCategory(categoryId)
-    
-    // Dar tempo para os estados serem atualizados
-    console.log(`Clicou na categoria: ${categoryId}`)
-    setTimeout(() => {
-      if (isMobile) {
-        ensureHeaderVisible(categoryId)
-      } else {
-        scrollToCategoryTop()
-      }
-    }, 100)
-  }
-
-  const navigateToCategory = (direction: "prev" | "next") => {
-    const categories = getCurrentEditionCategories()
-    if (!categories.length) return
-
-    const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)
-    if (currentCategoryIndex === -1) return
-
-    let nextCategoryId: string | undefined
-
-    if (direction === "prev") {
-      const prevIndex = (currentCategoryIndex - 1 + categories.length) % categories.length
-      nextCategoryId = categories[prevIndex]?.id
-    } else {
-      const nextIndex = (currentCategoryIndex + 1) % categories.length
-      nextCategoryId = categories[nextIndex]?.id
-    }
-
-    if (!nextCategoryId) return
-
-    // Começar a transição visual
-    handleCategoryTransition(localActiveCategory, nextCategoryId)
-    
-    // Atualizar estados logo em seguida
-    setLocalActiveCategory(nextCategoryId)
-    setActiveCategory(nextCategoryId)
-    
-    // Dar tempo para os estados serem atualizados antes de tentar rolar
-    console.log(`Navegando para categoria ${direction}: ${nextCategoryId}`)
-    setTimeout(() => {
-      if (isMobile) {
-        ensureHeaderVisible(nextCategoryId)
-      } else {
-        scrollToCategoryTop()
-      }
-    }, 100)
-  }
 
   const navigateToNextCategory = () => {
     const currentCategoryIndex = categories.findIndex((cat) => cat.id === localActiveCategory)

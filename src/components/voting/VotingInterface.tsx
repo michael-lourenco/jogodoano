@@ -19,6 +19,7 @@ import type { VotingInterfaceProps } from "@/types/voting/interfaces"
 import { CategorySelector } from "@/components/voting/CategorySelector"
 import { useLocalVotes } from "@/stores/useLocalVotes"
 import { CategoryStepper } from "@/components/voting/CategoryStepper"
+import { cn } from "@/lib/utils"
 
 export function VotingInterface({
   user,
@@ -743,31 +744,33 @@ export function VotingInterface({
                     {/* Category selector tabs */}
                     <div
                       ref={categoryTabsRef}
-                      className={`overflow-x-auto ${
+                      className={cn(
+                        "relative",
                         isSticky 
                           ? "fixed top-0 left-0 right-0 z-20 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm mt-[var(--editions-height,0px)]" 
                           : "mb-4"
-                      }`}
+                      )}
                     >
-                      <div className={`flex space-x-2 p-2 ${isSticky ? "max-w-4xl mx-auto" : ""}`}>
-                        {getCurrentEditionCategories().map((category) => (
-                          <button
-                            key={category.id}
-                            onClick={() => handleCategoryClick(category.id)}
-                            className={`px-3 py-2 text-sm whitespace-nowrap rounded-md flex items-center transition-all duration-200 ${
-                              localActiveCategory === category.id 
-                                ? "bg-primary text-primary-foreground scale-105" 
-                                : "bg-muted/30 hover:bg-muted/50"
-                            } ${votes[selectedEditionId]?.[category.id] ? "text-success" : ""}`}
-                            aria-pressed={localActiveCategory === category.id}
-                            aria-label={`Categoria ${category.name} ${votes[selectedEditionId]?.[category.id] ? "(votada)" : ""}`}
-                          >
-                            {category.name.split(" ").pop()}
-                            {votes[selectedEditionId]?.[category.id] && (
-                              <CheckCircle2 className="ml-1 h-3 w-3 inline-block" aria-hidden="true" />
-                            )}
-                          </button>
-                        ))}
+                      <div className={cn(
+                        "relative flex items-center justify-center py-2",
+                        isSticky ? "max-w-4xl mx-auto" : ""
+                      )}>
+                        <CategorySelector
+                          categories={getCurrentEditionCategories()
+                            .slice()
+                            .sort((a, b) => {
+                              const hasVoteA = Boolean(votes[selectedEditionId]?.[a.id])
+                              const hasVoteB = Boolean(votes[selectedEditionId]?.[b.id])
+                              if (hasVoteA === hasVoteB) {
+                                return 0
+                              }
+                              return hasVoteA ? 1 : -1
+                            })}
+                          selectedCategoryId={localActiveCategory}
+                          votes={votes[selectedEditionId] || {}}
+                          onCategoryChange={handleCategoryClick}
+                          isMobile={isMobile}
+                        />
                       </div>
                     </div>
 
@@ -908,6 +911,7 @@ export function VotingInterface({
                           selectedCategoryId={localActiveCategory}
                           votes={votes[selectedEditionId] || {}}
                           onCategoryChange={handleCategoryClick}
+                          isMobile={isMobile}
                         />
                         
                         {/* Adicionar o CategoryStepper */}

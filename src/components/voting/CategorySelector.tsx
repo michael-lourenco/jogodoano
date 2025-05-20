@@ -1,20 +1,17 @@
 "use client"
 
-import { useRef, useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react"
-import type { Category } from "@/types/types"
-import type { CategoryVotes } from "@/types/voting/interfaces"
-import { useIsMobile } from "@/hooks/use-mobile"
+import { useRef, useEffect, useState } from "react"
 import { motion } from "framer-motion"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import type { Category } from "@/types/types"
 
 interface CategorySelectorProps {
   categories: Category[]
   selectedCategoryId: string
-  votes: CategoryVotes
+  votes: Record<string, string>
   onCategoryChange: (categoryId: string) => void
-  isSticky?: boolean
+  isMobile?: boolean
 }
 
 export function CategorySelector({
@@ -22,31 +19,17 @@ export function CategorySelector({
   selectedCategoryId,
   votes,
   onCategoryChange,
-  isSticky = false
+  isMobile = false
 }: CategorySelectorProps) {
-  const isMobile = useIsMobile()
-  const currentIndex = categories.findIndex(cat => cat.id === selectedCategoryId)
   const containerRef = useRef<HTMLDivElement>(null)
+  const [showLeftArrow, setShowLeftArrow] = useState(false)
+  const [showRightArrow, setShowRightArrow] = useState(false)
+  const currentIndex = categories.findIndex(cat => cat.id === selectedCategoryId)
 
-  const handlePrevious = () => {
-    if (currentIndex === -1 || !categories.length) return
-    const previousIndex = (currentIndex - 1 + categories.length) % categories.length
-    const previousCategory = categories[previousIndex]
-    if (previousCategory?.id) {
-      onCategoryChange(previousCategory.id)
-    }
-  }
+  // Função para verificar se uma categoria foi votada
+  const hasVote = (categoryId: string) => Boolean(votes[categoryId])
 
-  const handleNext = () => {
-    if (currentIndex === -1 || !categories.length) return
-    const nextIndex = (currentIndex + 1) % categories.length
-    const nextCategory = categories[nextIndex]
-    if (nextCategory?.id) {
-      onCategoryChange(nextCategory.id)
-    }
-  }
-
-  // Função para calcular o índice real considerando o array circular
+  // Função para calcular o índice circular
   const getCircularIndex = (index: number) => {
     if (!categories.length) return 0
     return (index + categories.length) % categories.length
@@ -59,10 +42,32 @@ export function CategorySelector({
     currentIndex,
     getCircularIndex(currentIndex + 1),
     getCircularIndex(currentIndex + 2)
-  ].filter(index => index >= 0 && index < categories.length)
+  ].filter(index => {
+    return index >= 0 && index < categories.length && categories[index]?.id
+  })
 
-  const isCategoryVoted = (categoryId: string) => {
-    return votes[categoryId] !== undefined
+  // Função para verificar a visibilidade das setas
+  const checkScroll = () => {
+    if (!containerRef.current) return
+
+    const { scrollLeft, scrollWidth, clientWidth } = containerRef.current
+    setShowLeftArrow(scrollLeft > 0)
+    setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1)
+  }
+
+  // Função para rolar para a esquerda ou direita
+  const handleScroll = (direction: "left" | "right") => {
+    if (!containerRef.current) return
+
+    const scrollAmount = 200
+    const targetScroll = direction === "left" 
+      ? containerRef.current.scrollLeft - scrollAmount
+      : containerRef.current.scrollLeft + scrollAmount
+
+    containerRef.current.scrollTo({
+      left: targetScroll,
+      behavior: "smooth"
+    })
   }
 
   // Função para lidar com o evento de wheel
@@ -73,13 +78,15 @@ export function CategorySelector({
     const delta = Math.sign(e.deltaY)
     
     if (delta > 0) {
-      handleNext()
+      const nextIndex = getCircularIndex(currentIndex + 1)
+      onCategoryChange(categories[nextIndex].id)
     } else {
-      handlePrevious()
+      const prevIndex = getCircularIndex(currentIndex - 1)
+      onCategoryChange(categories[prevIndex].id)
     }
   }
 
-  // Adiciona e remove o evento de wheel
+  // Adicionar e remover o evento de wheel
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
@@ -88,106 +95,96 @@ export function CategorySelector({
     return () => container.removeEventListener('wheel', handleWheel)
   }, [currentIndex, isMobile])
 
+  // Verificar scroll inicial e quando o container mudar
+  useEffect(() => {
+    checkScroll()
+    const container = containerRef.current
+    if (container) {
+      container.addEventListener("scroll", checkScroll)
+      return () => container.removeEventListener("scroll", checkScroll)
+    }
+  }, [categories, selectedCategoryId])
+
+  // Centralizar a categoria selecionada
+  useEffect(() => {
+    if (!containerRef.current) return
+
+    const selectedElement = containerRef.current.querySelector(`[data-category-id="${selectedCategoryId}"]`)
+    if (selectedElement) {
+      selectedElement.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center"
+      })
+    }
+  }, [selectedCategoryId])
+
   return (
-    <div className={cn(
-      "relative",
-      isSticky 
-        ? "fixed top-0 left-0 right-0 z-20 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm mt-[var(--editions-height,0px)]" 
-        : "mb-4"
-    )}>
-      <div className={cn(
-        "relative flex items-center justify-center py-2",
-        isSticky ? "max-w-4xl mx-auto" : ""
-      )}>
-        {/* Botão Anterior */}
+    <div className="relative w-full">
+      {/* Botões de navegação */}
+      <div className="absolute inset-y-0 left-0 flex items-center z-10">
         <button
-          onClick={handlePrevious}
+          onClick={() => handleScroll("left")}
           className={cn(
-            "absolute left-0 z-20 rounded-full hover:bg-muted/50 transition-colors",
-            isMobile ? "p-1" : "p-1.5"
+            "p-1 rounded-full bg-background/80 backdrop-blur-sm shadow-lg transition-opacity duration-200",
+            showLeftArrow ? "opacity-100" : "opacity-0 pointer-events-none"
           )}
-          aria-label="Categoria anterior"
+          aria-label="Categorias anteriores"
         >
-          <ChevronLeft className={cn(isMobile ? "w-4 h-4" : "w-5 h-5")} />
+          <ChevronLeft className="h-5 w-5" />
         </button>
+      </div>
 
-        {/* Container do Carrossel */}
-        <div 
-          ref={containerRef}
-          className={cn(
-            "relative w-full overflow-hidden",
-            isMobile ? "max-w-[240px]" : "max-w-[280px]"
-          )}
-        >
-          <div className="flex items-center justify-center gap-0.5">
-            {visibleIndices.map((index, position) => {
-              const category = categories[index]
-              if (!category?.id) return null
-
-              const isActive = category.id === selectedCategoryId
-              const isVoted = isCategoryVoted(category.id)
-
-              return (
-                <motion.button
-                  key={category.id}
-                  onClick={() => onCategoryChange(category.id)}
-                  className={cn(
-                    "relative flex items-center justify-center transition-all duration-200 group",
-                    isMobile ? "w-5 h-5" : "w-8 h-8"
-                  )}
-                  initial={false}
-                  animate={{
-                    scale: isActive ? 1.1 : 1,
-                    opacity: isActive ? 1 : 0.7,
-                    x: `${(position - 2) * (isMobile ? 20 : 32)}px`
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 30
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button
-                    variant={isActive ? "default" : "outline"}
-                    className={cn(
-                      "transition-all duration-200",
-                      isMobile 
-                        ? "w-[90px] h-7 text-xs px-2" 
-                        : "w-[120px] h-8 text-sm",
-                      isActive
-                        ? "bg-gradient-to-r from-chart-2 to-chart-5 text-primary-foreground shadow-lg"
-                        : isVoted
-                          ? "text-success border-success/30 hover:border-success/50"
-                          : "hover:bg-muted/50"
-                    )}
-                  >
-                    <span className="truncate">{category.name.split(" ").pop()}</span>
-                    {isVoted && (
-                      <CheckCircle2 className={cn(
-                        "ml-1 flex-shrink-0",
-                        isMobile ? "h-2.5 w-2.5" : "h-3 w-3"
-                      )} />
-                    )}
-                  </Button>
-                </motion.button>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Botão Próximo */}
+      <div className="absolute inset-y-0 right-0 flex items-center z-10">
         <button
-          onClick={handleNext}
+          onClick={() => handleScroll("right")}
           className={cn(
-            "absolute right-0 z-20 rounded-full hover:bg-muted/50 transition-colors",
-            isMobile ? "p-1" : "p-1.5"
+            "p-1 rounded-full bg-background/80 backdrop-blur-sm shadow-lg transition-opacity duration-200",
+            showRightArrow ? "opacity-100" : "opacity-0 pointer-events-none"
           )}
-          aria-label="Próxima categoria"
+          aria-label="Próximas categorias"
         >
-          <ChevronRight className={cn(isMobile ? "w-4 h-4" : "w-5 h-5")} />
+          <ChevronRight className="h-5 w-5" />
         </button>
+      </div>
+
+      {/* Container do carrossel */}
+      <div
+        ref={containerRef}
+        className={cn(
+          "flex space-x-2 overflow-x-auto scrollbar-hide",
+          isMobile ? "px-8" : "px-12",
+          "scroll-smooth"
+        )}
+      >
+        {visibleIndices.map((index) => {
+          const category = categories[index]
+          if (!category?.id) return null
+
+          return (
+            <motion.button
+              key={category.id}
+              data-category-id={category.id}
+              onClick={() => onCategoryChange(category.id)}
+              className={cn(
+                "px-3 py-2 text-sm whitespace-nowrap rounded-md flex items-center transition-all duration-200",
+                selectedCategoryId === category.id 
+                  ? "bg-primary text-primary-foreground scale-105" 
+                  : "bg-muted/30 hover:bg-muted/50",
+                hasVote(category.id) && "text-success"
+              )}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              aria-pressed={selectedCategoryId === category.id}
+              aria-label={`Categoria ${category.name} ${hasVote(category.id) ? "(votada)" : ""}`}
+            >
+              {isMobile ? category.name.split(" ").pop() : category.name}
+              {hasVote(category.id) && (
+                <span className="ml-1 text-success">✓</span>
+              )}
+            </motion.button>
+          )
+        })}
       </div>
     </div>
   )

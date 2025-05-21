@@ -44,10 +44,7 @@ export function CategoryStepper({
     currentIndex,
     getCircularIndex(currentIndex + 1),
     getCircularIndex(currentIndex + 2)
-  ].filter(index => {
-    // Garantir que o índice é válido e a categoria existe
-    return index >= 0 && index < categories.length && categories[index]?.id
-  })
+  ]
 
   return (
     <div className="relative flex items-center justify-center py-2">
@@ -61,13 +58,12 @@ export function CategoryStepper({
       </button>
 
       {/* Container do Carrossel */}
-      <div className="relative w-full max-w-[280px] overflow-hidden">
-        <div className="flex items-center justify-center gap-1">
+      <div className="relative w-full max-w-[400px] overflow-hidden">
+        <div className="flex items-center justify-center gap-2">
           {visibleIndices.map((index, position) => {
             const category = categories[index]
-            // Verificação adicional de segurança
             if (!category?.id) return null
-
+            
             const isActive = category.id === currentCategoryId
             const isVoted = votes[category.id]
 
@@ -83,7 +79,7 @@ export function CategoryStepper({
                 animate={{
                   scale: isActive ? 1.1 : 1,
                   opacity: isActive ? 1 : 0.7,
-                  x: `${(position - 2) * (isMobile ? 24 : 32)}px`
+                  x: `${(position - 2) * (isMobile ? 32 : 48)}px`
                 }}
                 transition={{
                   type: "spring",

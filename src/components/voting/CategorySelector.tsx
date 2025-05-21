@@ -156,6 +156,11 @@ export function CategorySelector({
           isMobile ? "px-8" : "px-12",
           "scroll-smooth"
         )}
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          WebkitOverflowScrolling: "touch"
+        }}
       >
         {visibleIndices.map((index) => {
           const category = categories[index]

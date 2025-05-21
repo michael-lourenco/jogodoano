@@ -28,52 +28,52 @@
     --popover: 0 0% 100%;          
     --popover-foreground: 260 40% 16%;
     
-    /* Primary colors */
-    --primary: 265 80% 40%;        
+    /* Primary colors - Ajustado para um roxo mais vibrante */
+    --primary: 265 85% 45%;        
     --primary-foreground: 0 0% 100%;
     
-    /* Secondary colors */
+    /* Secondary colors - Ajustado para melhor contraste */
     --secondary: 260 25% 92%;      
-    --secondary-foreground: 265 70% 35%;
+    --secondary-foreground: 265 75% 35%;
     
-    /* Supporting colors */
+    /* Supporting colors - Ajustado para melhor harmonia */
     --muted: 260 20% 90%;          
     --muted-foreground: 260 30% 40%;
     --accent: 265 60% 90%;         
     --accent-foreground: 265 80% 30%;
     
-    /* Alert/status colors */
-    --destructive: 350 90% 50%;    
+    /* Alert/status colors - Ajustado para melhor visibilidade */
+    --destructive: 350 95% 55%;    
     --destructive-foreground: 0 0% 100%;
     
-    /* New semantic status colors */
-    --success: 150 70% 45%;         /* Verde esmeralda - similar ao chart-5 */
+    /* Semantic status colors - Ajustado para melhor consistência */
+    --success: 150 75% 45%;         
     --success-foreground: 0 0% 100%;
     
-    --warning: 40 95% 60%;          /* Amarelo dourado - similar ao chart-4 */
+    --warning: 40 95% 60%;          
     --warning-foreground: 260 40% 16%;
     
-    --info: 190 85% 50%;            /* Ciano - similar ao chart-3 */
+    --info: 190 90% 50%;            
     --info-foreground: 0 0% 100%;
     
-    /* Border and input colors */
+    /* Border and input colors - Ajustado para melhor definição */
     --border: 260 20% 85%;         
     --input: 260 20% 85%;          
-    --ring: 265 80% 40%;           
+    --ring: 265 85% 45%;           
     
-    /* Border radius */
-    --radius: 0.5rem;
+    /* Border radius - Ajustado para mais consistência */
+    --radius: 0.75rem;
     
-    /* Chart colors */
-    --chart-1: 265 75% 50%;        
-    --chart-2: 320 70% 55%;        
-    --chart-3: 190 85% 50%;        
+    /* Chart colors - Ajustado para melhor harmonia */
+    --chart-1: 265 85% 50%;        
+    --chart-2: 320 75% 55%;        
+    --chart-3: 190 90% 50%;        
     --chart-4: 40 95% 60%;         
-    --chart-5: 150 70% 45%;        
+    --chart-5: 150 75% 45%;        
   }
 
   .dark {
-    /* Base colors - dark mode */
+    /* Base colors - dark mode - Ajustado para melhor contraste */
     --slate-900: #10071e;          
     --background: 265 30% 10%;     
     --foreground: 260 15% 95%;     
@@ -82,40 +82,40 @@
     --popover: 265 35% 12%;        
     --popover-foreground: 260 15% 95%;
     
-    /* Primary colors - dark mode */
-    --primary: 265 80% 65%;        
+    /* Primary colors - dark mode - Ajustado para melhor visibilidade */
+    --primary: 265 85% 65%;        
     --primary-foreground: 260 40% 10%;
     
-    /* Secondary colors - dark mode */
+    /* Secondary colors - dark mode - Ajustado para melhor contraste */
     --secondary: 265 40% 20%;      
     --secondary-foreground: 260 15% 95%;
     
-    /* Supporting colors - dark mode */
+    /* Supporting colors - dark mode - Ajustado para melhor harmonia */
     --muted: 265 30% 25%;          
     --muted-foreground: 260 15% 75%;
     --accent: 265 50% 30%;         
     --accent-foreground: 260 15% 95%;
     
-    /* Alert/status colors - dark mode */
-    --destructive: 350 90% 60%;    
+    /* Alert/status colors - dark mode - Ajustado para melhor visibilidade */
+    --destructive: 350 95% 60%;    
     --destructive-foreground: 260 15% 95%;
     
-    /* New semantic status colors - dark mode */
-    --success: 150 85% 55%;         /* Verde esmeralda brilhante - similar ao chart-5 dark */
+    /* Semantic status colors - dark mode - Ajustado para melhor consistência */
+    --success: 150 85% 55%;         
     --success-foreground: 260 40% 10%;
     
-    --warning: 40 95% 65%;          /* Amarelo dourado brilhante - similar ao chart-4 dark */
+    --warning: 40 95% 65%;          
     --warning-foreground: 260 40% 10%;
     
-    --info: 190 90% 60%;            /* Ciano brilhante - similar ao chart-3 dark */
+    --info: 190 90% 60%;            
     --info-foreground: 260 40% 10%;
     
-    /* Border and input colors - dark mode */
+    /* Border and input colors - dark mode - Ajustado para melhor definição */
     --border: 265 35% 25%;         
     --input: 265 35% 25%;          
-    --ring: 265 80% 65%;           
+    --ring: 265 85% 65%;           
     
-    /* Chart colors - dark mode */
+    /* Chart colors - dark mode - Ajustado para melhor harmonia */
     --chart-1: 265 90% 70%;        
     --chart-2: 320 85% 65%;        
     --chart-3: 190 90% 60%;        
@@ -132,24 +132,24 @@
     @apply bg-background text-foreground;
   }
   
-  /* Componentes de cartões de jogos */
+  /* Componentes de cartões de jogos - Ajustado para melhor consistência */
   .game-card {
-    @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-lg;
+    @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-lg rounded-xl overflow-hidden;
   }
   
-  /* Botões de votação */
+  /* Botões de votação - Ajustado para melhor feedback visual */
   .vote-button {
-    @apply transition-colors duration-200 hover:bg-primary/90 active:bg-primary/70;
+    @apply transition-all duration-200 hover:bg-primary/90 active:bg-primary/70 rounded-lg;
   }
   
-  /* Animações hover */
+  /* Animações hover - Ajustado para melhor fluidez */
   .animate-hover {
-    @apply transition-all duration-300 ease-in-out;
+    @apply transition-all duration-300 ease-out;
   }
   
-  /* Jogos em destaque */
+  /* Jogos em destaque - Ajustado para melhor destaque */
   .featured-game {
-    @apply ring-2 ring-primary/50;
+    @apply ring-2 ring-primary/50 rounded-xl;
   }
 }
 

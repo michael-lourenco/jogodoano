@@ -31,16 +31,25 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground min-h-screen flex flex-col`}
       >
         <AuthProvider>
           <Providers>
-            {children}
+            <main className="flex-1 flex flex-col">
+              {children}
+            </main>
             <CookieConsent />
             <Toaster
               richColors
               position="top-right"
               theme="dark"
+              className="font-sans"
+              toastOptions={{
+                style: {
+                  borderRadius: 'var(--radius)',
+                  fontFamily: 'var(--font-geist-sans)',
+                },
+              }}
             />
           </Providers>
         </AuthProvider>

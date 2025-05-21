@@ -62,7 +62,7 @@ const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCard
     >
       <Card
         className={cn(
-          "cursor-pointer transition-all duration-200 hover:shadow-lg border-2 overflow-hidden h-full",
+          "cursor-pointer transition-all duration-200 hover:shadow-lg border-2 overflow-hidden h-full rounded-xl",
           localSelected 
             ? "border-success bg-success/5 shadow-success/30" 
             : "border-transparent hover:border-primary/30",
@@ -70,7 +70,7 @@ const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCard
         onClick={handleClick}
       >
         <CardContent className="p-0 flex flex-col h-full">
-          <div className="relative aspect-video w-full overflow-hidden">
+          <div className="relative aspect-video w-full overflow-hidden rounded-t-xl">
             {game.imageUrl ? (
               <Image
                 src={game.imageUrl}
@@ -104,19 +104,19 @@ const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCard
               </div>
             )}
           </div>
-          <div className="flex flex-col justify-between p-3 flex-grow">
+          <div className="flex flex-col justify-between p-4 flex-grow">
             <div>
-              <h3 className="font-semibold line-clamp-2 mb-1">{game.title}</h3>
-              <p className="text-xs text-muted-foreground">{game.developer}</p>
+              <h3 className="font-semibold text-base line-clamp-2 mb-2">{game.title}</h3>
+              <p className="text-sm text-muted-foreground">{game.developer}</p>
             </div>
-            <div className="mt-2">
+            <div className="mt-3">
               {localSelected ? (
-                <div className="mt-1 flex items-center">
-                  <span className="text-xs bg-success/15 text-success px-2 py-1 rounded-full font-medium">Selecionado</span>
-                  <CheckCircle2 className="h-3 w-3 text-success ml-1" />
+                <div className="mt-2 flex items-center">
+                  <span className="text-sm bg-success/15 text-success px-3 py-1.5 rounded-full font-medium">Selecionado</span>
+                  <CheckCircle2 className="h-4 w-4 text-success ml-2" />
                 </div>
               ) : (
-                <div className="mt-1 text-xs text-muted-foreground/70">Clique para selecionar</div>
+                <div className="mt-2 text-sm text-muted-foreground/70">Clique para selecionar</div>
               )}
             </div>
           </div>

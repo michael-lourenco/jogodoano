@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils"
 import { useVotingManager } from "@/hooks/useVotingManager"
 import { useFooterState } from "@/hooks/useFooterState"
 import { useScrollPosition } from "@/hooks/useScrollPosition"
+import { Header } from "@/components/Header"
 
 export function VotingInterface({
   user,
@@ -295,9 +296,9 @@ export function VotingInterface({
     <>
       <style>{styles}</style>
       <div className="flex flex-col min-h-screen bg-background text-foreground">
+        <Header />
         <main className="flex-grow flex flex-col items-center justify-start pt-4 px-4">
           <div className="w-full max-w-4xl mx-auto">
-            <UserInfo user={user} handleLogin={handleLogin} handleLogout={handleLogout} />
 
             <div
               ref={editionsSelectorRef}

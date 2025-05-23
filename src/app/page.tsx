@@ -8,6 +8,7 @@ import { useNavigation } from "@/hooks/useNavigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Footer } from "@/components/Footer";
 import { UserInfo } from "@/components/UserInfo";
+import { Header } from "@/components/Header"
 
 export default function Home() {
   const navigationService = useNavigation();
@@ -28,15 +29,9 @@ export default function Home() {
   return (
     <>
       <div className="flex flex-col min-h-screen bg-background text-foreground">
+        <Header />
         <main className="flex-grow flex flex-col items-center justify-start pt-4">
           <div className="max-w-4xl mx-auto">
-            {status !== "loading" && (
-              <UserInfo
-                user={user}
-                handleLogin={handleLogin}
-                handleLogout={handleLogout}
-              />
-            )}
             <Card className="bg-card border-none shadow-none">
               <CardHeader className="space-y-2">
                 <CardTitle className="text-4xl font-bold text-center bg-gradient-to-r from-chart-2 to-chart-5 text-transparent bg-clip-text">

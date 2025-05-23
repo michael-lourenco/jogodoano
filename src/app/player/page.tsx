@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Icon, IconName } from "@/components/icons";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Header } from "@/components/Header"
 
 // Interfaces para tipagem
 interface StatCardProps {
@@ -124,9 +125,9 @@ export default function PlayerDashboard() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
+      <Header />
       <main className="flex-grow flex flex-col items-center justify-start pt-4 px-4">
         <div className="w-full max-w-4xl mx-auto">
-          <UserInfo user={user} handleLogin={handleLogin} handleLogout={handleLogout} />
           
           {!user ? (
             <motion.div

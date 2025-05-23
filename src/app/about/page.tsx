@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Icon, IconName } from "@/components/icons"
 import { Footer } from "@/components/Footer"
+import { Header } from "@/components/Header"
 import { motion } from "framer-motion"
 import { Separator } from "@/components/ui/separator"
 
@@ -118,10 +119,9 @@ export default function About() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
+      <Header />
       <main className="flex-grow flex flex-col items-center justify-start pt-4 px-4">
-        <div className="w-full max-w-4xl mx-auto">
-          <UserInfo user={user} handleLogin={handleLogin} handleLogout={handleLogout} />
-          
+        <div className="w-full max-w-4xl mx-auto">          
           {/* Hero Section - Melhorado para mobile */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}

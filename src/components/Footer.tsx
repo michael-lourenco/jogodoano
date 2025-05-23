@@ -22,18 +22,31 @@ export function Footer() {
   const [isExpanded, setIsExpanded] = useState(true)
   const [lastScrollY, setLastScrollY] = useState(0)
 
-  // Efeito para controlar o colapso automático ao rolar
+  // Efeito para controlar o colapso automático ao mudar de página
+  useEffect(() => {
+    if (!isMobile) return
+
+    // Expande o menu quando muda de página
+    setIsExpanded(true)
+
+    // Colapsa após 3 segundos
+    const timer = setTimeout(() => {
+      setIsExpanded(false)
+    }, 3000)
+
+    return () => clearTimeout(timer)
+  }, [pathname, isMobile])
+
+  // Efeito para controlar o colapso ao rolar
   useEffect(() => {
     if (!isMobile) return
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY
       
-      // Colapsa ao rolar para baixo, expande ao rolar para cima
+      // Colapsa ao rolar para baixo após 100px
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
         setIsExpanded(false)
-      } else if (currentScrollY < lastScrollY) {
-        setIsExpanded(true)
       }
       
       setLastScrollY(currentScrollY)
@@ -45,7 +58,6 @@ export function Footer() {
 
   return (
     <TooltipProvider>
-
       <footer 
         className={`sticky bottom-0 w-full bg-background border-dashed border-t transition-all duration-300 z-[100] ${
           isMobile ? (isExpanded ? 'h-16' : 'h-4') : 'h-16'

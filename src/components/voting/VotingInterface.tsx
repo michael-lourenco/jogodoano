@@ -437,6 +437,11 @@ export function VotingInterface({
                           zIndex: footerState.isExpanded ? 20 : 50
                         }}
                       >
+                        <VotingProgress
+                          categories={categories}
+                          votes={votes[selectedEditionId] || {}}
+                          editionId={selectedEditionId}
+                        />
                         {/* Category Stepper */}
                         <div className="px-4 py-2">
                           <CategoryStepper

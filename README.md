@@ -1,131 +1,163 @@
 # Jogo do Ano - Sistema de Votação
 
-Sistema de votação para o Jogo do Ano, desenvolvido com React, TypeScript e Tailwind CSS.
+## Visão Geral
 
-## 🚀 Funcionalidades
+O "Jogo do Ano" é um aplicativo web moderno que permite aos usuários votar em jogos por categorias dentro de edições específicas. O sistema foi projetado com foco em uma experiência de usuário fluida e intuitiva, oferecendo recursos avançados de navegação e interação tanto em dispositivos desktop quanto móveis.
 
-- **Votação por Categorias**: Sistema de votação organizado por categorias
-- **Interface Responsiva**: Suporte completo para desktop e mobile
-- **Navegação Intuitiva**: 
-  - Desktop: Navegação por tabs e teclado
-  - Mobile: Navegação por swipe, wheel e botões
-- **Persistência Local**: Salvamento automático dos votos no localStorage
-- **Animações Suaves**: Transições e feedback visual para melhor experiência do usuário
-- **Acessibilidade**: Suporte a navegação por teclado e leitores de tela
+### Funcionalidades Principais
 
-## 🛠️ Tecnologias
+- **Autenticação e Perfil**
+  - Login/Logout integrado
+  - Perfil de usuário com histórico de votos
+  - Interface adaptativa para diferentes estados de autenticação
 
-- React
-- TypeScript
-- Tailwind CSS
-- Framer Motion
-- Lucide Icons
-- Shadcn/ui
+- **Sistema de Votação**
+  - Seleção intuitiva de edições
+  - Navegação fluida entre categorias
+  - Interface de votação otimizada para touch e mouse
+  - Progresso visual da votação
+  - Validação em tempo real
 
-## 📦 Instalação
+- **Navegação Avançada**
+  - Suporte a gestos touch (swipe)
+  - Navegação por teclado
+  - Transições suaves entre categorias
+  - Header e Footer inteligentes com comportamento adaptativo
+
+- **Interface Responsiva**
+  - Layout otimizado para mobile e desktop
+  - Componentes adaptativos
+  - Animações e transições suaves
+  - Feedback visual em tempo real
+
+## Estrutura do Projeto
+
+```
+├── src/
+│   ├── app/                    # Rotas e páginas (Next.js 14)
+│   ├── components/            # Componentes React
+│   │   ├── ui/               # Componentes base (shadcn/ui)
+│   │   ├── voting/           # Componentes específicos de votação
+│   │   └── admin/            # Componentes do painel administrativo
+│   ├── hooks/                # Hooks personalizados
+│   ├── stores/               # Gerenciamento de estado (Zustand)
+│   ├── types/                # Definições de tipos TypeScript
+│   ├── repositories/         # Camada de acesso a dados
+│   ├── application/          # Lógica de negócios
+│   ├── lib/                  # Bibliotecas e configurações
+│   ├── services/             # Serviços da aplicação
+│   └── utils/                # Funções utilitárias
+├── types/                    # Tipos globais
+├── public/                   # Arquivos estáticos
+└── [configurações]          # Arquivos de configuração
+```
+
+## Tecnologias Utilizadas
+
+### Frontend
+- **Next.js 14**: Framework React com App Router
+- **React 18**: Biblioteca para construção de interfaces
+- **TypeScript**: Tipagem estática e melhor DX
+- **TailwindCSS**: Estilização utilitária
+- **Shadcn/ui**: Componentes acessíveis e customizáveis
+- **Zustand**: Gerenciamento de estado
+- **Lucide Icons**: Ícones consistentes
+
+### Desenvolvimento
+- **ESLint**: Linting e padronização de código
+- **Prettier**: Formatação de código
+- **TypeScript**: Tipagem estática
+- **Husky**: Git hooks
+- **Docker**: Containerização
+
+## Instalação e Execução
+
+### Pré-requisitos
+
+- Node.js 18+
+- Yarn ou NPM
+- Docker (opcional)
+
+### Instalação
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/jogodoano-cursor.git
+git clone https://github.com/seu-usuario/jogodoano.git
+cd jogodoano
 ```
 
 2. Instale as dependências:
 ```bash
-npm install
-# ou
 yarn install
-```
-
-3. Execute o projeto:
-```bash
-npm run dev
 # ou
+npm install
+```
+
+3. Execute o ambiente de desenvolvimento:
+```bash
 yarn dev
+# ou
+npm run dev
 ```
 
-## 🏗️ Estrutura do Projeto
+4. Acesse [http://localhost:3000](http://localhost:3000)
 
-```
-src/
-├── components/
-│   ├── voting/
-│   │   ├── CategorySection.tsx
-│   │   ├── CategorySelector.tsx
-│   │   ├── CategoryStepper.tsx
-│   │   ├── EditionsSelector.tsx
-│   │   ├── VotingInterface.tsx
-│   │   └── VotingProgress.tsx
-│   └── ui/
-├── hooks/
-│   ├── useCategoryNavigation.ts
-│   ├── useKeyboardNavigation.ts
-│   ├── useSwipeNavigation.ts
-│   ├── useStickyHeader.ts
-│   └── useVotingInterface.ts
-├── stores/
-│   └── useLocalVotes.ts
-└── types/
-    └── voting/
+### Docker
+
+1. Construa e inicie os containers:
+```bash
+docker-compose up --build
 ```
 
-## 🔑 Principais Componentes
+2. Acesse [http://localhost:3030](http://localhost:3030)
 
-### VotingInterface
-Componente principal que gerencia a interface de votação, incluindo:
-- Seleção de edição
-- Navegação entre categorias
-- Exibição de jogos
-- Sistema de votação
-- Persistência de votos
+## Arquitetura
 
-### CategorySelector
-Seletor de categorias com:
-- Navegação por wheel
-- Centralização automática
-- Animações suaves
-- Indicador de votos
+### Padrões de Projeto
 
-### CategoryStepper
-Navegador de categorias com:
-- Visualização de progresso
-- Navegação rápida
-- Indicador de votos
+- **Clean Architecture**: Separação clara de responsabilidades
+- **Repository Pattern**: Abstração do acesso a dados
+- **Service Pattern**: Encapsulamento de lógica de negócios
+- **Hooks Pattern**: Reutilização de lógica de estado
+- **Component Pattern**: Componentes reutilizáveis e isolados
 
-## 🎯 Funcionalidades Detalhadas
+### Estrutura de Código
 
-### Navegação
-- **Desktop**: 
-  - Tabs para navegação
-  - Teclas de seta para navegação
-  - Scroll suave para categorias
-- **Mobile**:
-  - Swipe para navegação
-  - Wheel para navegação
-  - Botões de navegação
-  - Scroll automático para categoria selecionada
+- **Componentes**: Isolados e reutilizáveis
+- **Hooks**: Lógica de negócios reutilizável
+- **Stores**: Estado global gerenciado
+- **Types**: Tipos e interfaces TypeScript
+- **Services**: Lógica de negócios centralizada
 
-### Votação
-- Seleção de jogos por categoria
-- Persistência automática dos votos
-- Validação de votos obrigatórios
-- Envio em lote
+## Contribuição
 
-### Interface
-- Design responsivo
-- Animações suaves
-- Feedback visual
-- Suporte a temas
-- Acessibilidade
+### Padrões de Código
 
-## 🤝 Contribuindo
+1. **Commits**:
+   - Mensagens claras e descritivas
+   - Commits atômicos e focados
+   - Referência a issues quando aplicável
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
+2. **Pull Requests**:
+   - Descrição clara das mudanças
+   - Screenshots para mudanças visuais
+   - Testes quando aplicável
+   - Revisão de código necessária
 
-## 📝 Licença
+### Desenvolvimento
+
+1. **Setup**:
+   - Instale as dependências
+   - Configure as variáveis de ambiente
+   - Execute os testes
+
+2. **Fluxo de Trabalho**:
+   - Crie uma branch para sua feature
+   - Desenvolva e teste
+   - Submeta um PR
+   - Aguarde revisão e aprovação
+
+## Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 

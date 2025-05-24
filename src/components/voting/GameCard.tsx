@@ -70,17 +70,17 @@ const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCard
 
   // Função para lidar com o clique no card
   const handleClick = () => {
-    // Só atualiza se o estado atual for diferente
+
     if (!localSelected) {
-      // Atualizamos também o estado local para feedback imediato
+
       setLocalSelected(true)
-      // Mostra a animação de confirmação
+
       setShowConfirmation(true)
-      // Reproduz o som de confirmação
+
       playConfirmationSound()
-      // Chamamos a função onSelect para registrar o voto
+
       onSelect()
-      // Remove a animação de confirmação após um tempo
+
       setTimeout(() => {
         setShowConfirmation(false)
       }, 1000)

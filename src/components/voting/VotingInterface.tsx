@@ -323,14 +323,6 @@ export function VotingInterface({
 
             {selectedEditionId && editions.length > 0 && (
               <>
-                {/* Progress bar showing voting completion - apenas para desktop */}
-                {!isMobile && (
-                  <VotingProgress
-                    categories={categories}
-                    votes={votes[selectedEditionId] || {}}
-                    editionId={selectedEditionId}
-                  />
-                )}
 
                 {isMobile ? (
                   <div className="mb-6 relative" ref={mobileMainContainerRef}>
@@ -526,13 +518,7 @@ export function VotingInterface({
                           isMobile={isMobile}
                         />
                         
-                        {/* Adicionar o CategoryStepper */}
-                        <CategoryStepper
-                          categories={categories}
-                          currentCategoryId={localActiveCategory}
-                          onStepClick={handleCategoryClick}
-                          votes={votes[selectedEditionId] || {}}
-                        />
+
                       </div>
 
                       {isSticky && <div style={{ height: "3rem", marginBottom: "1rem" }}></div>}
@@ -560,6 +546,17 @@ export function VotingInterface({
 
                           {/* Botões de navegação - Desktop */}
                           <div className="mt-6 px-4 pb-4 flex flex-col gap-4">
+                            <VotingProgress
+                              categories={categories}
+                              votes={votes[selectedEditionId] || {}}
+                              editionId={selectedEditionId}
+                            />
+                            <CategoryStepper
+                              categories={categories}
+                              currentCategoryId={localActiveCategory}
+                              onStepClick={handleCategoryClick}
+                              votes={votes[selectedEditionId] || {}}
+                            />
                             <div className="flex items-center justify-between gap-2">
                               {isAllCategoriesVoted(categories) ? (
                                 <Button

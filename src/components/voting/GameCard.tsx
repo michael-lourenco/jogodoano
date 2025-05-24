@@ -4,8 +4,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 import { CheckCircle2, Gamepad2 } from "lucide-react"
-import { motion } from "framer-motion"
-import { useEffect, useState, memo } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { useEffect, useState, memo, useCallback } from "react"
 import type { Game } from "@/types/types"
 
 interface GameCardProps {
@@ -18,6 +18,7 @@ interface GameCardProps {
 const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCardProps) {
   // Estado local para animação suave
   const [localSelected, setLocalSelected] = useState(isSelected)
+  const [showConfirmation, setShowConfirmation] = useState(false)
 
   // Atualiza o estado local quando a prop isSelected muda
   useEffect(() => {
@@ -38,14 +39,51 @@ const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCard
     selected: { scale: 1, opacity: 1, transition: { type: "spring", stiffness: 500, damping: 30 } },
   };
 
+  // Variantes para animação de confirmação
+  const confirmationVariants = {
+    initial: { scale: 0.8, opacity: 0 },
+    animate: { 
+      scale: 1.2, 
+      opacity: 1,
+      transition: { 
+        type: "spring",
+        stiffness: 500,
+        damping: 15,
+        duration: 0.3
+      }
+    },
+    exit: { 
+      scale: 0.8, 
+      opacity: 0,
+      transition: { duration: 0.2 }
+    }
+  };
+
+  // Função para reproduzir o som de confirmação
+  const playConfirmationSound = useCallback(() => {
+    const audio = new Audio('/sounds/select.mp3')
+    audio.volume = 0.3 // Volume reduzido para não ser intrusivo
+    audio.play().catch(() => {
+      // Ignora erros de autoplay
+    })
+  }, [])
+
   // Função para lidar com o clique no card
   const handleClick = () => {
     // Só atualiza se o estado atual for diferente
     if (!localSelected) {
       // Atualizamos também o estado local para feedback imediato
-      setLocalSelected(true);
+      setLocalSelected(true)
+      // Mostra a animação de confirmação
+      setShowConfirmation(true)
+      // Reproduz o som de confirmação
+      playConfirmationSound()
       // Chamamos a função onSelect para registrar o voto
-      onSelect();
+      onSelect()
+      // Remove a animação de confirmação após um tempo
+      setTimeout(() => {
+        setShowConfirmation(false)
+      }, 1000)
     }
   };
 
@@ -58,7 +96,7 @@ const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCard
       whileHover={{ scale: 1.05, y: -5 }}
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.2 }}
-      className="h-full"
+      className="h-full relative"
     >
       <Card
         className={cn(
@@ -122,6 +160,23 @@ const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCard
           </div>
         </CardContent>
       </Card>
+
+      {/* Animação de confirmação */}
+      <AnimatePresence>
+        {showConfirmation && (
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            variants={confirmationVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            <div className="bg-success/20 rounded-full p-8 backdrop-blur-sm">
+              <CheckCircle2 className="h-12 w-12 text-success" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 });

@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
-import { CheckCircle2, Gamepad2 } from "lucide-react"
+import { Gamepad2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useEffect, useState, memo, useCallback } from "react"
 import type { Game } from "@/types/types"
@@ -135,9 +135,9 @@ const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCard
                   initial="initial"
                   animate="selected"
                   variants={checkVariants}
-                  className="bg-success text-success-foreground rounded-full p-2"
+                  className="bg-success text-success-foreground rounded-full w-8 h-8 flex items-center justify-center"
                 >
-                  <CheckCircle2 className="h-8 w-8" />
+                  <span className="text-xl font-bold">✓</span>
                 </motion.div>
               </div>
             )}
@@ -151,7 +151,7 @@ const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCard
               {localSelected ? (
                 <div className="mt-2 flex items-center">
                   <span className="text-sm bg-success/15 text-success px-3 py-1.5 rounded-full font-medium">Selecionado</span>
-                  <CheckCircle2 className="h-4 w-4 text-success ml-2" />
+                  <span className="text-success ml-2 w-4 h-4 flex items-center justify-center">✓</span>
                 </div>
               ) : (
                 <div className="mt-2 text-sm text-muted-foreground/70">Clique para selecionar</div>
@@ -171,8 +171,8 @@ const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCard
             animate="animate"
             exit="exit"
           >
-            <div className="bg-success/20 rounded-full p-8 backdrop-blur-sm">
-              <CheckCircle2 className="h-12 w-12 text-success" />
+            <div className="bg-success/20 rounded-full w-16 h-16 flex items-center justify-center backdrop-blur-sm">
+              <span className="text-2xl font-bold text-success">✓</span>
             </div>
           </motion.div>
         )}

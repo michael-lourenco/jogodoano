@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useAuth } from "@/hooks/useAuth"
 import { useVotes } from "@/hooks/useVotes"
@@ -10,10 +10,11 @@ import { rehydrateVotingEditions } from "@/utils/utils"
 import { VotingCompletePage } from "@/components/voting/VotingCompletePage"
 import { VotingInterface } from "@/components/voting/VotingInterface"
 import { LoginModal } from "@/components/voting/LoginModal"
-import { Header } from "@/components/Header"
+import { UserInfo } from "@/components/UserInfo"
 import { Footer } from "@/components/Footer"
+import { Header } from "@/components/Header"
 
-export default function VotingPage() {
+function VotingContent() {
   const navigationService = useNavigation()
   const { user, loading, handleLogin, handleLogout } = useAuth()
 
@@ -33,6 +34,7 @@ export default function VotingPage() {
     setVotedEditionId,
   } = useVotes({ user, editions })
 
+  // Carregar edições
   useEffect(() => {
     const hydratedEditions = rehydrateVotingEditions(votingEditions)
     setEditions(hydratedEditions)
@@ -67,9 +69,10 @@ export default function VotingPage() {
   if (!user) {
     return (
       <div className="flex flex-col min-h-screen bg-background text-foreground">
+        <Header />
         <main className="flex-grow flex flex-col items-center justify-start pt-4 px-4">
           <div className="w-full max-w-4xl mx-auto">
-            <Header />
+            <UserInfo user={user} handleLogin={handleLogin} handleLogout={handleLogout} />
             <LoginModal handleLogin={handleLogin} />
           </div>
         </main>
@@ -108,5 +111,17 @@ export default function VotingPage() {
       handleVoteInUI={handleVoteInUI}
       handleSubmitVotesInUI={handleSubmitVotesInUI}
     />
+  )
+}
+
+export default function VotingPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center items-center h-screen bg-background">
+        <div className="animate-pulse text-primary">Carregando...</div>
+      </div>
+    }>
+      <VotingContent />
+    </Suspense>
   )
 }

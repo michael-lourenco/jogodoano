@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import type { VotingEdition, Category } from "@/types/types"
+import { useLocalEdition } from "@/hooks/useLocalEdition"
 
 interface UseEditionManagerProps {
   editions: VotingEdition[]
-  initialEditionId?: string
 }
 
 interface UseEditionManagerReturn {
@@ -19,20 +20,49 @@ interface UseEditionManagerReturn {
 
 export function useEditionManager({
   editions,
-  initialEditionId = "2025",
 }: UseEditionManagerProps): UseEditionManagerReturn {
-  const [selectedEditionId, setSelectedEditionId] = useState<string>(initialEditionId)
+  const searchParams = useSearchParams()
+  const { localEdition, saveLocalEdition } = useLocalEdition()
+  
+  // Obter edição inicial da URL ou localStorage
+  const getInitialEdition = () => {
+    const editionFromUrl = searchParams.get("votingEdition")
+    if (editionFromUrl && editions.some(e => e.id === editionFromUrl)) {
+      return editionFromUrl
+    }
+    if (localEdition && editions.some(e => e.id === localEdition)) {
+      return localEdition
+    }
+    return "2025" // Edição padrão
+  }
+
+  const [selectedEditionId, setSelectedEditionId] = useState<string>(getInitialEdition())
   const [activeCategory, setActiveCategory] = useState<string>("")
 
-
+  // Atualizar edição quando mudar na URL ou quando as edições forem carregadas
   useEffect(() => {
-    if (!selectedEditionId && editions.length > 0) {
-      setSelectedEditionId(initialEditionId)
+    if (editions.length > 0) {
+      const editionFromUrl = searchParams.get("votingEdition")
+      
+      // Se houver edição na URL, usa ela
+      if (editionFromUrl && editions.some(e => e.id === editionFromUrl)) {
+        setSelectedEditionId(editionFromUrl)
+        saveLocalEdition(editionFromUrl)
+      } 
+      // Se não houver edição na URL, verifica o localStorage
+      else if (localEdition && editions.some(e => e.id === localEdition)) {
+        setSelectedEditionId(localEdition)
+      }
+      // Se não houver nem na URL nem no localStorage, usa 2025
+      else {
+        setSelectedEditionId("2025")
+      }
     }
-  }, [editions, initialEditionId, selectedEditionId])
+  }, [searchParams, editions, localEdition])
 
+  // Atualizar categoria ativa quando mudar a edição
   useEffect(() => {
-    if (selectedEditionId) {
+    if (selectedEditionId && editions.length > 0) {
       const currentEdition = editions.find((edition) => edition.id === selectedEditionId)
       if (currentEdition && currentEdition.categories.length > 0 && !activeCategory) {
         setActiveCategory(currentEdition.categories[0].id)
@@ -41,13 +71,16 @@ export function useEditionManager({
   }, [selectedEditionId, activeCategory, editions])
 
   const handleEditionChange = (editionId: string) => {
-    setSelectedEditionId(editionId)
+    if (editions.some(e => e.id === editionId)) {
+      setSelectedEditionId(editionId)
+      saveLocalEdition(editionId)
 
-    const currentEdition = editions.find((edition) => edition.id === editionId)
-    if (currentEdition && currentEdition.categories.length > 0) {
-      setActiveCategory(currentEdition.categories[0].id)
-    } else {
-      setActiveCategory("")
+      const currentEdition = editions.find((edition) => edition.id === editionId)
+      if (currentEdition && currentEdition.categories.length > 0) {
+        setActiveCategory(currentEdition.categories[0].id)
+      } else {
+        setActiveCategory("")
+      }
     }
   }
 

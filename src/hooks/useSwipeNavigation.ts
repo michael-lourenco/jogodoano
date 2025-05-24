@@ -97,12 +97,12 @@ export function useSwipeNavigation({
       if (currentIndex !== -1) {
         let newIndex
 
-        if (isLeftSwipe && currentIndex < categories.length - 1) {
-          // Swipe left to go to next category
-          newIndex = currentIndex + 1
-        } else if (isRightSwipe && currentIndex > 0) {
-          // Swipe right to go to previous category
-          newIndex = currentIndex - 1
+        if (isLeftSwipe) {
+          // Swipe left to go to next category (circular)
+          newIndex = (currentIndex + 1) % categories.length
+        } else if (isRightSwipe) {
+          // Swipe right to go to previous category (circular)
+          newIndex = (currentIndex - 1 + categories.length) % categories.length
         }
 
         if (newIndex !== undefined) {

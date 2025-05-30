@@ -59,7 +59,7 @@ export function Footer() {
   return (
     <TooltipProvider>
       <footer 
-        className={`sticky bottom-0 w-full bg-background border-dashed border-t transition-all duration-300 z-[100] ${
+        className={`sticky bottom-0 w-full bg-background/80 backdrop-blur-md border-t border-border/40 transition-all duration-300 z-[100] shadow-[0_-1px_3px_rgba(0,0,0,0.1)] ${
           isMobile ? (isExpanded ? 'h-16' : 'h-4') : 'h-16'
         }`}
       >
@@ -67,7 +67,7 @@ export function Footer() {
           {isMobile && !isExpanded && (
             <button
               onClick={() => setIsExpanded(true)}
-              className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-background border border-dashed rounded-t-lg px-3 py-1 flex items-center justify-center hover:bg-muted/50 transition-colors shadow-sm z-50"
+              className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-background/80 backdrop-blur-md border border-border/40 rounded-t-lg px-3 py-1 flex items-center justify-center hover:bg-muted/50 transition-all duration-200 shadow-sm z-50 hover:scale-105 active:scale-95"
               aria-label="Expandir menu"
             >
               <ChevronUp className="h-3 w-3" />
@@ -85,16 +85,24 @@ export function Footer() {
                     <Button
                       asChild
                       variant={isActive ? "ghost" : "secondary"}
-                      className="flex-1 flex flex-col items-center justify-center h-16 space-y-1 rounded-none"
+                      className={`flex-1 flex flex-col items-center justify-center h-16 space-y-1 rounded-none transition-all duration-200 ${
+                        isActive 
+                          ? 'bg-primary/10 text-primary hover:bg-primary/20' 
+                          : 'hover:bg-muted/50'
+                      }`}
                     >
-                      <Link href={item.href}>
-                        <Icon name={item.icon} className="h-5 w-5" />
-                        <span className="text-xs font-medium">{item.label}</span>
+                      <Link href={item.href} className="w-full h-full flex flex-col items-center justify-center">
+                        <Icon name={item.icon} className={`h-5 w-5 transition-transform duration-200 ${
+                          isActive ? 'scale-110' : 'group-hover:scale-105'
+                        }`} />
+                        <span className={`text-xs font-medium transition-colors duration-200 ${
+                          isActive ? 'text-primary' : 'text-muted-foreground'
+                        }`}>{item.label}</span>
                       </Link>
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent side="top">
-                    <p>{item.label}</p>
+                  <TooltipContent side="top" className="bg-background/80 backdrop-blur-md border border-border/40">
+                    <p className="text-sm font-medium">{item.label}</p>
                   </TooltipContent>
                 </Tooltip>
               )

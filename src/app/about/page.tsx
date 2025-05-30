@@ -57,11 +57,11 @@ export default function About() {
     },
     {
       icon: "LuPaintbrush" as IconName,
-      name: "Melhor Direção de Arte"
+      name: "Melhor RPG"
     },
     {
       icon: "LuMusic" as IconName,
-      name: "Melhor Trilha Sonora"
+      name: "Melhor Jogo BR"
     },
     {
       icon: "LuUsers" as IconName,
@@ -319,7 +319,7 @@ export default function About() {
                       </h2>
                       
                       <p className="mb-4 md:mb-6 text-sm md:text-base">
-                        Nossa premiação contempla uma ampla variedade de categorias para reconhecer as diversas qualidades e experiências que os jogos oferecem. Cada categoria busca destacar aspectos específicos da arte dos videogames.
+                        Nossa premiação foca exclusivamente nos gêneros de games, ampliando ainda mais as opções além do que normalmente se vê em outrtas premiações. Acreditamos que um jogo deve ser avaliado como um todo, levando em conta sua experiência completa e integrada — afinal, um bom jogo não se resume apenas à música, gráficos ou gameplay isoladamente, mas sim à forma como todos esses elementos se combinam dentro do seu gênero.
                       </p>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">

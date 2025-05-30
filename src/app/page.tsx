@@ -30,59 +30,57 @@ export default function Home() {
     <>
       <div className="flex flex-col min-h-screen bg-background text-foreground">
         <Header />
-        <main className="flex-grow flex flex-col items-center justify-start pt-4">
-          <div className="max-w-4xl mx-auto">
-            <Card className="bg-card border-none shadow-none">
-              <CardHeader className="space-y-2">
-                <CardTitle className="text-4xl font-bold text-center bg-gradient-to-r from-chart-2 to-chart-5 text-transparent bg-clip-text">
+        <main className="flex-grow flex flex-col items-center justify-start pt-8 px-4">
+          <div className="max-w-4xl w-full mx-auto space-y-6">
+            <Card className="bg-card/50 backdrop-blur-sm border-none shadow-none relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-chart-2/10 to-chart-5/10 animate-gradient" />
+              <CardHeader className="space-y-2 relative">
+                <CardTitle className="text-5xl font-bold text-center bg-gradient-to-r from-chart-2 to-chart-5 text-transparent bg-clip-text animate-gradient">
                   JOGO DO ANO
                 </CardTitle>
               </CardHeader>
             </Card>
-            <Card className="mb-6 border border-muted bg-card shadow-sm">
-              <CardContent className="pt-6 pb-4">
-                <p className="text-muted-foreground">
+
+            <Card className="border border-muted/50 bg-card/50 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardContent className="pt-8 pb-6 px-6">
+                <p className="text-muted-foreground text-lg leading-relaxed">
                   Vote no seu jogo favorito em cada categoria. Você só pode escolher um jogo por categoria. Após
                   selecionar seus favoritos em todas as categorias, clique em "Enviar Votos" para registrar sua
                   participação.
                 </p>
               </CardContent>
             </Card>
-            <Card className="bg-card border-none shadow-none">
 
-              <CardContent className="space-y-8">
+            <Card className="bg-card/50 backdrop-blur-sm border-none shadow-none">
+              <CardContent className="space-y-10 py-8">
                 <div className="flex justify-center">
                   <Button
-                    onClick={handleNavigation("/voting")}
-                    className="w-32 h-32 rounded-full bg-gradient-to-r from-chart-2 to-chart-5 hover:from-chart-2 hover:to-chart-4 shadow-lg hover:shadow-chart-5/25 transition-all duration-300 transform hover:scale-105"
+                    onClick={handleNavigation("/voting/2025")}
+                    className="w-40 h-40 rounded-full bg-gradient-to-r from-chart-2 to-chart-5 hover:from-chart-2 hover:to-chart-4 shadow-lg hover:shadow-chart-5/25 transition-all duration-300 transform hover:scale-105 group relative overflow-hidden flex flex-col items-center justify-center gap-2"
                     size="lg"
                   >
-                    <Icon name="LuPlay" style={{ width: "36px", height: "36px" }}  className="text-background"/>
+                    <div className="absolute inset-0 bg-gradient-to-r from-chart-2/20 to-chart-5/20 animate-pulse" />
+                    <Icon 
+                      name="LuPlay" 
+                      style={{ width: "32px", height: "32px" }}  
+                      className="text-background relative z-10 transform group-hover:scale-110 transition-transform duration-300"
+                    />
+                    <span className="text-background font-medium text-sm relative z-10">Votar 2025</span>
                   </Button>
                 </div>
 
-                <div className="space-y-4">
-                  {/* <Button
-                    onClick={handleNavigation("/about")}
-                    variant="ghost"
-                    className="w-full group transition-all duration-300 hover:bg-background"
-                  >
-                    <HelpCircle className="w-5 h-5 mr-2 text-primary group-hover:text-chart-2" />
-                    <span className="text-primary group-hover:text-chart-2">Sobre</span>
-                  </Button> */}
-
+                <div className="space-y-4 max-w-md mx-auto">
                   <Button
                     onClick={() => window.open("https://buy.stripe.com/00g02GeSnaJC12g5kk", "_blank")}
                     variant="outline"
-                    className="w-full border-chart-4/50 text-chart-4 hover:bg-chart-4/10 hover:border-chart-4 group transition-all duration-300"
+                    className="w-full border-chart-4/50 text-chart-4 hover:bg-chart-4/10 hover:border-chart-4 group transition-all duration-300 hover:shadow-lg hover:shadow-chart-4/20"
                   >
                     <Heart className="w-5 h-5 mr-2 text-chart-4 group-hover:text-chart-4" />
-                    <span>Apoiar o Projeto</span>
+                    <span className="font-medium">Apoiar o Projeto</span>
                   </Button>
                 </div>
               </CardContent>
             </Card>
-
           </div>
         </main>
         <Footer />

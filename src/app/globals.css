@@ -153,6 +153,23 @@
   }
 }
 
+/* Estilos específicos para o toast */
+.dark .toast {
+  @apply bg-card text-card-foreground border-border;
+}
+
+.dark .toast-description {
+  @apply text-muted-foreground;
+}
+
+.dark .toast-action {
+  @apply bg-primary text-primary-foreground;
+}
+
+.dark .toast-cancel {
+  @apply bg-muted text-muted-foreground;
+}
+
 /* 
   Nota: As classes de status como .status-success, .status-warning, etc.
   são definidas diretamente no tailwind.config.js como componentes para

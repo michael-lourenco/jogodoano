@@ -312,20 +312,21 @@ export function VotingInterface({
             {/* Alerta de Status da Votação */}
             {currentEdition && (
               <div className="mb-6">
-                <Alert className={`mb-4 ${
+                <Alert className={cn(
+                  "mb-4",
                   votingStatus === 'upcoming' 
-                    ? 'bg-blue-50 border-blue-200' 
+                    ? 'bg-info/10 border-info/20 text-info' 
                     : votingStatus === 'ended'
-                    ? 'bg-red-50 border-red-200'
-                    : 'bg-green-50 border-green-200'
-                }`}>
+                    ? 'bg-destructive/10 border-destructive/20 text-destructive'
+                    : 'bg-success/10 border-success/20 text-success'
+                )}>
                   <div className="flex items-center gap-2">
                     {votingStatus === 'upcoming' ? (
-                      <Clock className="h-4 w-4 text-blue-600" />
+                      <Clock className="h-4 w-4 text-info" />
                     ) : votingStatus === 'ended' ? (
-                      <AlertCircle className="h-4 w-4 text-red-600" />
+                      <AlertCircle className="h-4 w-4 text-destructive" />
                     ) : (
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <CheckCircle2 className="h-4 w-4 text-success" />
                     )}
                     <AlertDescription className="text-sm font-medium">
                       {votingMessage}

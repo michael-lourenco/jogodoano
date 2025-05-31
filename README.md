@@ -1,163 +1,106 @@
 # Jogo do Ano - Sistema de Votação
 
-## Visão Geral
+## 🎮 Sobre o Projeto
 
-O "Jogo do Ano" é um aplicativo web moderno que permite aos usuários votar em jogos por categorias dentro de edições específicas. O sistema foi projetado com foco em uma experiência de usuário fluida e intuitiva, oferecendo recursos avançados de navegação e interação tanto em dispositivos desktop quanto móveis.
+Sistema de votação para eleger os melhores jogos do ano, desenvolvido com Next.js 14, TypeScript e Tailwind CSS.
 
-### Funcionalidades Principais
-
-- **Autenticação e Perfil**
-  - Login/Logout integrado
-  - Perfil de usuário com histórico de votos
-  - Interface adaptativa para diferentes estados de autenticação
+## ✨ Funcionalidades
 
 - **Sistema de Votação**
-  - Seleção intuitiva de edições
-  - Navegação fluida entre categorias
-  - Interface de votação otimizada para touch e mouse
-  - Progresso visual da votação
-  - Validação em tempo real
+  - Votação em múltiplas categorias
+  - Seleção visual de jogos com animações
+  - Feedback sonoro e visual ao selecionar
+  - Controle de período de votação por edição
+  - Status visual de disponibilidade da votação
+  - Validação de usuário autenticado
 
-- **Navegação Avançada**
-  - Suporte a gestos touch (swipe)
-  - Navegação por teclado
-  - Transições suaves entre categorias
-  - Header e Footer inteligentes com comportamento adaptativo
+- **Edições de Votação**
+  - Edição anual (2025)
+  - Edição "Todos os Tempos"
+  - Períodos de votação configuráveis
+  - Status de disponibilidade (upcoming, active, ended)
 
-- **Interface Responsiva**
-  - Layout otimizado para mobile e desktop
-  - Componentes adaptativos
-  - Animações e transições suaves
-  - Feedback visual em tempo real
+- **Interface**
+  - Design moderno e responsivo
+  - Animações suaves
+  - Feedback visual de seleção
+  - Indicadores de status de votação
+  - Cards de jogos com imagens e informações
 
-## Estrutura do Projeto
+## 📊 Status das Edições
 
-```
-├── src/
-│   ├── app/                    # Rotas e páginas (Next.js 14)
-│   ├── components/            # Componentes React
-│   │   ├── ui/               # Componentes base (shadcn/ui)
-│   │   ├── voting/           # Componentes específicos de votação
-│   │   └── admin/            # Componentes do painel administrativo
-│   ├── hooks/                # Hooks personalizados
-│   ├── stores/               # Gerenciamento de estado (Zustand)
-│   ├── types/                # Definições de tipos TypeScript
-│   ├── repositories/         # Camada de acesso a dados
-│   ├── application/          # Lógica de negócios
-│   ├── lib/                  # Bibliotecas e configurações
-│   ├── services/             # Serviços da aplicação
-│   └── utils/                # Funções utilitárias
-├── types/                    # Tipos globais
-├── public/                   # Arquivos estáticos
-└── [configurações]          # Arquivos de configuração
-```
+O sistema suporta três estados diferentes para as edições:
 
-## Tecnologias Utilizadas
+### 1. Upcoming (Próxima)
+- **Visual**: Ícone de relógio em azul
+- **Estado**: Edição ainda não iniciada
+- **Características**:
+  - Fundo azul claro (10% opacidade)
+  - Borda azul (20% opacidade)
+  - Texto em azul
+- **Exemplo**: Edição 2025 antes de 01/01/2025
 
-### Frontend
-- **Next.js 14**: Framework React com App Router
-- **React 18**: Biblioteca para construção de interfaces
-- **TypeScript**: Tipagem estática e melhor DX
-- **TailwindCSS**: Estilização utilitária
-- **Shadcn/ui**: Componentes acessíveis e customizáveis
-- **Zustand**: Gerenciamento de estado
-- **Lucide Icons**: Ícones consistentes
+### 2. Active (Ativa)
+- **Visual**: Ícone de check em verde
+- **Estado**: Edição em andamento
+- **Características**:
+  - Fundo verde claro (10% opacidade)
+  - Borda verde (20% opacidade)
+  - Texto em verde
+- **Exemplo**: Edição atual aberta para votação
 
-### Desenvolvimento
-- **ESLint**: Linting e padronização de código
-- **Prettier**: Formatação de código
-- **TypeScript**: Tipagem estática
-- **Husky**: Git hooks
-- **Docker**: Containerização
+### 3. Ended (Encerrada)
+- **Visual**: Ícone de alerta em vermelho
+- **Estado**: Edição finalizada
+- **Características**:
+  - Fundo vermelho claro (10% opacidade)
+  - Borda vermelha (20% opacidade)
+  - Texto em vermelho
+- **Exemplo**: Edições passadas que já encerraram
 
-## Instalação e Execução
+## 🚀 Tecnologias
 
-### Pré-requisitos
+- Next.js 14
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- Shadcn/ui
+- React Hook Form
+- Zod
 
-- Node.js 18+
-- Yarn ou NPM
-- Docker (opcional)
+## 📦 Instalação
 
-### Instalação
-
-1. Clone o repositório:
 ```bash
+# Clone o repositório
 git clone https://github.com/seu-usuario/jogodoano.git
-cd jogodoano
-```
 
-2. Instale as dependências:
-```bash
-yarn install
-# ou
+# Instale as dependências
 npm install
-```
 
-3. Execute o ambiente de desenvolvimento:
-```bash
-yarn dev
-# ou
+# Execute o projeto
 npm run dev
 ```
 
-4. Acesse [http://localhost:3000](http://localhost:3000)
+## 🔧 Configuração
 
-### Docker
-
-1. Construa e inicie os containers:
-```bash
-docker-compose up --build
+1. Configure as variáveis de ambiente:
+```env
+NEXT_PUBLIC_API_URL=sua_url_api
 ```
 
-2. Acesse [http://localhost:3030](http://localhost:3030)
+2. Configure as edições de votação em `src/repositories/votingEditions.tsx`:
+```typescript
+{
+  id: "2025",
+  title: "Jogos de 2025",
+  isLimitedTime: true,
+  startAt: new Date("2025-01-01T00:00:00Z"),
+  endAt: new Date("2025-12-31T23:59:59Z"),
+  status: "upcoming"
+}
+```
 
-## Arquitetura
-
-### Padrões de Projeto
-
-- **Clean Architecture**: Separação clara de responsabilidades
-- **Repository Pattern**: Abstração do acesso a dados
-- **Service Pattern**: Encapsulamento de lógica de negócios
-- **Hooks Pattern**: Reutilização de lógica de estado
-- **Component Pattern**: Componentes reutilizáveis e isolados
-
-### Estrutura de Código
-
-- **Componentes**: Isolados e reutilizáveis
-- **Hooks**: Lógica de negócios reutilizável
-- **Stores**: Estado global gerenciado
-- **Types**: Tipos e interfaces TypeScript
-- **Services**: Lógica de negócios centralizada
-
-## Contribuição
-
-### Padrões de Código
-
-1. **Commits**:
-   - Mensagens claras e descritivas
-   - Commits atômicos e focados
-   - Referência a issues quando aplicável
-
-2. **Pull Requests**:
-   - Descrição clara das mudanças
-   - Screenshots para mudanças visuais
-   - Testes quando aplicável
-   - Revisão de código necessária
-
-### Desenvolvimento
-
-1. **Setup**:
-   - Instale as dependências
-   - Configure as variáveis de ambiente
-   - Execute os testes
-
-2. **Fluxo de Trabalho**:
-   - Crie uma branch para sua feature
-   - Desenvolva e teste
-   - Submeta um PR
-   - Aguarde revisão e aprovação
-
-## Licença
+## 📝 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 

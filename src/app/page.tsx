@@ -2,13 +2,16 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, HelpCircle, Heart } from "lucide-react";
+import { Play, HelpCircle, Heart, Clock, Trophy, Youtube, Instagram, Mail } from "lucide-react";
 import { Icon } from "@/components/icons";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useAuth } from "@/hooks/useAuth";
 import { Footer } from "@/components/Footer";
 import { UserInfo } from "@/components/UserInfo";
 import { Header } from "@/components/Header"
+import { votingEditions } from "@/repositories/votingEditions";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export default function Home() {
   const navigationService = useNavigation();
@@ -17,6 +20,11 @@ export default function Home() {
   const handleNavigation = (path: string) => () => {
     navigationService.navigateTo(path);
   };
+
+  const edition2025 = votingEditions.find(edition => edition.id === "2025");
+  const allTimeEdition = votingEditions.find(edition => edition.id === "all_time");
+  const now = new Date();
+  const isVotingOpen = edition2025?.startAt && edition2025?.endAt && now >= edition2025.startAt && now <= edition2025.endAt;
 
   if (loading) {
     return (
@@ -51,24 +59,115 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 backdrop-blur-sm border-none shadow-none">
-              <CardContent className="space-y-10 py-8">
-                <div className="flex justify-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Card da Edição 2025 */}
+              <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Clock className="w-6 h-6 text-info" />
+                    <h3 className="text-xl font-semibold">Edição 2025</h3>
+                  </div>
+                  {isVotingOpen ? (
+                    <div className="space-y-4">
+                      <p className="text-muted-foreground">
+                        A votação está aberta! Escolha seus jogos favoritos de 2025.
+                      </p>
+                      <Button
+                        onClick={handleNavigation("/voting?votingEdition=2025")}
+                        className="w-full bg-gradient-to-r from-chart-2 to-chart-5 hover:from-chart-2 hover:to-chart-4"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        Votar Agora
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <p className="text-muted-foreground">
+                        A votação começará em {format(edition2025?.startAt || new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}.
+                      </p>
+                      <Button
+                        variant="outline"
+                        className="w-full border-muted-foreground/50 text-muted-foreground"
+                        disabled
+                      >
+                        <Clock className="w-4 h-4 mr-2" />
+                        Em Breve
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Card da Edição Todos os Tempos */}
+              <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Trophy className="w-6 h-6 text-warning" />
+                    <h3 className="text-xl font-semibold">Todos os Tempos</h3>
+                  </div>
+                  <div className="space-y-4">
+                    <p className="text-muted-foreground">
+                      Vote nos melhores jogos de todos os tempos. Esta edição está sempre aberta!
+                    </p>
+                    <Button
+                      onClick={handleNavigation("/voting?votingEdition=all_time")}
+                      className="w-full bg-gradient-to-r from-warning to-warning/80 hover:from-warning/90 hover:to-warning"
+                    >
+                      <Play className="w-4 h-4 mr-2" />
+                      Votar Agora
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Seção de Patrocinadores */}
+            <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-semibold mb-4 text-center">Patrocinadores</h3>
+                <div className="flex justify-center items-center gap-8">
+                  {/* Adicione aqui as logos dos patrocinadores */}
+                  <div className="text-muted-foreground text-sm">Em breve</div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Redes Sociais */}
+            <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-semibold mb-4 text-center">Redes Sociais</h3>
+                <div className="flex justify-center items-center gap-4">
                   <Button
-                    onClick={handleNavigation("/voting/2025")}
-                    className="w-40 h-40 rounded-full bg-gradient-to-r from-chart-2 to-chart-5 hover:from-chart-2 hover:to-chart-4 shadow-lg hover:shadow-chart-5/25 transition-all duration-300 transform hover:scale-105 group relative overflow-hidden flex flex-col items-center justify-center gap-2"
-                    size="lg"
+                    variant="ghost"
+                    size="icon"
+                    className="hover:bg-muted"
+                    onClick={() => window.open("https://youtube.com/@jogodoano", "_blank")}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-chart-2/20 to-chart-5/20 animate-pulse" />
-                    <Icon 
-                      name="LuPlay" 
-                      style={{ width: "32px", height: "32px" }}  
-                      className="text-background relative z-10 transform group-hover:scale-110 transition-transform duration-300"
-                    />
-                    <span className="text-background font-medium text-sm relative z-10">Votar 2025</span>
+                    <Youtube className="w-6 h-6 text-destructive" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hover:bg-muted"
+                    onClick={() => window.open("https://instagram.com/jogodoano", "_blank")}
+                  >
+                    <Instagram className="w-6 h-6 text-pink-600" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hover:bg-muted"
+                    onClick={() => window.open("mailto:contato@jogodoano.com.br", "_blank")}
+                  >
+                    <Mail className="w-6 h-6 text-info" />
                   </Button>
                 </div>
+              </CardContent>
+            </Card>
 
+            {/* Botão de Apoio */}
+            <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg">
+              <CardContent className="p-6">
                 <div className="space-y-4 max-w-md mx-auto">
                   <Button
                     onClick={() => window.open("https://buy.stripe.com/00g02GeSnaJC12g5kk", "_blank")}

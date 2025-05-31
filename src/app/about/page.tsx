@@ -135,19 +135,9 @@ export default function About() {
             <p className="text-lg md:text-xl text-muted-foreground mb-4 md:mb-6 max-w-2xl mx-auto px-2">
               Sua voz na celebração dos melhores jogos do ano
             </p>
-            <div className="relative w-full h-[180px] md:h-[300px] overflow-hidden rounded-lg mb-6 md:mb-8">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-chart-2/20 z-10 rounded-lg flex items-center justify-center">
-                <motion.div 
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 0.4 }}
-                >
-                  <Icon name="LuTrophy" className="w-8 h-8 md:w-12 md:h-12 mx-auto text-chart-2 mb-2" />
-                  <p className="text-base md:text-lg font-medium text-foreground">Celebrando a excelência nos games</p>
-                </motion.div>
-              </div>
+            <div className="relative w-full h-[360px] md:h-[600px] overflow-hidden rounded-lg mb-6 md:mb-8">
               <img
-                src="/placeholder.svg?height=300&width=800"
+                src="/banner_min.jpg?height=600&width=800"
                 alt="Jogo do Ano - Votação"
                 className="w-full h-full object-cover rounded-lg"
               />

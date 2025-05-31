@@ -130,6 +130,19 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image: linear-gradient(to bottom, 
+      hsl(var(--background)) 0%,
+      hsl(var(--background) / 0.85) 50%,
+      hsl(var(--background) / 0.75) 100%
+    );
+  }
+  
+  .dark body {
+    background-image: linear-gradient(to bottom, 
+      hsl(var(--background)) 0%,
+      hsl(var(--background) / 0.85) 50%,
+      hsl(var(--background) / 0.75) 100%
+    );
   }
   
   /* Componentes de cartões de jogos - Ajustado para melhor consistência */

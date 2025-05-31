@@ -146,14 +146,9 @@ const GameCard = memo(function GameCard({ game, isSelected, onSelect, disabled =
               <p className="text-sm text-muted-foreground">{game.developer}</p>
             </div>
             <div className="mt-3">
-              {localSelected ? (
-                <div className="mt-2 flex items-center">
-                  <span className="text-sm bg-success/15 text-success px-3 py-1.5 rounded-full font-medium">Selecionado</span>
-                  <span className="text-success ml-2 w-4 h-4 flex items-center justify-center">✓</span>
-                </div>
-              ) : (
+              {disabled && (
                 <div className="mt-2 text-sm text-muted-foreground/70">
-                  {disabled ? "Votação indisponível" : "Clique para selecionar"}
+                  Votação indisponível
                 </div>
               )}
             </div>

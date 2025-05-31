@@ -6,6 +6,7 @@ import { Heart, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface UserInfoProps {
   user: UserData | null;
@@ -20,9 +21,20 @@ export const UserInfo: React.FC<UserInfoProps> = ({
 }) => {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleDonation = () => {
@@ -36,7 +48,10 @@ export const UserInfo: React.FC<UserInfoProps> = ({
   return (
     <>
       {user ? (
-        <div className="flex flex-col text-foreground mb-4 p-4 bg-card rounded-sm">
+        <div className={cn(
+          "flex flex-col text-foreground mb-4 p-4 bg-card rounded-sm transition-all duration-300",
+          isScrolled && "opacity-0 pointer-events-none"
+        )}>
           <div className="flex items-center gap-4 mb-2">
             <Image src="/logo.png" alt="Logo" width={40} height={40} />
             <div className="grid grid-cols-[1fr,auto,auto,auto] items-center gap-2 w-full">
@@ -88,7 +103,10 @@ export const UserInfo: React.FC<UserInfoProps> = ({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col text-foreground mb-4 p-4 rounded-lg">
+        <div className={cn(
+          "flex flex-col text-foreground mb-4 p-4 rounded-lg transition-all duration-300",
+          isScrolled && "opacity-0 pointer-events-none"
+        )}>
           <div className="flex items-center gap-4">
             <Image src="/logo.png" alt="Logo" width={40} height={40} />
             <div className="grid grid-cols-[1fr,auto,auto] items-center gap-2 w-full">

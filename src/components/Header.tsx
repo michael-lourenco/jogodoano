@@ -19,7 +19,7 @@ export function Header() {
 
   // Efeito para controlar o colapso automático ao mudar de página
   useEffect(() => {
-    if (!isMobile || !pathname) return
+    if (!pathname) return
 
     // Expande o menu quando muda de página
     setIsExpanded(true)
@@ -30,12 +30,10 @@ export function Header() {
     }, 3000)
 
     return () => clearTimeout(timer)
-  }, [pathname, isMobile])
+  }, [pathname])
 
   // Efeito para controlar o colapso ao rolar
   useEffect(() => {
-    if (!isMobile) return
-
     const handleScroll = () => {
       const currentScrollY = window.scrollY
       
@@ -49,7 +47,7 @@ export function Header() {
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [lastScrollY, isMobile])
+  }, [lastScrollY])
 
   const handleToggle = () => {
     setIsExpanded(true)
@@ -71,11 +69,11 @@ export function Header() {
     <TooltipProvider>
       <header 
         className={`sticky top-0 w-full bg-background border-dashed border-b transition-all duration-300 z-[100] ${
-          isMobile ? (isExpanded ? 'h-16' : 'h-4') : 'h-16'
+          isExpanded ? 'h-16' : 'h-4'
         }`}
       >
         <nav className="max-w-md mx-auto px-0 py-0 relative h-full">
-          {isMobile && !isExpanded && (
+          {!isExpanded && (
             <button
               onClick={handleToggle}
               className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background border border-dashed rounded-lg px-3 py-1 flex items-center justify-center hover:bg-muted/50 transition-colors shadow-sm z-50"
@@ -85,14 +83,16 @@ export function Header() {
             </button>
           )}
           
-          <div className={`flex flex-col justify-between items-center transition-all duration-300 h-full ${
-            isMobile && !isExpanded ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          <div className={`flex flex-col justify-center items-center h-full transition-all duration-300 ${
+            !isExpanded ? 'opacity-0 pointer-events-none' : 'opacity-100'
           }`}>
-            <UserInfo 
-              user={user} 
-              handleLogin={handleLoginWithExpand} 
-              handleLogout={handleLogoutWithExpand}
-            />
+            <div className="h-full flex items-center">
+              <UserInfo 
+                user={user} 
+                handleLogin={handleLoginWithExpand} 
+                handleLogout={handleLogoutWithExpand}
+              />
+            </div>
           </div>
         </nav>
       </header>

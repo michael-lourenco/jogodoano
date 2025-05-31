@@ -327,7 +327,7 @@ export function VotingInterface({
                 {isMobile ? (
                   <div className="mb-6 relative" ref={mobileMainContainerRef}>
                     {/* Category selector tabs */}
-                    <div
+                    {/* <div
                       ref={categoryTabsRef}
                       className={cn(
                         "relative",
@@ -357,7 +357,7 @@ export function VotingInterface({
                           isMobile={isMobile}
                         />
                       </div>
-                    </div>
+                    </div> */}
 
                     {isSticky && categoryTabsRef.current && (
                       <div style={{ height: categoryTabsHeight.current + 64, marginBottom: "1rem" }}></div>
@@ -493,7 +493,7 @@ export function VotingInterface({
                       onValueChange={(newValue) => handleCategoryClick(newValue)} 
                       className="w-full"
                     >
-                      <div
+                      {/* <div
                         ref={tabsListRef}
                         className={`w-full ${
                           isSticky
@@ -519,7 +519,7 @@ export function VotingInterface({
                         />
                         
 
-                      </div>
+                      </div> */}
 
                       {isSticky && <div style={{ height: "3rem", marginBottom: "1rem" }}></div>}
 

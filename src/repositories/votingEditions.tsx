@@ -3,6 +3,10 @@ export const votingEditions: VotingEdition[] = [
   {
     id: "2025",
     name: "2025",
+    isLimitedTime: true,
+    startAt: new Date("2025-11-01T00:00:00Z"),
+    endAt: new Date("2025-11-30T23:59:59Z"),
+    status: "upcoming",
     categories: [
       {
         id: "goty",
@@ -109,6 +113,8 @@ export const votingEditions: VotingEdition[] = [
   {
     id: "all_time",
     name: "Todos os Tempos",
+    isLimitedTime: false,
+    status: "active",
     categories: [
       {
         id: "all_time_goty",

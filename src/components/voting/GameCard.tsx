@@ -12,10 +12,11 @@ interface GameCardProps {
   game: Game
   isSelected: boolean
   onSelect: () => void
+  disabled?: boolean
 }
 
 // Usando memo para evitar renderizações desnecessárias
-const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCardProps) {
+const GameCard = memo(function GameCard({ game, isSelected, onSelect, disabled = false }: GameCardProps) {
   // Estado local para animação suave
   const [localSelected, setLocalSelected] = useState(isSelected)
   const [showConfirmation, setShowConfirmation] = useState(false)
@@ -70,17 +71,13 @@ const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCard
 
   // Função para lidar com o clique no card
   const handleClick = () => {
+    if (disabled) return
 
     if (!localSelected) {
-
       setLocalSelected(true)
-
       setShowConfirmation(true)
-
       playConfirmationSound()
-
       onSelect()
-
       setTimeout(() => {
         setShowConfirmation(false)
       }, 1000)
@@ -93,14 +90,15 @@ const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCard
       initial="normal"
       animate={localSelected ? "selected" : "normal"}
       variants={cardVariants}
-      whileHover={{ scale: 1.05, y: -5 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={disabled ? {} : { scale: 1.05, y: -5 }}
+      whileTap={disabled ? {} : { scale: 0.98 }}
       transition={{ duration: 0.2 }}
       className="h-full relative"
     >
       <Card
         className={cn(
-          "cursor-pointer transition-all duration-200 hover:shadow-lg border-2 overflow-hidden h-full rounded-xl",
+          "transition-all duration-200 hover:shadow-lg border-2 overflow-hidden h-full rounded-xl",
+          disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
           localSelected 
             ? "border-success bg-success/5 shadow-success/30" 
             : "border-transparent hover:border-primary/30",
@@ -154,7 +152,9 @@ const GameCard = memo(function GameCard({ game, isSelected, onSelect }: GameCard
                   <span className="text-success ml-2 w-4 h-4 flex items-center justify-center">✓</span>
                 </div>
               ) : (
-                <div className="mt-2 text-sm text-muted-foreground/70">Clique para selecionar</div>
+                <div className="mt-2 text-sm text-muted-foreground/70">
+                  {disabled ? "Votação indisponível" : "Clique para selecionar"}
+                </div>
               )}
             </div>
           </div>

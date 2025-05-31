@@ -14,6 +14,10 @@ export interface VotingEdition {
   id: string
   name: string
   categories: Category[]
+  isLimitedTime: boolean
+  startAt?: Date
+  endAt?: Date
+  status: 'upcoming' | 'active' | 'ended'
 }
 
 // Category type

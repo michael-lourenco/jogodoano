@@ -8,9 +8,10 @@ interface CategorySectionProps {
   category: Category
   selectedGameId?: string
   onVote: (gameId: string) => void
+  disabled?: boolean
 }
 
-export function CategorySection({ category, selectedGameId, onVote }: CategorySectionProps) {
+export function CategorySection({ category, selectedGameId, onVote, disabled = false }: CategorySectionProps) {
   // Estado local para acompanhar a seleção e garantir re-renderizações adequadas
   const [selected, setSelected] = useState<string | undefined>(selectedGameId);
 
@@ -24,9 +25,10 @@ export function CategorySection({ category, selectedGameId, onVote }: CategorySe
 
   // Função para lidar com a seleção de um jogo
   const handleSelect = useCallback((gameId: string) => {
+    if (disabled) return
     setSelected(gameId); // Atualiza o estado local imediatamente
     onVote(gameId); // Propaga o evento de voto para o componente pai
-  }, [onVote]);
+  }, [onVote, disabled]);
 
   // Animação para o container de cards
   const containerVariants = {
@@ -69,6 +71,7 @@ export function CategorySection({ category, selectedGameId, onVote }: CategorySe
                 game={game}
                 isSelected={selected === game.id}
                 onSelect={() => handleSelect(game.id)}
+                disabled={disabled}
               />
             </motion.div>
           ))}

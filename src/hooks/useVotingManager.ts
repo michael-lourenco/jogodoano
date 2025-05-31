@@ -1,17 +1,21 @@
 "use client"
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { useLocalVotes } from '@/stores/useLocalVotes'
+import { useToast } from '@/hooks/use-toast'
+import { VotingEdition } from '@/types/types'
 
 interface UseVotingManagerProps {
   selectedEditionId: string
+  editions: VotingEdition[]
   votes: Record<string, Record<string, string>>
   handleVoteInUI: (categoryId: string, gameId: string) => void
-  handleSubmitVotesInUI: () => Promise<void>
-  userEmail?: string
+  handleSubmitVotesInUI: () => void
+  userEmail?: string | null
 }
 
 export function useVotingManager({
   selectedEditionId,
+  editions,
   votes,
   handleVoteInUI,
   handleSubmitVotesInUI,
@@ -20,52 +24,134 @@ export function useVotingManager({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedGame, setSelectedGame] = useState<string | null>(null)
   const { setVote, getVotes, clearVotes } = useLocalVotes()
+  const { toast } = useToast()
 
-  const handleGameSelection = useCallback((categoryId: string, gameId: string) => {
-    // Verificar se o voto já está definido para este jogo
-    const currentVote = votes[selectedEditionId]?.[categoryId]
-    
-    // Só atualizar se o voto for diferente
-    if (currentVote !== gameId) {
-      // Registra o voto no sistema
-      handleVoteInUI(categoryId, gameId)
-      
-      // Salvar voto localmente
-      setVote(selectedEditionId, categoryId, gameId, userEmail)
-      
-      // Atualizar o estado local
-      setSelectedGame(gameId)
+  const currentEdition = editions.find(edition => edition.id === selectedEditionId)
+
+  const canVote = () => {
+    if (!currentEdition) return false
+    if (!currentEdition.isLimitedTime) return true
+
+    const now = new Date()
+    const startDate = currentEdition.startAt ? new Date(currentEdition.startAt) : null
+    const endDate = currentEdition.endAt ? new Date(currentEdition.endAt) : null
+
+    if (!startDate || !endDate) return false
+    return now >= startDate && now <= endDate
+  }
+
+  const getVotingStatus = () => {
+    if (!currentEdition) return { status: 'unknown', message: 'Edição não encontrada' }
+    if (!currentEdition.isLimitedTime) return { status: 'active', message: 'Votação sempre disponível' }
+
+    const now = new Date()
+    const startDate = currentEdition.startAt ? new Date(currentEdition.startAt) : null
+    const endDate = currentEdition.endAt ? new Date(currentEdition.endAt) : null
+
+    if (!startDate || !endDate) {
+      return { status: 'unknown', message: 'Período de votação não definido' }
     }
-  }, [votes, selectedEditionId, handleVoteInUI, setVote, userEmail])
 
-  const handleSubmitVotes = useCallback(async () => {
+    if (now < startDate) {
+      return {
+        status: 'upcoming',
+        message: `Votação iniciará em ${startDate.toLocaleDateString()}`
+      }
+    }
+
+    if (now > endDate) {
+      return {
+        status: 'ended',
+        message: `Votação encerrada em ${endDate.toLocaleDateString()}`
+      }
+    }
+
+    return {
+      status: 'active',
+      message: `Votação disponível até ${endDate.toLocaleDateString()}`
+    }
+  }
+
+  const handleGameSelection = (categoryId: string, gameId: string) => {
+    if (!canVote()) {
+      toast({
+        title: "Votação indisponível",
+        description: getVotingStatus().message,
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (!userEmail) {
+      toast({
+        title: "Usuário não autenticado",
+        description: "Por favor, faça login para votar",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setSelectedGame(gameId)
+    handleVoteInUI(categoryId, gameId)
+  }
+
+  const handleSubmitVotes = async () => {
+    if (!canVote()) {
+      toast({
+        title: "Votação indisponível",
+        description: getVotingStatus().message,
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (!userEmail) {
+      toast({
+        title: "Usuário não autenticado",
+        description: "Por favor, faça login para enviar seus votos",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setIsSubmitting(true)
     try {
-      setIsSubmitting(true)
       await handleSubmitVotesInUI()
-      // Limpar votos locais após envio bem-sucedido
-      clearVotes(selectedEditionId)
+      toast({
+        title: "Votos enviados com sucesso!",
+        description: "Obrigado por participar da votação",
+        variant: "default"
+      })
     } catch (error) {
-      console.error('Erro ao enviar votos:', error)
+      toast({
+        title: "Erro ao enviar votos",
+        description: "Por favor, tente novamente",
+        variant: "destructive"
+      })
     } finally {
       setIsSubmitting(false)
     }
-  }, [handleSubmitVotesInUI, clearVotes, selectedEditionId])
+  }
 
-  const loadLocalVotes = useCallback(() => {
-    if (selectedEditionId) {
-      const localVotes = getVotes(selectedEditionId)
-      if (localVotes) {
-        // Atualizar o estado local com os votos salvos
-        Object.entries(localVotes).forEach(([categoryId, gameId]) => {
+  const loadLocalVotes = () => {
+    const localVotes = localStorage.getItem(`votes_${selectedEditionId}`)
+    if (localVotes) {
+      try {
+        const parsedVotes = JSON.parse(localVotes)
+        Object.entries(parsedVotes).forEach(([categoryId, gameId]) => {
           handleVoteInUI(categoryId, gameId as string)
         })
+      } catch (error) {
+        console.error('Erro ao carregar votos locais:', error)
       }
     }
-  }, [selectedEditionId, getVotes, handleVoteInUI])
+  }
 
-  const isAllCategoriesVoted = useCallback((categories: Array<{ id: string }>) => {
-    return categories.every(category => !!votes[selectedEditionId]?.[category.id])
-  }, [votes, selectedEditionId])
+  const isAllCategoriesVoted = (categories: { id: string }[]) => {
+    return categories.every(category => votes[selectedEditionId]?.[category.id])
+  }
+
+  const { status: votingStatus, message: votingMessage } = getVotingStatus()
 
   return {
     isSubmitting,
@@ -73,6 +159,9 @@ export function useVotingManager({
     handleGameSelection,
     handleSubmitVotes,
     loadLocalVotes,
-    isAllCategoriesVoted
+    isAllCategoriesVoted,
+    canVote: canVote(),
+    votingStatus,
+    votingMessage
   }
 } 

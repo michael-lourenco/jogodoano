@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Footer } from "@/components/Footer"
-import { CheckCircle2, ArrowRight, Trophy, ArrowLeft } from "lucide-react"
+import { CheckCircle2, ArrowRight, Trophy, ArrowLeft, Clock, AlertCircle } from "lucide-react"
 import { UserInfo } from "@/components/UserInfo"
 import { CategorySection } from "@/components/voting/CategorySection"
 import { EditionsSelector } from "@/components/voting/EditionsSelector"
@@ -24,6 +24,8 @@ import { useVotingManager } from "@/hooks/useVotingManager"
 import { useFooterState } from "@/hooks/useFooterState"
 import { useScrollPosition } from "@/hooks/useScrollPosition"
 import { Header } from "@/components/Header"
+import { useVotingPeriod } from '@/hooks/useVotingPeriod'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export function VotingInterface({
   user,
@@ -87,9 +89,13 @@ export function VotingInterface({
     handleGameSelection,
     handleSubmitVotes,
     loadLocalVotes,
-    isAllCategoriesVoted
+    isAllCategoriesVoted,
+    canVote,
+    votingStatus,
+    votingMessage
   } = useVotingManager({
     selectedEditionId,
+    editions,
     votes,
     handleVoteInUI,
     handleSubmitVotesInUI,
@@ -101,6 +107,9 @@ export function VotingInterface({
   const { scrollPosition, isScrolledToBottom, checkScrollPosition, resetScroll } = useScrollPosition({
     containerRef: contentContainerRef
   })
+
+  const currentEdition = editions.find(edition => edition.id === selectedEditionId)
+  const votingPeriod = useVotingPeriod(currentEdition!)
 
   // Atualiza o jogo selecionado quando a categoria muda
   useEffect(() => {
@@ -300,6 +309,32 @@ export function VotingInterface({
         <main className="flex-grow flex flex-col items-center justify-start pt-4 px-4">
           <div className="w-full max-w-4xl mx-auto">
 
+            {/* Alerta de Status da Votação */}
+            {currentEdition && (
+              <div className="mb-6">
+                <Alert className={`mb-4 ${
+                  votingStatus === 'upcoming' 
+                    ? 'bg-blue-50 border-blue-200' 
+                    : votingStatus === 'ended'
+                    ? 'bg-red-50 border-red-200'
+                    : 'bg-green-50 border-green-200'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    {votingStatus === 'upcoming' ? (
+                      <Clock className="h-4 w-4 text-blue-600" />
+                    ) : votingStatus === 'ended' ? (
+                      <AlertCircle className="h-4 w-4 text-red-600" />
+                    ) : (
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    )}
+                    <AlertDescription className="text-sm font-medium">
+                      {votingMessage}
+                    </AlertDescription>
+                  </div>
+                </Alert>
+              </div>
+            )}
+
             <div
               ref={editionsSelectorRef}
               className={`w-full transition-all duration-200 ${
@@ -414,6 +449,7 @@ export function VotingInterface({
                                 category={category}
                                 selectedGameId={votes[selectedEditionId]?.[category.id]}
                                 onVote={(gameId) => handleGameSelection(category.id, gameId)}
+                                disabled={!canVote}
                               />
                             </div>
                           </div>
@@ -450,7 +486,7 @@ export function VotingInterface({
                             {isAllCategoriesVoted(categories) ? (
                               <Button
                                 onClick={handleSubmitVotes}
-                                disabled={isSubmittingVotes}
+                                disabled={isSubmittingVotes || !canVote}
                                 className="flex-1 h-10 text-primary-foreground bg-gradient-to-r from-chart-1 to-success hover:from-chart-1 hover:to-success-foreground shadow-lg hover:shadow-success/25 hover:text-secondary-foreground transition-all duration-300"
                                 aria-live="polite"
                               >
@@ -469,10 +505,10 @@ export function VotingInterface({
                             ) : (
                               <Button
                                 onClick={navigateToNextCategory}
-                                disabled={!votes[selectedEditionId]?.[localActiveCategory]}
+                                disabled={!votes[selectedEditionId]?.[localActiveCategory] || !canVote}
                                 className={cn(
                                   "flex-1 h-10 transition-all duration-300",
-                                  votes[selectedEditionId]?.[localActiveCategory]
+                                  votes[selectedEditionId]?.[localActiveCategory] && canVote
                                     ? "text-primary-foreground bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-primary/25"
                                     : "text-muted-foreground bg-muted/50 cursor-not-allowed"
                                 )}

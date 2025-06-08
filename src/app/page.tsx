@@ -12,6 +12,7 @@ import { Header } from "@/components/Header"
 import { votingEditions } from "@/repositories/votingEditions";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { CountdownTimer } from "@/components/CountdownTimer";
 
 export default function Home() {
   const navigationService = useNavigation();
@@ -85,6 +86,7 @@ export default function Home() {
                       <p className="text-muted-foreground">
                         A votação começará em {format(edition2025?.startAt || new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}.
                       </p>
+                      <CountdownTimer targetDate={edition2025?.startAt || new Date()} />
                       <Button
                         variant="outline"
                         className="w-full border-muted-foreground/50 text-muted-foreground"

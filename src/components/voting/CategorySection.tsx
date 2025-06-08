@@ -60,7 +60,7 @@ export function CategorySection({ category, selectedGameId, onVote, disabled = f
     <Card className="border border-muted/30 bg-background/50 shadow-sm overflow-hidden">
       <CardContent className="p-4">
         <motion.div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-1"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-1"
           variants={containerVariants}
           initial="hidden"
           animate="visible"

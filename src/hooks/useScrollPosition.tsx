@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, RefObject } from "react"
 type ScrollPosition = 'top' | 'middle' | 'bottom'
 
 interface UseScrollPositionProps {
-  containerRef: RefObject<HTMLElement>
+  containerRef: RefObject<HTMLDivElement | null>
   onScrollPositionChange?: (position: ScrollPosition) => void
 }
 

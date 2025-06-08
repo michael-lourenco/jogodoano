@@ -9,7 +9,7 @@ interface UseCategoryNavigationProps {
   setActiveCategory: (categoryId: string) => void
   handleCategoryTransition: (fromCategoryId: string, toCategoryId: string) => void
   isMobile: boolean
-  containerRef: RefObject<HTMLDivElement>
+  containerRef: RefObject<HTMLDivElement | null>
 }
 
 export function useCategoryNavigation({

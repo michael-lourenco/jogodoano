@@ -43,9 +43,11 @@ export function VotingInterface({
   handleVoteInUI,
   handleSubmitVotesInUI,
 }: VotingInterfaceProps) {
-  const isMobile = useIsMobile()
-  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false)
   const contentContainerRef = useRef<HTMLDivElement>(null)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
   const [selectedGameElementId, setSelectedGameElementId] = useState<string | null>(null)
   const mobileMainContainerRef = useRef<HTMLDivElement>(null)
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({})
@@ -104,7 +106,7 @@ export function VotingInterface({
 
   const footerState = useFooterState()
 
-  const { scrollPosition, isScrolledToBottom, checkScrollPosition, resetScroll } = useScrollPosition({
+  const { scrollPosition, checkScrollPosition, resetScroll } = useScrollPosition({
     containerRef: contentContainerRef
   })
 
@@ -277,6 +279,20 @@ export function VotingInterface({
     }
   }, [isSticky]);
 
+  // Adicionar useEffect para detectar mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile)
+    }
+  }, [])
+
   const styles = `
     @keyframes fadeInDown {
       from {
@@ -359,46 +375,8 @@ export function VotingInterface({
 
             {selectedEditionId && editions.length > 0 && (
               <>
-
                 {isMobile ? (
-                  <div className="mb-6 relative" ref={mobileMainContainerRef}>
-                    {/* Category selector tabs */}
-                    {/* <div
-                      ref={categoryTabsRef}
-                      className={cn(
-                        "relative",
-                        isSticky 
-                          ? "fixed top-0 left-0 right-0 z-20 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm mt-[var(--editions-height,0px)]" 
-                          : "mb-4"
-                      )}
-                    >
-                      <div className={cn(
-                        "relative flex items-center justify-center py-2",
-                        isSticky ? "max-w-4xl mx-auto" : ""
-                      )}>
-                        <CategorySelector
-                          categories={getCurrentEditionCategories()
-                            .slice()
-                            .sort((a, b) => {
-                              const hasVoteA = Boolean(votes[selectedEditionId]?.[a.id])
-                              const hasVoteB = Boolean(votes[selectedEditionId]?.[b.id])
-                              if (hasVoteA === hasVoteB) {
-                                return 0
-                              }
-                              return hasVoteA ? 1 : -1
-                            })}
-                          selectedCategoryId={localActiveCategory}
-                          votes={votes[selectedEditionId] || {}}
-                          onCategoryChange={handleCategoryClick}
-                          isMobile={isMobile}
-                        />
-                      </div>
-                    </div> */}
-
-                    {isSticky && categoryTabsRef.current && (
-                      <div style={{ height: categoryTabsHeight.current + 64, marginBottom: "1rem" }}></div>
-                    )}
-
+                  <div className="md:hidden mb-6 relative" ref={mobileMainContainerRef}>
                     {/* Category heading and description */}
                     <div 
                       className="mb-6 text-center" 
@@ -530,7 +508,7 @@ export function VotingInterface({
                       onValueChange={(newValue) => handleCategoryClick(newValue)} 
                       className="w-full"
                     >
-                      {/* <div
+                      <div
                         ref={tabsListRef}
                         className={`w-full ${
                           isSticky
@@ -554,9 +532,7 @@ export function VotingInterface({
                           onCategoryChange={handleCategoryClick}
                           isMobile={isMobile}
                         />
-                        
-
-                      </div> */}
+                      </div>
 
                       {isSticky && <div style={{ height: "3rem", marginBottom: "1rem" }}></div>}
 
@@ -579,6 +555,7 @@ export function VotingInterface({
                             category={category}
                             selectedGameId={votes[selectedEditionId]?.[category.id]}
                             onVote={(gameId) => handleGameSelection(category.id, gameId)}
+                            disabled={!canVote}
                           />
 
                           {/* Botões de navegação - Desktop */}
@@ -598,7 +575,7 @@ export function VotingInterface({
                               {isAllCategoriesVoted(categories) ? (
                                 <Button
                                   onClick={handleSubmitVotes}
-                                  disabled={isSubmittingVotes}
+                                  disabled={isSubmittingVotes || !canVote}
                                   className="flex-1 h-10 text-primary-foreground bg-gradient-to-r from-chart-1 to-success hover:from-chart-1 hover:to-success-foreground shadow-lg hover:shadow-success/25 hover:text-secondary-foreground transition-all duration-300"
                                   aria-live="polite"
                                 >
@@ -617,10 +594,10 @@ export function VotingInterface({
                               ) : (
                                 <Button
                                   onClick={navigateToNextCategory}
-                                  disabled={!votes[selectedEditionId]?.[category.id]}
+                                  disabled={!votes[selectedEditionId]?.[category.id] || !canVote}
                                   className={cn(
                                     "flex-1 h-10 transition-all duration-300",
-                                    votes[selectedEditionId]?.[category.id]
+                                    votes[selectedEditionId]?.[category.id] && canVote
                                       ? "text-primary-foreground bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-primary/25"
                                       : "text-muted-foreground bg-muted/50 cursor-not-allowed"
                                   )}

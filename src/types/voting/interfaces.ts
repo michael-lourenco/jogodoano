@@ -41,8 +41,8 @@ export interface SwipeNavigationProps {
 
 export interface StickyHeaderState {
   isSticky: boolean
-  editionsSelectorRef: React.RefObject<HTMLDivElement>
+  editionsSelectorRef: React.RefObject<HTMLDivElement | null>
   editionsSelectorHeight: React.MutableRefObject<number>
-  categoryTabsRef: React.RefObject<HTMLDivElement>
+  categoryTabsRef: React.RefObject<HTMLDivElement | null>
   categoryTabsHeight: React.MutableRefObject<number>
 }

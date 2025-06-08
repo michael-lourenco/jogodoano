@@ -2,12 +2,21 @@ import { dbFirestore } from "@/services/firebase/FirebaseService"
 import { collection, getDocs, doc, writeBatch } from "firebase/firestore"
 import type { UserData } from "@/application/entities/User"
 
+interface GameVotes {
+  gameId: string
+  votes: number
+  voters: string[] // Array de IDs dos usuários que votaram
+}
+
 interface CategoryStats {
   totalVotes: number
-  topGames: Array<{
-    gameId: string
-    votes: number
-  }>
+  topGames: GameVotes[]
+  games: {
+    [gameId: string]: {
+      votes: number
+      voters: string[]
+    }
+  }
 }
 
 interface EditionStats {
@@ -91,23 +100,39 @@ export async function generateStatistics() {
           if (!editionStats[editionId].categories[categoryId]) {
             editionStats[editionId].categories[categoryId] = {
               totalVotes: 0,
-              topGames: []
+              topGames: [],
+              games: {}
+            }
+          }
+
+          const categoryStats = editionStats[editionId].categories[categoryId]
+
+          // Inicializar estatísticas do jogo se não existir
+          if (!categoryStats.games[gameId]) {
+            categoryStats.games[gameId] = {
+              votes: 0,
+              voters: []
             }
           }
 
           // Incrementar contadores
           editionStats[editionId].totalVotes++
-          editionStats[editionId].categories[categoryId].totalVotes++
+          categoryStats.totalVotes++
+          categoryStats.games[gameId].votes++
+          categoryStats.games[gameId].voters.push(user.email)
           globalStats.totalVotes++
 
-          // Atualizar contagem de votos do jogo
-          const categoryStats = editionStats[editionId].categories[categoryId]
+          // Atualizar topGames
           const gameIndex = categoryStats.topGames.findIndex(g => g.gameId === gameId)
-          
           if (gameIndex === -1) {
-            categoryStats.topGames.push({ gameId, votes: 1 })
+            categoryStats.topGames.push({
+              gameId,
+              votes: 1,
+              voters: [user.email]
+            })
           } else {
             categoryStats.topGames[gameIndex].votes++
+            categoryStats.topGames[gameIndex].voters.push(user.email)
           }
         }
       }

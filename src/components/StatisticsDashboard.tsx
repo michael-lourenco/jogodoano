@@ -3,116 +3,126 @@
 import { useStatistics } from "@/hooks/useStatistics"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
 
 export function StatisticsDashboard() {
-  const { statistics, loading, error } = useStatistics()
+  const { statistics, isLoading, error } = useStatistics()
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {[1, 2, 3].map((i) => (
-          <Card key={i}>
-            <CardHeader>
-              <Skeleton className="h-4 w-[200px]" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-8 w-[100px]" />
-            </CardContent>
-          </Card>
-        ))}
+      <div className="space-y-4">
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-32 w-full" />
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="rounded-lg bg-destructive/15 p-4 text-destructive">
-        {error}
-      </div>
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Erro</AlertTitle>
+        <AlertDescription>
+          {error.message || "Erro ao carregar estatísticas"}
+        </AlertDescription>
+      </Alert>
     )
   }
-
-  if (!statistics) {
-    return null
-  }
-
-  const { globalStats, editionStats } = statistics
 
   return (
     <div className="space-y-8">
       {/* Estatísticas Globais */}
-      <section>
-        <h2 className="mb-4 text-2xl font-bold">Estatísticas Globais</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Total de Edições</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{globalStats.totalEditions}</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Total de Categorias</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{globalStats.totalCategories}</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Total de Votos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{globalStats.totalVotes}</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Total de Votantes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{globalStats.totalVoters}</p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+      <Card>
+        <CardHeader>
+          <CardTitle>Estatísticas Globais</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground">Total de Edições</p>
+              <p className="text-2xl font-bold">{statistics?.globalStats.totalEditions}</p>
+            </div>
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground">Total de Categorias</p>
+              <p className="text-2xl font-bold">{statistics?.globalStats.totalCategories}</p>
+            </div>
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground">Total de Votos</p>
+              <p className="text-2xl font-bold">{statistics?.globalStats.totalVotes}</p>
+            </div>
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground">Total de Votantes</p>
+              <p className="text-2xl font-bold">{statistics?.globalStats.totalVoters}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Estatísticas por Edição */}
-      <section>
-        <h2 className="mb-4 text-2xl font-bold">Estatísticas por Edição</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {Object.entries(editionStats).map(([editionId, stats]) => (
-            <Card key={editionId}>
-              <CardHeader>
-                <CardTitle>{stats.name || `Edição ${editionId}`}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total de Votos</p>
-                    <p className="text-2xl font-bold">{stats.totalVotes}</p>
+      {Object.entries(statistics?.editionStats || {}).map(([editionId, edition]) => (
+        <Card key={editionId}>
+          <CardHeader>
+            <CardTitle>Edição {edition.name || editionId}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              {/* Resumo da Edição */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-muted rounded-lg">
+                  <p className="text-sm text-muted-foreground">Total de Votos</p>
+                  <p className="text-2xl font-bold">{edition.totalVotes}</p>
+                </div>
+                <div className="p-4 bg-muted rounded-lg">
+                  <p className="text-sm text-muted-foreground">Total de Votantes</p>
+                  <p className="text-2xl font-bold">{edition.totalVoters}</p>
+                </div>
+                <div className="p-4 bg-muted rounded-lg">
+                  <p className="text-sm text-muted-foreground">Total de Categorias</p>
+                  <p className="text-2xl font-bold">{Object.keys(edition.categories).length}</p>
+                </div>
+              </div>
+
+              {/* Estatísticas por Categoria */}
+              {Object.entries(edition.categories).map(([categoryId, category]) => (
+                <div key={categoryId} className="space-y-4">
+                  <h3 className="text-xl font-semibold">Categoria {categoryId}</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* Top 3 Jogos */}
+                    {category.topGames.slice(0, 3).map((game, index) => (
+                      <div key={game.gameId} className="p-4 bg-muted rounded-lg">
+                        <p className="text-sm text-muted-foreground">
+                          {index + 1}º Lugar
+                        </p>
+                        <p className="text-lg font-semibold">Jogo {game.gameId}</p>
+                        <p className="text-sm">
+                          {game.votes} votos ({game.voters.length} votantes)
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total de Votantes</p>
-                    <p className="text-2xl font-bold">{stats.totalVoters}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Categorias</p>
-                    <p className="text-2xl font-bold">
-                      {Object.keys(stats.categories).length}
-                    </p>
+
+                  {/* Lista Completa de Jogos */}
+                  <div className="mt-4">
+                    <h4 className="text-lg font-medium mb-2">Todos os Jogos</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {Object.entries(category.games).map(([gameId, gameStats]) => (
+                        <div key={gameId} className="p-4 bg-muted rounded-lg">
+                          <p className="text-lg font-semibold">Jogo {gameId}</p>
+                          <p className="text-sm">
+                            {gameStats.votes} votos ({gameStats.voters.length} votantes)
+                          </p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   )
 } 

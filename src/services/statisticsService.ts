@@ -8,7 +8,7 @@ interface GameVotes {
   voters: string[] // Array de IDs dos usuários que votaram
 }
 
-interface CategoryStats {
+export interface CategoryStats {
   totalVotes: number
   topGames: GameVotes[]
   games: {
@@ -19,7 +19,7 @@ interface CategoryStats {
   }
 }
 
-interface EditionStats {
+export interface EditionStats {
   id: string
   name: string
   totalVotes: number
@@ -30,7 +30,7 @@ interface EditionStats {
   lastUpdated: Date
 }
 
-interface GlobalStats {
+export interface GlobalStats {
   id: string
   totalEditions: number
   totalCategories: number

@@ -1,6 +1,8 @@
 import { dbFirestore } from "@/services/firebase/FirebaseService"
-import { collection, getDocs, doc, writeBatch } from "firebase/firestore"
+import { collection, getDocs, doc, writeBatch, Timestamp, DocumentData, QueryDocumentSnapshot } from "firebase/firestore"
 import type { UserData } from "@/application/entities/User"
+import type { VotingEdition } from "@/types/types"
+import { votingEditions } from "@/repositories/votingEditions"
 
 interface GameVotes {
   gameId: string
@@ -22,6 +24,10 @@ export interface CategoryStats {
 export interface EditionStats {
   id: string
   name: string
+  isLimitedTime: boolean
+  startAt: Date | null
+  endAt: Date | null
+  status: "upcoming" | "active" | "ended"
   totalVotes: number
   totalVoters: number
   categories: {
@@ -55,12 +61,36 @@ export async function generateStatistics() {
   try {
     console.log("Iniciando geração de estatísticas...")
 
-    // 1. Buscar todos os usuários com votos
+    // 1. Usar as edições do repositório
+    const editions = votingEditions.reduce((acc, edition) => {
+      console.log(`Processando edição ${edition.id}:`, {
+        startAt: edition.startAt,
+        endAt: edition.endAt,
+        isLimitedTime: edition.isLimitedTime
+      })
+
+      acc[edition.id] = {
+        name: edition.name,
+        isLimitedTime: edition.isLimitedTime,
+        startAt: edition.startAt || null,
+        endAt: edition.endAt || null,
+        status: edition.status
+      }
+      return acc
+    }, {} as Record<string, { 
+      name: string
+      isLimitedTime: boolean
+      startAt: Date | null
+      endAt: Date | null
+      status: "upcoming" | "active" | "ended"
+    }>)
+
+    // 2. Buscar todos os usuários com votos
     const usersCollection = collection(dbFirestore, "users")
     const usersSnapshot = await getDocs(usersCollection)
-    const users = usersSnapshot.docs.map(doc => doc.data() as UserData)
+    const users = usersSnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => doc.data() as UserData)
 
-    // 2. Agregar votos por jogo em cada categoria de cada edição
+    // 3. Agregar votos por jogo em cada categoria de cada edição
     const editionStats: { [editionId: string]: EditionStats } = {}
     const globalStats: GlobalStats = {
       id: "global",
@@ -77,12 +107,24 @@ export async function generateStatistics() {
       if (!user.votes) continue
 
       // Processar votos de cada edição
-      for (const [editionId, categoryVotes] of Object.entries(user.votes)) {
+      for (const [editionId, categoryVotes] of Object.entries(user.votes as unknown as UserVotes)) {
         // Inicializar estatísticas da edição se não existir
         if (!editionStats[editionId]) {
+          const editionData = editions[editionId] || { 
+            name: `Edição ${editionId}`,
+            isLimitedTime: false,
+            startAt: null,
+            endAt: null,
+            status: "upcoming"
+          }
+
           editionStats[editionId] = {
             id: editionId,
-            name: "", // Será preenchido depois
+            name: editionData.name,
+            isLimitedTime: editionData.isLimitedTime,
+            startAt: editionData.startAt,
+            endAt: editionData.endAt,
+            status: editionData.status,
             totalVotes: 0,
             totalVoters: 0,
             categories: {},
@@ -138,32 +180,56 @@ export async function generateStatistics() {
       }
     }
 
-    // 3. Ordenar jogos por número de votos em cada categoria
+    // 4. Ordenar jogos por número de votos em cada categoria
     for (const edition of Object.values(editionStats)) {
       for (const category of Object.values(edition.categories)) {
         category.topGames.sort((a, b) => b.votes - a.votes)
       }
     }
 
-    // 4. Atualizar estatísticas globais
+    // 5. Atualizar estatísticas globais
     globalStats.totalEditions = Object.keys(editionStats).length
     globalStats.totalCategories = Object.values(editionStats).reduce(
       (acc, edition) => acc + Object.keys(edition.categories).length,
       0
     )
 
-    // 5. Salvar estatísticas no Firestore
+    // 6. Salvar estatísticas no Firestore
     const batch = writeBatch(dbFirestore)
 
     // Salvar estatísticas por edição
     for (const [editionId, stats] of Object.entries(editionStats)) {
       const editionRef = doc(dbFirestore, "edition_statistics", editionId)
-      batch.set(editionRef, stats)
+      
+      // Verificar e converter as datas
+      console.log(`Salvando estatísticas para edição ${editionId}:`, {
+        startAt: stats.startAt,
+        endAt: stats.endAt,
+        isLimitedTime: stats.isLimitedTime
+      })
+
+      const statsToSave = {
+        ...stats,
+        startAt: stats.startAt ? Timestamp.fromDate(new Date(stats.startAt)) : null,
+        endAt: stats.endAt ? Timestamp.fromDate(new Date(stats.endAt)) : null,
+        lastUpdated: Timestamp.fromDate(new Date())
+      }
+
+      console.log(`Dados convertidos para salvar:`, {
+        startAt: statsToSave.startAt,
+        endAt: statsToSave.endAt
+      })
+
+      batch.set(editionRef, statsToSave)
     }
 
     // Salvar estatísticas globais
     const globalStatsRef = doc(dbFirestore, "global_statistics", "global")
-    batch.set(globalStatsRef, globalStats)
+    const globalStatsToSave = {
+      ...globalStats,
+      lastUpdated: Timestamp.fromDate(new Date())
+    }
+    batch.set(globalStatsRef, globalStatsToSave)
 
     // Executar batch
     await batch.commit()

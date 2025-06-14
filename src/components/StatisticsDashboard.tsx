@@ -142,7 +142,7 @@ export function StatisticsDashboard() {
             <CardContent>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <div>
-                  <div className="text-sm font-medium">Total de Votos</div>
+                  <div className="text-sm font-medium">Total de votos</div>
                   <div className="text-2xl font-bold">{edition.totalVotes}</div>
                 </div>
                 <div>

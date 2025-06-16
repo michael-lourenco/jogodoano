@@ -10,10 +10,16 @@ import { votingEditions } from "@/repositories/votingEditions"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { CountdownTimer } from "@/components/CountdownTimer"
+import { DonationBanner } from "@/components/DonationBanner"
+import { DonationModal } from "@/components/DonationModal"
+import { useState } from "react"
+import { useDonation } from "@/hooks/useDonation"
 
 export function HomeContent() {
   const navigationService = useNavigation()
   const { user, loading, status, handleLogin, handleLogout } = useAuth()
+  const [isDonationModalOpen, setIsDonationModalOpen] = useState(false)
+  const { donationMeta, isLoading: isLoadingDonation } = useDonation()
 
   const handleNavigation = (path: string) => () => {
     navigationService.navigateTo(path)
@@ -45,6 +51,14 @@ export function HomeContent() {
               </CardTitle>
             </CardHeader>
           </Card>
+
+          {/* Banner de Doação - Reposicionado para melhor visibilidade */}
+          {!isLoadingDonation && donationMeta && (
+            <DonationBanner
+              donationMeta={donationMeta}
+              onDonate={() => setIsDonationModalOpen(true)}
+            />
+          )}
 
           <Card className="border border-muted/50 bg-card/50 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
             <CardContent className="pt-8 pb-6 px-6">
@@ -130,6 +144,12 @@ export function HomeContent() {
             </CardContent>
           </Card>
 
+          {/* Modal de Doação */}
+          <DonationModal
+            isOpen={isDonationModalOpen}
+            onClose={() => setIsDonationModalOpen(false)}
+          />
+
           {/* Redes Sociais */}
           <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg">
             <CardContent className="p-6">
@@ -158,22 +178,6 @@ export function HomeContent() {
                   onClick={() => window.open("mailto:contato@jogodoano.com.br", "_blank")}
                 >
                   <Mail className="w-6 h-6 text-info" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Botão de Apoio */}
-          <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg">
-            <CardContent className="p-6">
-              <div className="space-y-4 max-w-md mx-auto">
-                <Button
-                  onClick={() => window.open("https://buy.stripe.com/00g02GeSnaJC12g5kk", "_blank")}
-                  variant="outline"
-                  className="w-full border-chart-4/50 text-chart-4 hover:bg-chart-4/10 hover:border-chart-4 group transition-all duration-300 hover:shadow-lg hover:shadow-chart-4/20"
-                >
-                  <Heart className="w-5 h-5 mr-2 text-chart-4 group-hover:text-chart-4" />
-                  <span className="font-medium">Apoiar o Projeto</span>
                 </Button>
               </div>
             </CardContent>

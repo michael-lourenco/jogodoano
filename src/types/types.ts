@@ -55,3 +55,25 @@ export interface VoteStats {
   gameId: string
   voteCount: number
 }
+
+// Donation types
+export interface DonationMeta {
+  edition: string
+  totalRaised: number
+  startDate: string
+  endDate: string
+  donationUrl: string
+  isRevealed: boolean
+  winnerGameId?: string
+}
+
+export interface DonationTransaction {
+  id: string
+  userId: string
+  amount: number
+  status: 'pending' | 'completed' | 'failed'
+  createdAt: string
+  updatedAt: string
+  paymentMethod: 'pix' | 'picpay' | 'apoiase'
+  paymentId?: string
+}

@@ -37,13 +37,17 @@ export function DonationBanner({ donationMeta, onDonate }: DonationBannerProps) 
           <span className="text-lg font-bold">R$ {donationMeta.totalRaised.toLocaleString('pt-BR')}</span>
         </div>
 
+        <div className="text-xs text-primary-foreground/70">
+          Doações processadas via Apoia.se
+        </div>
+
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onDonate}
           className="w-full bg-primary-foreground text-primary font-bold py-3 px-6 rounded-lg hover:bg-primary-foreground/90 transition-colors"
         >
-          Contribuir Agora
+          Contribuir via Apoia.se
         </motion.button>
       </div>
     </motion.div>

@@ -159,7 +159,7 @@ export function HomeContent() {
                   variant="ghost"
                   size="icon"
                   className="hover:bg-muted"
-                  onClick={() => window.open("https://youtube.com/@jogodoano", "_blank")}
+                  onClick={() => window.open("https://youtube.com/@appjogodoano", "_blank")}
                 >
                   <Youtube className="w-6 h-6 text-destructive" />
                 </Button>
@@ -167,7 +167,7 @@ export function HomeContent() {
                   variant="ghost"
                   size="icon"
                   className="hover:bg-muted"
-                  onClick={() => window.open("https://instagram.com/jogodoano", "_blank")}
+                  onClick={() => window.open("https://instagram.com/appjogodoano", "_blank")}
                 >
                   <Instagram className="w-6 h-6 text-pink-600" />
                 </Button>
@@ -175,7 +175,7 @@ export function HomeContent() {
                   variant="ghost"
                   size="icon"
                   className="hover:bg-muted"
-                  onClick={() => window.open("mailto:contato@jogodoano.com.br", "_blank")}
+                  onClick={() => window.open("mailto:appjogodoano@gmail.com", "_blank")}
                 >
                   <Mail className="w-6 h-6 text-info" />
                 </Button>

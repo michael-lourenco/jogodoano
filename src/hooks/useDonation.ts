@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { DonationMeta, DonationTransaction } from '@/types/types'
+import { DonationMeta } from '@/types/types'
 import { DonationService } from '@/services/donationService'
 
 export function useDonation() {
@@ -24,19 +24,9 @@ export function useDonation() {
     loadDonationMeta()
   }, [])
 
-  const createDonation = async (amount: number, paymentMethod: 'pix' | 'picpay' | 'apoiase') => {
-    try {
-      const transaction = await donationService.createDonation(amount, paymentMethod)
-      return transaction
-    } catch (err) {
-      throw err instanceof Error ? err : new Error('Erro ao criar doação')
-    }
-  }
-
   return {
     donationMeta,
     isLoading,
-    error,
-    createDonation
+    error
   }
 } 

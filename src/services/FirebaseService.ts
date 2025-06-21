@@ -15,6 +15,7 @@ import {
 import { initializeApp } from "firebase/app"
 import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, type Auth } from "firebase/auth"
 import type { StoryEntry } from "@/application/entities/User"
+import type { DonationMeta } from "@/types/types"
 
 export interface Round {
   dice_1: number
@@ -116,28 +117,6 @@ interface VotesData {
   userId: string
   votes: Votes
   timestamp: Date
-}
-
-// Interfaces para doação
-export interface DonationMeta {
-  edition: string
-  totalRaised: number
-  startDate: string
-  endDate: string
-  donationUrl: string
-  isRevealed: boolean
-  winnerGameId?: string
-}
-
-export interface DonationTransaction {
-  id: string
-  userId: string
-  amount: number
-  status: 'pending' | 'completed' | 'failed'
-  createdAt: string
-  updatedAt: string
-  paymentMethod: 'pix' | 'picpay' | 'apoiase'
-  paymentId?: string
 }
 
 let globalUser: UserData | null = null
@@ -318,7 +297,7 @@ async function updateUserTotalGames(email: string, total_games: TotalGamesData, 
 }
 
 // Funções para doação
-export async function getDonationMeta(db: Firestore): Promise<DonationMeta> {
+async function fetchDonationMeta(db: Firestore): Promise<DonationMeta> {
   const docRef = doc(db, 'donations', 'meta')
   const docSnap = await getDoc(docRef)
 
@@ -329,7 +308,7 @@ export async function getDonationMeta(db: Firestore): Promise<DonationMeta> {
       totalRaised: 0,
       startDate: new Date().toISOString(),
       endDate: new Date('2025-12-31').toISOString(),
-      donationUrl: 'https://picpay.me/jogodoano',
+      donationUrl: 'https://apoia.se/appjogodoano',
       isRevealed: false
     }
 
@@ -338,48 +317,6 @@ export async function getDonationMeta(db: Firestore): Promise<DonationMeta> {
   }
 
   return docSnap.data() as DonationMeta
-}
-
-export async function createDonationTransaction(
-  transaction: Omit<DonationTransaction, 'id'>,
-  db: Firestore
-): Promise<DonationTransaction> {
-  const transactionsRef = collection(db, 'donations', 'meta', 'transactions')
-  const docRef = await addDoc(transactionsRef, transaction)
-
-  // Atualiza o total arrecadado
-  const metaRef = doc(db, 'donations', 'meta')
-  const metaSnap = await getDoc(metaRef)
-  const currentMeta = metaSnap.data() as DonationMeta
-
-  await updateDoc(metaRef, {
-    totalRaised: currentMeta.totalRaised + transaction.amount
-  })
-
-  return {
-    ...transaction,
-    id: docRef.id
-  }
-}
-
-export async function updateDonationStatus(
-  transactionId: string,
-  status: 'completed' | 'failed',
-  db: Firestore
-): Promise<void> {
-  const transactionRef = doc(db, 'donations', 'meta', 'transactions', transactionId)
-  await updateDoc(transactionRef, {
-    status,
-    updatedAt: new Date().toISOString()
-  })
-}
-
-export async function setWinnerGame(gameId: string, db: Firestore): Promise<void> {
-  const metaRef = doc(db, 'donations', 'meta')
-  await updateDoc(metaRef, {
-    winnerGameId: gameId,
-    isRevealed: true
-  })
 }
 
 export {
@@ -396,6 +333,7 @@ export {
   updateUserCurrency,
   updateMatchHistory,
   updateUserTotalGames,
+  fetchDonationMeta,
 }
 
 export type { UserData, MatchHistoryEntry, Votes }

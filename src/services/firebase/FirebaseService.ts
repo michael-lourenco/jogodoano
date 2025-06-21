@@ -9,10 +9,13 @@ import {
   type Firestore,
   type DocumentSnapshot,
   type DocumentData,
+  collection,
+  addDoc,
 } from "firebase/firestore"
 import { initializeApp } from "firebase/app"
 import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, type Auth } from "firebase/auth"
 import type { StoryEntry } from "@/application/entities/User"
+import type { DonationMeta } from "@/types/types"
 
 export interface Round {
   dice_1: number
@@ -293,6 +296,29 @@ async function updateUserTotalGames(email: string, total_games: TotalGamesData, 
   }
 }
 
+// Funções para doação
+async function fetchDonationMeta(db: Firestore): Promise<DonationMeta> {
+  const docRef = doc(db, 'donations', 'meta')
+  const docSnap = await getDoc(docRef)
+
+  if (!docSnap.exists()) {
+    // Se não existir, cria com valores padrão
+    const defaultMeta: DonationMeta = {
+      edition: '2025',
+      totalRaised: 0,
+      startDate: new Date().toISOString(),
+      endDate: new Date('2025-12-31').toISOString(),
+      donationUrl: 'https://apoia.se/appjogodoano',
+      isRevealed: false
+    }
+
+    await setDoc(docRef, defaultMeta)
+    return defaultMeta
+  }
+
+  return docSnap.data() as DonationMeta
+}
+
 export {
   authFirestore,
   dbFirestore,
@@ -307,6 +333,7 @@ export {
   updateUserCurrency,
   updateMatchHistory,
   updateUserTotalGames,
+  fetchDonationMeta,
 }
 
 export type { UserData, MatchHistoryEntry, Votes }

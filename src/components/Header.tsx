@@ -9,6 +9,8 @@ import { ChevronUp, ChevronDown } from "lucide-react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { UserInfo } from "./UserInfo"
 import { useAuth } from "@/hooks/useAuth"
+import Link from "next/link"
+import Image from "next/image"
 
 export function Header() {
   const pathname = usePathname()
@@ -68,31 +70,38 @@ export function Header() {
   return (
     <TooltipProvider>
       <header 
-        className={`sticky top-0 w-full bg-background border-dashed border-b transition-all duration-300 z-[100] ${
+        className={`sticky top-0 w-full bg-background/95 backdrop-blur-md border-b border-border/40 transition-all duration-300 z-[100] shadow-sm ${
           isExpanded ? 'h-16' : 'h-4'
         }`}
       >
-        <nav className="max-w-md mx-auto px-0 py-0 relative h-full">
+        <nav className="max-w-4xl mx-auto px-4 py-0 relative h-full">
           {!isExpanded && (
             <button
               onClick={handleToggle}
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background border border-dashed rounded-lg px-3 py-1 flex items-center justify-center hover:bg-muted/50 transition-colors shadow-sm z-50"
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-background/95 backdrop-blur-md border border-border/40 rounded-lg px-3 py-1 flex items-center justify-center hover:bg-muted/50 transition-colors shadow-sm z-50"
               aria-label="Expandir menu"
             >
               <ChevronDown className="h-3 w-3" />
             </button>
           )}
           
-          <div className={`flex flex-col justify-center items-center h-full transition-all duration-300 ${
+          <div className={`flex items-center justify-between h-full transition-all duration-300 ${
             !isExpanded ? 'opacity-0 pointer-events-none' : 'opacity-100'
           }`}>
-            <div className="h-full flex items-center">
-              <UserInfo 
-                user={user} 
-                handleLogin={handleLoginWithExpand} 
-                handleLogout={handleLogoutWithExpand}
-              />
-            </div>
+            {/* Logo com link para Home */}
+            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <Image src="/logo.png" alt="Jogo do Ano BR" width={32} height={32} className="rounded-md" />
+              {/* <span className="text-lg font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                Jogo do Ano BR
+              </span> */}
+            </Link>
+
+            {/* UserInfo */}
+            <UserInfo 
+              user={user} 
+              handleLogin={handleLoginWithExpand} 
+              handleLogout={handleLogoutWithExpand}
+            />
           </div>
         </nav>
       </header>

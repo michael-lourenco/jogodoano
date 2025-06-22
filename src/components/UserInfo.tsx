@@ -2,11 +2,11 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { UserData } from "@/services/firebase/FirebaseService";
 import { Icon } from "./icons";
-import { Heart, Moon, Sun } from "lucide-react";
+import { Heart, Moon, Sun, LogOut } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface UserInfoProps {
   user: UserData | null;
@@ -21,24 +21,13 @@ export const UserInfo: React.FC<UserInfoProps> = ({
 }) => {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setIsScrolled(scrollPosition > 100);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   const handleDonation = () => {
-    window.open("https://buy.stripe.com/00g02GeSnaJC12g5kk", "_blank");
+    window.open("https://apoia.se/appjogodoano", "_blank");
   };
 
   const toggleTheme = () => {
@@ -46,91 +35,147 @@ export const UserInfo: React.FC<UserInfoProps> = ({
   };
 
   return (
-    <>
+    <div className="flex items-center gap-2">
       {user ? (
-        <div className={cn(
-          "flex flex-col text-foreground mb-4 p-4 bg-card rounded-sm transition-all duration-300",
-          isScrolled && "opacity-0 pointer-events-none"
-        )}>
-          <div className="flex items-center gap-4 mb-2">
-            <Image src="/logo.png" alt="Logo" width={40} height={40} />
-            <div className="grid grid-cols-[1fr,auto,auto,auto] items-center gap-2 w-full">
-              <div className="flex items-center text-lg font-semibold truncate">
-                <Icon
-                  name="PiTarget"
-                  className="w-6 h-6 text-success mx-2 flex-shrink-0"
-                />
-                <span className="text-foreground">
-                  {user.best_score?.value ?? 0}
-                </span>
-                <Icon
-                  name="PiCoin"
-                  className="w-6 h-6 text-warning mx-2 flex-shrink-0"
-                />
-                <span className="text-foreground">{user.currency?.value ?? 0}</span>
-                <Icon
-                  name="PiStar"
-                  className="w-6 h-6 text-info mx-2 flex-shrink-0"
-                />
-                <span className="text-foreground">
-                  {user.credits?.value ?? 0}
-                </span>
-              </div>
-              {mounted && (
-                <Button
-                  onClick={toggleTheme}
-                  variant="outline"
-                  size="icon"
-                  className="border-accent text-accent-foreground hover:bg-accent"
-                >
-                  {theme === "dark" ? (
-                    <Sun className="w-4 h-4" />
-                  ) : (
-                    <Moon className="w-4 h-4" />
-                  )}
-                </Button>
-              )}
-              <Button
-                onClick={handleDonation}
-                variant="outline"
-                className="border-chart-4 text-chart-4 hover:bg-chart-4 hover:text-card-foreground flex items-center gap-2 whitespace-nowrap"
-                size="sm"
-              >
-                <Heart className="w-4 h-4" />
-                Apoiar
-              </Button>
+        <>
+          {/* Informações do usuário - Desktop */}
+          <div className="hidden md:flex items-center gap-3">
+            <div className="flex items-center gap-2 text-sm">
+              <Icon name="PiTarget" className="w-4 h-4 text-success" />
+              <span className="font-medium">{user.best_score?.value ?? 0}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Icon name="PiCoin" className="w-4 h-4 text-warning" />
+              <span className="font-medium">{user.currency?.value ?? 0}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Icon name="PiStar" className="w-4 h-4 text-info" />
+              <span className="font-medium">{user.credits?.value ?? 0}</span>
             </div>
           </div>
-        </div>
+
+          {/* Informações do usuário - Mobile */}
+          <div className="md:hidden flex items-center gap-1">
+            <div className="flex items-center gap-1 text-xs">
+              <Icon name="PiTarget" className="w-3 h-3 text-success" />
+              <span className="font-medium">{user.best_score?.value ?? 0}</span>
+            </div>
+            <div className="flex items-center gap-1 text-xs">
+              <Icon name="PiCoin" className="w-3 h-3 text-warning" />
+              <span className="font-medium">{user.currency?.value ?? 0}</span>
+            </div>
+          </div>
+
+          {/* Botões de ação */}
+          <div className="flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={handleDonation}
+                  variant="outline"
+                  size="sm"
+                  className="hidden sm:flex items-center gap-1 border-primary/20 text-primary hover:bg-primary/10"
+                >
+                  <Heart className="w-3 h-3" />
+                  <span className="text-xs">Apoiar</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Apoiar via Apoia.se</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={handleDonation}
+                  variant="outline"
+                  size="icon"
+                  className="sm:hidden border-primary/20 text-primary hover:bg-primary/10"
+                >
+                  <Heart className="w-3 h-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Apoiar via Apoia.se</p>
+              </TooltipContent>
+            </Tooltip>
+
+            {mounted && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={toggleTheme}
+                    variant="outline"
+                    size="icon"
+                    className="border-border/40 hover:bg-muted/50"
+                  >
+                    {theme === "dark" ? (
+                      <Sun className="w-3 h-3" />
+                    ) : (
+                      <Moon className="w-3 h-3" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Alternar tema</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={handleLogout}
+                  variant="outline"
+                  size="icon"
+                  className="border-border/40 hover:bg-muted/50"
+                >
+                  <LogOut className="w-3 h-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Sair</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </>
       ) : (
-        <div className={cn(
-          "flex flex-col text-foreground mb-4 p-4 rounded-lg transition-all duration-300",
-          isScrolled && "opacity-0 pointer-events-none"
-        )}>
-          <div className="flex items-center gap-4">
-            <Image src="/logo.png" alt="Logo" width={40} height={40} />
-            <div className="grid grid-cols-[1fr,auto,auto] items-center gap-2 w-full">
-              <Button onClick={handleLogin} className="text-accent-foreground">
-                Sign in with Google
-              </Button>
-              {mounted && (
+        <>
+          {/* Botão de login */}
+          <Button 
+            onClick={handleLogin} 
+            size="sm"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            <span className="hidden sm:inline">Entrar</span>
+            <span className="sm:hidden">Login</span>
+          </Button>
+
+          {/* Botão de tema */}
+          {mounted && (
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <Button
                   onClick={toggleTheme}
                   variant="outline"
                   size="icon"
-                  className="border-accent text-accent-foreground hover:bg-accent"
+                  className="border-border/40 hover:bg-muted/50"
                 >
                   {theme === "dark" ? (
-                    <Sun className="w-4 h-4" />
+                    <Sun className="w-3 h-3" />
                   ) : (
-                    <Moon className="w-4 h-4" />
+                    <Moon className="w-3 h-3" />
                   )}
                 </Button>
-              )}
-            </div>
-          </div>
-        </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Alternar tema</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </>
       )}
-    </>
+    </div>
   );
 };

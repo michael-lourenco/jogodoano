@@ -10,7 +10,6 @@ import { rehydrateVotingEditions } from "@/utils/utils"
 import { VotingCompletePage } from "@/components/voting/VotingCompletePage"
 import { VotingInterface } from "@/components/voting/VotingInterface"
 import { LoginModal } from "@/components/voting/LoginModal"
-import { UserInfo } from "@/components/UserInfo"
 import { Footer } from "@/components/Footer"
 import { Header } from "@/components/Header"
 
@@ -72,7 +71,6 @@ function VotingContent() {
         <Header />
         <main className="flex-grow flex flex-col items-center justify-start pt-4 px-4">
           <div className="w-full max-w-4xl mx-auto">
-            <UserInfo user={user} handleLogin={handleLogin} handleLogout={handleLogout} />
             <LoginModal handleLogin={handleLogin} />
           </div>
         </main>

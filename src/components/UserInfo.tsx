@@ -21,18 +21,39 @@ export const UserInfo: React.FC<UserInfoProps> = ({
 }) => {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    if (theme) {
+      setCurrentTheme(theme as 'light' | 'dark');
+    }
+  }, [theme]);
 
   const handleDonation = () => {
     window.open("https://apoia.se/appjogodoano", "_blank");
   };
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+    setCurrentTheme(newTheme);
+    setTheme(newTheme);
   };
+
+  if (!mounted) {
+    return (
+      <div className="flex items-center gap-2">
+        <Button 
+          onClick={handleLogin} 
+          size="sm"
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
+        >
+          <span className="hidden sm:inline">Entrar</span>
+          <span className="sm:hidden">Login</span>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center gap-2">
@@ -101,27 +122,25 @@ export const UserInfo: React.FC<UserInfoProps> = ({
               </TooltipContent>
             </Tooltip>
 
-            {mounted && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={toggleTheme}
-                    variant="outline"
-                    size="icon"
-                    className="border-border/40 hover:bg-muted/50"
-                  >
-                    {theme === "dark" ? (
-                      <Sun className="w-3 h-3" />
-                    ) : (
-                      <Moon className="w-3 h-3" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Alternar tema</p>
-                </TooltipContent>
-              </Tooltip>
-            )}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={toggleTheme}
+                  variant="outline"
+                  size="icon"
+                  className="border-border/40 hover:bg-muted/50"
+                >
+                  {currentTheme === "dark" ? (
+                    <Sun className="w-3 h-3" />
+                  ) : (
+                    <Moon className="w-3 h-3" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Alternar tema</p>
+              </TooltipContent>
+            </Tooltip>
 
             <Tooltip>
               <TooltipTrigger asChild>
@@ -153,27 +172,25 @@ export const UserInfo: React.FC<UserInfoProps> = ({
           </Button>
 
           {/* Botão de tema */}
-          {mounted && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={toggleTheme}
-                  variant="outline"
-                  size="icon"
-                  className="border-border/40 hover:bg-muted/50"
-                >
-                  {theme === "dark" ? (
-                    <Sun className="w-3 h-3" />
-                  ) : (
-                    <Moon className="w-3 h-3" />
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Alternar tema</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={toggleTheme}
+                variant="outline"
+                size="icon"
+                className="border-border/40 hover:bg-muted/50"
+              >
+                {currentTheme === "dark" ? (
+                  <Sun className="w-3 h-3" />
+                ) : (
+                  <Moon className="w-3 h-3" />
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Alternar tema</p>
+            </TooltipContent>
+          </Tooltip>
         </>
       )}
     </div>

@@ -39,7 +39,14 @@ export default function CookieConsent() {
     <div className="fixed bottom-0 left-0 w-full bg-secondary text-secondary-foreground p-4 flex flex-col md:flex-row items-center justify-between shadow-md border-t z-[1000]">
       <p className="text-sm text-muted-foreground">
         Usamos cookies para melhorar sua experiência. Ao continuar, você concorda com nossa{" "}
-        <a href="/politica-de-cookies" className="underline text-primary">Política de Cookies</a>.
+        <a 
+          href="/cookies-politics" 
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-primary hover:text-primary/80 transition-colors"
+        >
+          Política de Cookies
+        </a>.
       </p>
       <div className="flex space-x-2 mt-2 md:mt-0">
         <Button onClick={handleAccept} className="bg-success hover:bg-success/90 text-success-foreground">

@@ -16,11 +16,9 @@ export const votingEditions: VotingEdition[] = [
           "thefirstberserkerkhazan",
           "clairobscurexpedition33",
           "kingdomcomedeliverance2",
-          "doomthedarkages",
-          "gosthofyotei",
+          "finalfantasyviirebirth",
           "likeadragonpirateyakuza",
           "splitfiction",
-          "borderlands4",
           "monsterhunterwilds",
         ],
       },
@@ -75,7 +73,8 @@ export const votingEditions: VotingEdition[] = [
           "Jogos desenvolvidos por estúdios independentes com ideias inovadoras",
         gameIds: [
           "markofthedeep",
-          "hades2"
+          "hades2",
+          "splitfiction"
         ],
       },
       {

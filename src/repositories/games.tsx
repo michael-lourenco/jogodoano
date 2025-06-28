@@ -258,7 +258,7 @@ export const games: Game[] = [
   { id: "shadowverse-worlds-beyond", title: "Shadowverse: Worlds Beyond", imageUrl: "/shadowverse-worlds-beyond.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "raidou-remastered", title: "Raidou Remastered", imageUrl: "/raidou-remastered.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "rematch", title: "Rematch", imageUrl: "/rematch.jpg?height=200&width=350", developer: "DEVELOPER" },
-  { id: "death-stranding-2-on-the-beach", title: "Death Stranding 2: On The Beach", imageUrl: "/death-stranding-2-on-the-beach.jpg?height=200&width=350", developer: "DEVELOPER" },
+  { id: "death-stranding-2-on-the-beach", title: "Death Stranding 2: On The Beach", imageUrl: "/death-stranding-2-on-the-beach.jpg?height=200&width=350", developer: "Kojima Productions" },
   { id: "ruffy-and-the-riverside", title: "Ruffy and the Riverside", imageUrl: "/ruffy-and-the-riverside.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "tamagotchi-plaza", title: "Tamagotchi Plaza", imageUrl: "/tamagotchi-plaza.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "patapon-1-2-replay", title: "Patapon 1 + 2 Replay", imageUrl: "/patapon-1-2-replay.jpg?height=200&width=350", developer: "DEVELOPER" },

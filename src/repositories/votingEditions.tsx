@@ -16,7 +16,7 @@ export const votingEditions: VotingEdition[] = [
           "thefirstberserkerkhazan",
           "clairobscurexpedition33",
           "kingdomcomedeliverance2",
-          "finalfantasyviirebirth",
+          "death-stranding-2-on-the-beach",
           "likeadragonpirateyakuza",
           "splitfiction",
           "monsterhunterwilds",

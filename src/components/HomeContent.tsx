@@ -150,6 +150,30 @@ export function HomeContent() {
             onClose={() => setIsDonationModalOpen(false)}
           />
 
+          {/* Links Úteis */}
+          <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg">
+            <CardContent className="p-6">
+              <h3 className="text-xl font-semibold mb-4 text-center">Links Úteis</h3>
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+                <Button
+                  onClick={() => navigationService.navigateTo("/results?edition=2025")}
+                  variant="outline"
+                  className="bg-gradient-to-r from-chart-2 to-chart-5 text-white hover:from-chart-2 hover:to-chart-4"
+                >
+                  <Trophy className="w-4 h-4 mr-2" />
+                  Ver Resultados
+                </Button>
+                <Button
+                  onClick={() => window.open('/about', '_blank')}
+                  variant="outline"
+                >
+                  <HelpCircle className="w-4 h-4 mr-2" />
+                  Como Jogar
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Redes Sociais */}
           <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg">
             <CardContent className="p-6">

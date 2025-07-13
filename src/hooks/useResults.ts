@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react"
-import { toast } from "sonner"
 import type { EditionResults, ResultsFilters } from "@/types/results"
 import { getEditionResults, hasEditionResults, getEditionBasicStats } from "@/services/resultsService"
 
@@ -45,7 +44,7 @@ export function useResults({ editionId }: UseResultsProps = {}): UseResultsRetur
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Erro ao carregar resultados"
       setError(errorMessage)
-      toast.error(errorMessage)
+      console.error("Erro ao carregar resultados:", errorMessage)
     } finally {
       setIsLoading(false)
     }

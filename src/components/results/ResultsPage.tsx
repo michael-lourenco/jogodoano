@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -23,9 +22,17 @@ interface ResultsPageProps {
 }
 
 export function ResultsPage({ onBackToHome }: ResultsPageProps) {
-  const searchParams = useSearchParams()
-  const editionId = searchParams.get("edition") || "2025"
+  const [editionId, setEditionId] = useState("2025")
   const [activeTab, setActiveTab] = useState("summary")
+
+  // Carrega o editionId do searchParams no lado do cliente
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const edition = params.get("edition") || "2025"
+      setEditionId(edition)
+    }
+  }, [])
 
   const { 
     results, 

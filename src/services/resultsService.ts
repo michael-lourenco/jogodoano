@@ -10,6 +10,12 @@ import type { VotingEdition } from "@/types/types"
  */
 async function fetchEditionVotes(editionId: string) {
   try {
+    // Verifica se o Firebase está disponível
+    if (!dbFirestore) {
+      console.warn("Firebase não está disponível")
+      return []
+    }
+
     const usersRef = collection(dbFirestore, process.env.NEXT_PUBLIC_USERS_COLLECTION!)
     const usersSnapshot = await getDocs(usersRef)
     
@@ -144,6 +150,50 @@ function calculateEditionStats(results: CategoryResult[]): EditionStats {
 }
 
 /**
+ * Gera dados mock para ambiente de build
+ */
+function generateMockResults(editionId: string): EditionResults {
+  const edition = votingEditions.find(ed => ed.id === editionId)
+  if (!edition) {
+    throw new Error(`Edição ${editionId} não encontrada`)
+  }
+
+  const mockResults: EditionResults = {
+    editionId,
+    editionName: edition.name,
+    totalVotes: 0,
+    uniqueVoters: 0,
+    categories: edition.categories.map(category => {
+      const mockGame = games.find(g => category.gameIds.includes(g.id)) || {
+        id: category.gameIds[0] || 'mock-game',
+        title: 'Jogo Mock',
+        imageUrl: '',
+        developer: 'Desenvolvedor Mock'
+      }
+
+      const mockGameResult: GameResult = {
+        game: mockGame,
+        votes: 0,
+        percentage: 0,
+        position: 1
+      }
+
+      return {
+        category,
+        totalVotes: 0,
+        games: [],
+        topGame: mockGameResult
+      }
+    }),
+    topGames: [],
+    lastUpdated: new Date().toISOString(),
+    isRevealed: true
+  }
+
+  return mockResults
+}
+
+/**
  * Gera dados para gráficos
  */
 function generateChartData(results: CategoryResult[]): ResultsChartData {
@@ -184,6 +234,12 @@ function generateChartData(results: CategoryResult[]): ResultsChartData {
  */
 export async function getEditionResults(editionId: string): Promise<EditionResults> {
   try {
+    // Verifica se estamos no ambiente de build
+    if (typeof window === 'undefined') {
+      console.warn("Executando em ambiente de build, retornando dados mock")
+      return generateMockResults(editionId)
+    }
+
     // Busca a edição
     const edition = votingEditions.find(ed => ed.id === editionId)
     if (!edition) {

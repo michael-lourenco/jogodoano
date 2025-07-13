@@ -107,7 +107,7 @@ export function CategoryStepper({
                       animate={{ scale: 1 }}
                       className="text-success-foreground"
                     >
-                      ✓
+                    {index + 1}
                     </motion.div>
                   ) : (
                     index + 1

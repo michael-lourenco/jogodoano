@@ -12,27 +12,33 @@ import { CategoryResults } from "@/components/results/CategoryResults"
 import { ResultsCharts } from "@/components/results/ResultsCharts"
 import { ResultsFilters } from "@/components/results/ResultsFilters"
 import { ResultsLoadingState } from "@/components/results/ResultsLoadingState"
+import { EditionNotAvailable } from "@/components/results/EditionNotAvailable"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowLeft, RefreshCw, Trophy, BarChart3, Filter } from "lucide-react"
 import { motion } from "framer-motion"
 import { votingEditions } from "@/repositories/votingEditions"
+import { canShowResults } from "@/utils/editionUtils"
 
 interface ResultsPageProps {
   onBackToHome?: () => void
+  onBackToEditions?: () => void
+  forcedEditionId?: string
 }
 
-export function ResultsPage({ onBackToHome }: ResultsPageProps) {
-  const [editionId, setEditionId] = useState("2025")
+export function ResultsPage({ onBackToHome, onBackToEditions, forcedEditionId }: ResultsPageProps) {
+  const [editionId, setEditionId] = useState(forcedEditionId || "2025")
   const [activeTab, setActiveTab] = useState("summary")
 
-  // Carrega o editionId do searchParams no lado do cliente
+  // Carrega o editionId do searchParams no lado do cliente ou usa o forcedEditionId
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (forcedEditionId) {
+      setEditionId(forcedEditionId)
+    } else if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search)
       const edition = params.get("edition") || "2025"
       setEditionId(edition)
     }
-  }, [])
+  }, [forcedEditionId])
 
   const { 
     results, 
@@ -54,6 +60,34 @@ export function ResultsPage({ onBackToHome }: ResultsPageProps) {
   } | undefined>(undefined)
 
   const edition = votingEditions.find(ed => ed.id === editionId)
+
+  // Verifica se a edição pode mostrar resultados
+  if (!edition) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background text-foreground">
+        <main className="flex-grow flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardContent className="p-6 text-center">
+              <Alert variant="destructive">
+                <AlertDescription>
+                  Edição não encontrada
+                </AlertDescription>
+              </Alert>
+              <Button onClick={onBackToHome} className="mt-4">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Voltar
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    )
+  }
+
+  // Verifica se a edição pode mostrar resultados
+  if (!canShowResults(edition)) {
+    return <EditionNotAvailable edition={edition} onBackToHome={onBackToHome} />
+  }
 
   const handleBackToHome = () => {
     onBackToHome?.()
@@ -173,6 +207,12 @@ export function ResultsPage({ onBackToHome }: ResultsPageProps) {
                       <RefreshCw className="w-4 h-4 mr-2" />
                       Atualizar
                     </Button>
+                    {onBackToEditions && (
+                      <Button onClick={onBackToEditions} variant="outline" size="sm">
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        Voltar às Edições
+                      </Button>
+                    )}
                     <Button onClick={handleBackToHome} variant="outline" size="sm">
                       <ArrowLeft className="w-4 h-4 mr-2" />
                       Voltar

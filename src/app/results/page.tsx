@@ -1,17 +1,47 @@
 "use client"
 
-import { Suspense } from "react"
+import { Suspense, useState } from "react"
 import { ResultsPage } from "@/components/results/ResultsPage"
+import { AvailableEditions } from "@/components/results/AvailableEditions"
 import { useRouter } from "next/navigation"
 
 function ResultsContent() {
   const router = useRouter()
+  const [selectedEdition, setSelectedEdition] = useState<string | null>(null)
 
   const handleBackToHome = () => {
     router.push("/")
   }
 
-  return <ResultsPage onBackToHome={handleBackToHome} />
+  const handleEditionSelect = (editionId: string) => {
+    setSelectedEdition(editionId)
+    // Atualiza a URL sem recarregar a página
+    const url = new URL(window.location.href)
+    url.searchParams.set('edition', editionId)
+    window.history.pushState({}, '', url.toString())
+  }
+
+  const handleBackToEditions = () => {
+    setSelectedEdition(null)
+    // Remove o parâmetro edition da URL
+    const url = new URL(window.location.href)
+    url.searchParams.delete('edition')
+    window.history.pushState({}, '', url.toString())
+  }
+
+  // Se uma edição foi selecionada, mostra os resultados
+  if (selectedEdition) {
+    return (
+      <ResultsPage 
+        onBackToHome={handleBackToHome}
+        onBackToEditions={handleBackToEditions}
+        forcedEditionId={selectedEdition}
+      />
+    )
+  }
+
+  // Caso contrário, mostra a lista de edições disponíveis
+  return <AvailableEditions onEditionSelect={handleEditionSelect} onBackToHome={handleBackToHome} />
 }
 
 export default function Results() {

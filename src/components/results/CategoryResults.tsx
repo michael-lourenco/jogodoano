@@ -21,11 +21,11 @@ export function CategoryResults({ results, filters }: CategoryResultsProps) {
   const getPositionIcon = (position: number) => {
     switch (position) {
       case 1:
-        return <Trophy className="w-5 h-5 text-yellow-500" />
+        return <Trophy className="w-5 h-5 text-warning" />
       case 2:
-        return <Medal className="w-5 h-5 text-gray-400" />
+        return <Medal className="w-5 h-5 text-muted-foreground" />
       case 3:
-        return <Award className="w-5 h-5 text-amber-600" />
+        return <Award className="w-5 h-5 text-warning/80" />
       default:
         return <span className="text-sm font-bold text-muted-foreground">#{position}</span>
     }
@@ -34,11 +34,11 @@ export function CategoryResults({ results, filters }: CategoryResultsProps) {
   const getPositionColor = (position: number) => {
     switch (position) {
       case 1:
-        return "bg-gradient-to-r from-yellow-400 to-yellow-600 text-white"
+        return "bg-gradient-to-r from-warning to-warning/80 text-warning-foreground"
       case 2:
-        return "bg-gradient-to-r from-gray-300 to-gray-500 text-white"
+        return "bg-gradient-to-r from-muted to-muted/80 text-muted-foreground"
       case 3:
-        return "bg-gradient-to-r from-amber-500 to-amber-700 text-white"
+        return "bg-gradient-to-r from-warning/80 to-warning/60 text-warning-foreground"
       default:
         return "bg-muted text-foreground"
     }
@@ -117,7 +117,7 @@ export function CategoryResults({ results, filters }: CategoryResultsProps) {
                           </div>
                           
                           <div className="text-right">
-                            <div className="text-lg font-bold text-chart-2">
+                            <div className="text-lg font-bold text-primary">
                               {game.votes} votos
                             </div>
                             <div className="text-sm text-muted-foreground">
@@ -135,10 +135,10 @@ export function CategoryResults({ results, filters }: CategoryResultsProps) {
                           <div className="w-full bg-muted rounded-full h-2">
                             <div
                               className={`h-2 rounded-full transition-all duration-500 ${
-                                game.position === 1 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
-                                game.position === 2 ? 'bg-gradient-to-r from-gray-300 to-gray-500' :
-                                game.position === 3 ? 'bg-gradient-to-r from-amber-500 to-amber-700' :
-                                'bg-gradient-to-r from-chart-2 to-chart-5'
+                                game.position === 1 ? 'bg-gradient-to-r from-warning to-warning/80' :
+                                game.position === 2 ? 'bg-gradient-to-r from-muted to-muted/80' :
+                                game.position === 3 ? 'bg-gradient-to-r from-warning/80 to-warning/60' :
+                                'bg-gradient-to-r from-primary to-primary/70'
                               }`}
                               style={{ width: `${game.percentage}%` }}
                             />

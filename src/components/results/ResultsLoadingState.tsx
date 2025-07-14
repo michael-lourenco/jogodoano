@@ -49,8 +49,8 @@ export function ResultsLoadingState({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="bg-card/50 backdrop-blur-sm border border-muted/50">
             <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Database className="w-5 h-5 text-blue-500" />
+                               <div className="flex items-center gap-2">
+                   <Database className="w-5 h-5 text-info" />
                 <div>
                   <p className="text-sm text-muted-foreground">Total de Votos</p>
                   <p className="text-2xl font-bold">{basicStats.totalVotes}</p>
@@ -61,8 +61,8 @@ export function ResultsLoadingState({
 
           <Card className="bg-card/50 backdrop-blur-sm border border-muted/50">
             <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-green-500" />
+                               <div className="flex items-center gap-2">
+                   <Users className="w-5 h-5 text-success" />
                 <div>
                   <p className="text-sm text-muted-foreground">Votantes Únicos</p>
                   <p className="text-2xl font-bold">{basicStats.uniqueVoters}</p>
@@ -73,8 +73,8 @@ export function ResultsLoadingState({
 
           <Card className="bg-card/50 backdrop-blur-sm border border-muted/50">
             <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-yellow-500" />
+                               <div className="flex items-center gap-2">
+                   <Trophy className="w-5 h-5 text-warning" />
                 <div>
                   <p className="text-sm text-muted-foreground">Categorias</p>
                   <p className="text-2xl font-bold">{basicStats.categories}</p>

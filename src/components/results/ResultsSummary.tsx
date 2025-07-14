@@ -36,7 +36,7 @@ export function ResultsSummary({ results }: ResultsSummaryProps) {
                   <p className="text-sm font-medium text-muted-foreground">Total de Votos</p>
                   <p className="text-2xl font-bold">{results.totalVotes.toLocaleString()}</p>
                 </div>
-                <Trophy className="w-8 h-8 text-chart-2" />
+                <Trophy className="w-8 h-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -54,7 +54,7 @@ export function ResultsSummary({ results }: ResultsSummaryProps) {
                   <p className="text-sm font-medium text-muted-foreground">Participantes</p>
                   <p className="text-2xl font-bold">{results.uniqueVoters.toLocaleString()}</p>
                 </div>
-                <Users className="w-8 h-8 text-chart-3" />
+                <Users className="w-8 h-8 text-success" />
               </div>
             </CardContent>
           </Card>
@@ -72,7 +72,7 @@ export function ResultsSummary({ results }: ResultsSummaryProps) {
                   <p className="text-sm font-medium text-muted-foreground">Taxa de Participação</p>
                   <p className="text-2xl font-bold">{participationRate}%</p>
                 </div>
-                <TrendingUp className="w-8 h-8 text-chart-4" />
+                <TrendingUp className="w-8 h-8 text-warning" />
               </div>
             </CardContent>
           </Card>
@@ -92,7 +92,7 @@ export function ResultsSummary({ results }: ResultsSummaryProps) {
                     {format(new Date(results.lastUpdated), "dd/MM/yyyy HH:mm", { locale: ptBR })}
                   </p>
                 </div>
-                <Calendar className="w-8 h-8 text-chart-5" />
+                <Calendar className="w-8 h-8 text-info" />
               </div>
             </CardContent>
           </Card>
@@ -108,7 +108,7 @@ export function ResultsSummary({ results }: ResultsSummaryProps) {
         <Card className="bg-card/50 backdrop-blur-sm border border-muted/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Award className="w-5 h-5 text-chart-2" />
+              <Award className="w-5 h-5 text-primary" />
               Categoria Mais Votada
             </CardTitle>
             <CardDescription>
@@ -130,7 +130,7 @@ export function ResultsSummary({ results }: ResultsSummaryProps) {
               {topCategory.topGame && (
                 <div className="bg-muted/30 rounded-lg p-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-chart-2 to-chart-5 rounded-lg flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center">
                       <Trophy className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
@@ -139,7 +139,7 @@ export function ResultsSummary({ results }: ResultsSummaryProps) {
                         {topCategory.topGame.votes} votos ({topCategory.topGame.percentage.toFixed(1)}%)
                       </p>
                     </div>
-                    <Badge className="bg-chart-2 text-white">
+                    <Badge className="bg-primary text-primary-foreground">
                       #{topCategory.topGame.position}
                     </Badge>
                   </div>
@@ -179,7 +179,7 @@ export function ResultsSummary({ results }: ResultsSummaryProps) {
                       value={percentage} 
                       className="h-2"
                       style={{
-                        '--progress-background': 'hsl(var(--chart-2))'
+                        '--progress-background': 'hsl(var(--primary))'
                       } as React.CSSProperties}
                     />
                   </div>

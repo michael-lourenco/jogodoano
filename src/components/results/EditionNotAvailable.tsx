@@ -31,11 +31,11 @@ export function EditionNotAvailable({ edition, onBackToHome }: EditionNotAvailab
             <CardHeader className="text-center space-y-4">
               <div className="flex justify-center">
                 {isUpcoming ? (
-                  <Clock className="w-16 h-16 text-blue-500" />
+                  <Clock className="w-16 h-16 text-info" />
                 ) : isActive ? (
-                  <Calendar className="w-16 h-16 text-green-500" />
+                  <Calendar className="w-16 h-16 text-success" />
                 ) : (
-                  <AlertCircle className="w-16 h-16 text-orange-500" />
+                  <AlertCircle className="w-16 h-16 text-warning" />
                 )}
               </div>
               

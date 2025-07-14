@@ -195,7 +195,7 @@ export function ResultsPage({ onBackToHome, onBackToEditions, forcedEditionId }:
               <CardHeader className="space-y-2 relative">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-4xl font-bold bg-gradient-to-r from-chart-2 to-chart-5 text-transparent bg-clip-text">
+                    <CardTitle className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 text-transparent bg-clip-text">
                       Resultados {results.editionName}
                     </CardTitle>
                     <CardDescription className="text-lg mt-2">

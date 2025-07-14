@@ -10,7 +10,7 @@ interface ResultsChartsProps {
   results: EditionResults
 }
 
-const COLORS = ['#14b8a6', '#0d9488', '#0f766e', '#115e59', '#134e4a']
+const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))']
 
 export function ResultsCharts({ results }: ResultsChartsProps) {
   const { theme } = useTheme()
@@ -86,7 +86,7 @@ export function ResultsCharts({ results }: ResultsChartsProps) {
                   />
                   <Bar 
                     dataKey="votes" 
-                    fill={theme === "dark" ? "#14b8a6" : "#0d9488"} 
+                    fill={theme === "dark" ? "hsl(var(--primary))" : "hsl(var(--primary))"} 
                     radius={[0, 4, 4, 0]} 
                   />
                 </BarChart>
@@ -181,9 +181,9 @@ export function ResultsCharts({ results }: ResultsChartsProps) {
                   <Line
                     type="monotone"
                     dataKey="votes"
-                    stroke={theme === "dark" ? "#14b8a6" : "#0d9488"}
+                    stroke={theme === "dark" ? "hsl(var(--primary))" : "hsl(var(--primary))"}
                     strokeWidth={2}
-                    dot={{ fill: theme === "dark" ? "#14b8a6" : "#0d9488" }}
+                    dot={{ fill: theme === "dark" ? "hsl(var(--primary))" : "hsl(var(--primary))" }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -202,7 +202,7 @@ export function ResultsCharts({ results }: ResultsChartsProps) {
         <Card className="bg-card/50 backdrop-blur-sm border border-muted/50">
           <CardContent className="p-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-chart-2">
+              <div className="text-2xl font-bold text-primary">
                 {results.categories.length}
               </div>
               <div className="text-sm text-muted-foreground">Categorias</div>
@@ -213,7 +213,7 @@ export function ResultsCharts({ results }: ResultsChartsProps) {
         <Card className="bg-card/50 backdrop-blur-sm border border-muted/50">
           <CardContent className="p-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-chart-3">
+              <div className="text-2xl font-bold text-success">
                 {results.categories.reduce((sum, cat) => sum + cat.games.length, 0)}
               </div>
               <div className="text-sm text-muted-foreground">Jogos Votados</div>
@@ -224,7 +224,7 @@ export function ResultsCharts({ results }: ResultsChartsProps) {
         <Card className="bg-card/50 backdrop-blur-sm border border-muted/50">
           <CardContent className="p-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-chart-4">
+              <div className="text-2xl font-bold text-warning">
                 {Math.round(results.totalVotes / results.categories.length)}
               </div>
               <div className="text-sm text-muted-foreground">Média por Categoria</div>

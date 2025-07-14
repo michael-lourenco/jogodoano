@@ -19,13 +19,13 @@ export function AvailableEditions({ onEditionSelect, onBackToHome }: AvailableEd
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-500'
+        return 'bg-success'
       case 'ended':
-        return 'bg-blue-500'
+        return 'bg-info'
       case 'upcoming':
-        return 'bg-yellow-500'
+        return 'bg-warning'
       default:
-        return 'bg-gray-500'
+        return 'bg-muted'
     }
   }
 
@@ -96,8 +96,8 @@ export function AvailableEditions({ onEditionSelect, onBackToHome }: AvailableEd
                         onClick={() => onEditionSelect(edition.id)}>
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Trophy className="w-8 h-8 text-yellow-500" />
+                                                 <div className="flex items-center gap-3">
+                           <Trophy className="w-8 h-8 text-warning" />
                           <div>
                             <CardTitle className="text-xl">{edition.name}</CardTitle>
                             <CardDescription>{statusMessage}</CardDescription>
@@ -141,7 +141,7 @@ export function AvailableEditions({ onEditionSelect, onBackToHome }: AvailableEd
 
                       {/* Botão de ação */}
                       <Button 
-                        className="w-full group-hover:bg-primary/90 transition-colors"
+                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                         onClick={(e) => {
                           e.stopPropagation()
                           onEditionSelect(edition.id)

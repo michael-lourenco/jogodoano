@@ -168,7 +168,7 @@ export function HomeContent() {
                   variant="outline"
                 >
                   <HelpCircle className="w-4 h-4 mr-2" />
-                  Como Jogar
+                  Sobre o projeto
                 </Button>
               </div>
             </CardContent>

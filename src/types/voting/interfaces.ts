@@ -12,6 +12,7 @@ export interface VotingInterfaceProps {
   activeCategory: string
   votes: Record<string, CategoryVotes>
   isSubmitting: boolean
+  isGuestMode: boolean
   getCurrentEditionCategories: () => Category[]
   handleLogin: () => void
   handleLogout: () => void
@@ -19,7 +20,7 @@ export interface VotingInterfaceProps {
   handleEditionChange: (editionId: string) => void
   setActiveCategory: (categoryId: string) => void
   handleVoteInUI: (categoryId: string, gameId: string) => void
-  handleSubmitVotesInUI: () => Promise<void>
+  handleSubmitVotesInUI: () => Promise<boolean>
 }
 
 export interface VotingInterfaceHookProps {

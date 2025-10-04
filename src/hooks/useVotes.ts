@@ -15,6 +15,7 @@ interface UseVotesReturn {
   hasVoted: boolean;
   votedEditionId: string;
   isSubmitting: boolean;
+  isGuestMode: boolean;
   handleVote: (editionId: string, categoryId: string, gameId: string) => void;
   handleSubmitVotes: (editionId: string) => Promise<boolean>;
   setHasVoted: (value: boolean) => void;
@@ -28,10 +29,13 @@ export function useVotes({ user, editions }: UseVotesProps): UseVotesReturn {
   const [hasVoted, setHasVoted] = useState(false);
   const [votedEditionId, setVotedEditionId] = useState<string>("");
   const [userVotesLoaded, setUserVotesLoaded] = useState(false);
+  const [isGuestMode, setIsGuestMode] = useState(false);
 
-  // Carregar votos do usuário quando disponíveis
+  // Carregar votos do usuário quando disponíveis ou votos guest do localStorage
   useEffect(() => {
     if (user && user.votes) {
+      // Usuário logado - carregar votos do Firebase
+      console.log('🔄 Carregando votos do usuário logado:', user.votes);
       const votesData = user.votes;
 
       if (votesData && typeof votesData === "object") {
@@ -50,32 +54,84 @@ export function useVotes({ user, editions }: UseVotesProps): UseVotesReturn {
         setVotes({});
       }
       setUserVotesLoaded(true);
+      setIsGuestMode(false);
     } else {
-      setVotes({});
-      setUserVotesLoaded(false);
+      // Usuário não logado - carregar votos guest do localStorage
+      console.log('🔄 Carregando votos guest do localStorage...');
+      const guestVotes = localStorage.getItem('jogodoano_guest_votes');
+      console.log('📦 Votos guest encontrados:', guestVotes);
+      
+      if (guestVotes) {
+        try {
+          const parsedVotes = JSON.parse(guestVotes);
+          console.log('✅ Votos guest carregados:', parsedVotes);
+          setVotes(parsedVotes);
+        } catch (error) {
+          console.error('❌ Erro ao carregar votos guest:', error);
+          setVotes({});
+        }
+      } else {
+        console.log('📭 Nenhum voto guest encontrado');
+        setVotes({});
+      }
+      setUserVotesLoaded(true);
+      setIsGuestMode(true);
     }
   }, [user]);
 
+  // Efeito adicional para garantir carregamento inicial correto
+  useEffect(() => {
+    // Se não há usuário e ainda não carregamos os votos, tentar carregar do localStorage
+    if (!user && !userVotesLoaded) {
+      console.log('🔄 Carregamento inicial - verificando localStorage...');
+      const guestVotes = localStorage.getItem('jogodoano_guest_votes');
+      if (guestVotes) {
+        try {
+          const parsedVotes = JSON.parse(guestVotes);
+          console.log('✅ Votos guest carregados no carregamento inicial:', parsedVotes);
+          setVotes(parsedVotes);
+        } catch (error) {
+          console.error('❌ Erro no carregamento inicial:', error);
+        }
+      }
+      setUserVotesLoaded(true);
+      setIsGuestMode(true);
+    }
+  }, [user, userVotesLoaded]);
+
   // Função para registrar um voto
   const handleVote = useCallback((editionId: string, categoryId: string, gameId: string) => {
+    console.log(`🗳️ Registrando voto: ${editionId}/${categoryId}/${gameId} (Guest: ${isGuestMode})`);
+    
     setVotes((prev) => {
       // Verificar se o voto está mudando
       const currentVote = prev[editionId]?.[categoryId];
       if (currentVote === gameId) {
         // Se o voto é o mesmo, não faz nada para evitar atualizações desnecessárias
+        console.log('🔄 Voto igual ao atual, ignorando');
         return prev;
       }
       
       // Se o voto é diferente, atualiza o estado
-      return {
+      const newVotes = {
         ...prev,
         [editionId]: {
           ...(prev[editionId] || {}),
           [categoryId]: gameId,
         },
       };
+
+      console.log('📝 Novos votos:', newVotes);
+
+      // Se estiver em modo guest, salva no localStorage
+      if (isGuestMode) {
+        localStorage.setItem('jogodoano_guest_votes', JSON.stringify(newVotes));
+        console.log('💾 Votos salvos no localStorage');
+      }
+
+      return newVotes;
     });
-  }, []);
+  }, [isGuestMode]);
 
   // Verificar se todas as categorias foram votadas
   const areAllCategoriesVoted = useCallback((editionId: string, categories: { id: string }[]) => {
@@ -104,11 +160,9 @@ export function useVotes({ user, editions }: UseVotesProps): UseVotesReturn {
       return false;
     }
 
-    if (!user || !user.email) {
-      toast.error("Login necessário", {
-        description: "Você precisa estar logado para votar.",
-      });
-      return false;
+    // Se estiver em modo guest, retorna false para mostrar modal de login
+    if (isGuestMode || !user || !user.email) {
+      return false; // Isso vai acionar o modal de login
     }
 
     setIsSubmitting(true);
@@ -125,6 +179,9 @@ export function useVotes({ user, editions }: UseVotesProps): UseVotesReturn {
 
       await updateUserVotes(user.email, updatedVotes, dbFirestore);
 
+      // Limpar votos guest do localStorage após sucesso
+      localStorage.removeItem('jogodoano_guest_votes');
+
       setHasVoted(true);
       setVotedEditionId(editionId);
       toast.success("Votação enviada com sucesso!", {
@@ -140,13 +197,14 @@ export function useVotes({ user, editions }: UseVotesProps): UseVotesReturn {
     } finally {
       setIsSubmitting(false);
     }
-  }, [votes, editions, user, areAllCategoriesVoted]);
+  }, [votes, editions, user, areAllCategoriesVoted, isGuestMode]);
 
   return {
     votes,
     hasVoted,
     votedEditionId,
     isSubmitting,
+    isGuestMode,
     handleVote,
     handleSubmitVotes,
     setHasVoted,

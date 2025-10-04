@@ -22,7 +22,6 @@ export function useVotingManager({
   userEmail
 }: UseVotingManagerProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [selectedGame, setSelectedGame] = useState<string | null>(null)
   const { setVote, getVotes, clearVotes } = useLocalVotes()
   const { toast } = useToast()
 
@@ -82,16 +81,11 @@ export function useVotingManager({
       return
     }
 
-    if (!userEmail) {
-      toast({
-        title: "Usuário não autenticado",
-        description: "Por favor, faça login para votar",
-        variant: "destructive"
-      })
-      return
-    }
+    // REMOVIDO: Bloqueio de usuários não autenticados
+    // Agora usuários guest podem votar localmente
 
-    setSelectedGame(gameId)
+    // REMOVIDO: setSelectedGame - não é mais necessário
+    // O estado visual é gerenciado diretamente pelos votos salvos
     handleVoteInUI(categoryId, gameId)
   }
 
@@ -105,23 +99,20 @@ export function useVotingManager({
       return
     }
 
-    if (!userEmail) {
-      toast({
-        title: "Usuário não autenticado",
-        description: "Por favor, faça login para enviar seus votos",
-        variant: "destructive"
-      })
-      return
-    }
+    // REMOVIDO: Bloqueio de usuários não autenticados
+    // O handleSubmitVotesInUI agora gerencia o modo guest
 
     setIsSubmitting(true)
     try {
-      await handleSubmitVotesInUI()
-      toast({
-        title: "Votos enviados com sucesso!",
-        description: "Obrigado por participar da votação",
-        variant: "default"
-      })
+      const success = await handleSubmitVotesInUI()
+      if (success) {
+        toast({
+          title: "Votos enviados com sucesso!",
+          description: "Obrigado por participar da votação",
+          variant: "default"
+        })
+      }
+      // Se success for false, o modal de login será mostrado pelo componente pai
     } catch (error) {
       toast({
         title: "Erro ao enviar votos",
@@ -134,15 +125,19 @@ export function useVotingManager({
   }
 
   const loadLocalVotes = () => {
-    const localVotes = localStorage.getItem(`votes_${selectedEditionId}`)
-    if (localVotes) {
+    // Usar a mesma chave que o useVotes.ts para consistência
+    const guestVotes = localStorage.getItem('jogodoano_guest_votes')
+    if (guestVotes) {
       try {
-        const parsedVotes = JSON.parse(localVotes)
-        Object.entries(parsedVotes).forEach(([categoryId, gameId]) => {
-          handleVoteInUI(categoryId, gameId as string)
-        })
+        const parsedVotes = JSON.parse(guestVotes)
+        // Aplicar votos da edição atual se existirem
+        if (parsedVotes[selectedEditionId]) {
+          Object.entries(parsedVotes[selectedEditionId]).forEach(([categoryId, gameId]) => {
+            handleVoteInUI(categoryId, gameId as string)
+          })
+        }
       } catch (error) {
-        console.error('Erro ao carregar votos locais:', error)
+        console.error('Erro ao carregar votos guest:', error)
       }
     }
   }
@@ -155,7 +150,6 @@ export function useVotingManager({
 
   return {
     isSubmitting,
-    selectedGame,
     handleGameSelection,
     handleSubmitVotes,
     loadLocalVotes,

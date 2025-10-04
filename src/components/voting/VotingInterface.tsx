@@ -25,6 +25,7 @@ import { useScrollPosition } from "@/hooks/useScrollPosition"
 import { Header } from "@/components/Header"
 import { useVotingPeriod } from '@/hooks/useVotingPeriod'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { GuestLoginModal } from "@/components/voting/GuestLoginModal"
 
 export function VotingInterface({
   user,
@@ -33,6 +34,7 @@ export function VotingInterface({
   activeCategory,
   votes,
   isSubmitting,
+  isGuestMode,
   getCurrentEditionCategories,
   handleLogin,
   handleLogout,
@@ -48,6 +50,7 @@ export function VotingInterface({
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [selectedGameElementId, setSelectedGameElementId] = useState<string | null>(null)
+  const [showGuestLoginModal, setShowGuestLoginModal] = useState(false)
   const mobileMainContainerRef = useRef<HTMLDivElement>(null)
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({})
   
@@ -86,7 +89,6 @@ export function VotingInterface({
 
   const {
     isSubmitting: isSubmittingVotes,
-    selectedGame,
     handleGameSelection,
     handleSubmitVotes,
     loadLocalVotes,
@@ -99,7 +101,13 @@ export function VotingInterface({
     editions,
     votes,
     handleVoteInUI,
-    handleSubmitVotesInUI,
+    handleSubmitVotesInUI: async () => {
+      const success = await handleSubmitVotesInUI()
+      if (!success && isGuestMode) {
+        setShowGuestLoginModal(true)
+      }
+      return success
+    },
     userEmail: user?.email
   })
 
@@ -114,10 +122,12 @@ export function VotingInterface({
 
   // Atualiza o jogo selecionado quando a categoria muda
   useEffect(() => {
-    if (selectedGame) {
-      updateSelectedGameRef(localActiveCategory, selectedGame)
+    // Usar o voto salvo da categoria atual em vez do selectedGame local
+    const currentVote = votes[selectedEditionId]?.[localActiveCategory]
+    if (currentVote) {
+      updateSelectedGameRef(localActiveCategory, currentVote)
     }
-  }, [localActiveCategory, selectedGame])
+  }, [localActiveCategory, votes, selectedEditionId])
 
   // Atualiza o localActiveCategory quando a edição muda
   useEffect(() => {
@@ -616,6 +626,18 @@ export function VotingInterface({
           </div>
         </main>
         <Footer />
+        
+        {/* Modal de Login para Usuários Guest */}
+        <GuestLoginModal
+          isOpen={showGuestLoginModal}
+          onClose={() => setShowGuestLoginModal(false)}
+          onLogin={() => {
+            setShowGuestLoginModal(false)
+            handleLogin()
+          }}
+          votesCount={Object.keys(votes[selectedEditionId] || {}).length}
+          editionName={editions.find(e => e.id === selectedEditionId)?.name || selectedEditionId}
+        />
       </div>
     </>
   )

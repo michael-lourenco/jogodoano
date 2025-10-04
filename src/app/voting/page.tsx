@@ -27,6 +27,7 @@ function VotingContent() {
     hasVoted,
     votedEditionId,
     isSubmitting,
+    isGuestMode,
     handleVote,
     handleSubmitVotes,
     setHasVoted,
@@ -48,7 +49,15 @@ function VotingContent() {
   }
 
   const handleSubmitVotesInUI = async () => {
-    await handleSubmitVotes(selectedEditionId)
+    const success = await handleSubmitVotes(selectedEditionId)
+    
+    // Se retornou false (modo guest), mostra modal de login
+    if (!success && isGuestMode) {
+      // O modal será mostrado pelo componente VotingInterface
+      return false
+    }
+    
+    return success
   }
 
   const handleBackToVoting = () => {
@@ -64,20 +73,8 @@ function VotingContent() {
     )
   }
 
-  // Se o usuário não estiver logado, exibir o modal de login
-  if (!user) {
-    return (
-      <div className="flex flex-col min-h-screen bg-background text-foreground">
-        <Header />
-        <main className="flex-grow flex flex-col items-center justify-start pt-4 px-4">
-          <div className="w-full max-w-4xl mx-auto">
-            <LoginModal handleLogin={handleLogin} />
-          </div>
-        </main>
-        <Footer />
-      </div>
-    )
-  }
+  // REMOVIDO: Bloqueio de acesso para usuários não logados
+  // Agora usuários guest podem acessar e votar localmente
 
   if (hasVoted) {
     return (
@@ -100,6 +97,7 @@ function VotingContent() {
       activeCategory={activeCategory}
       votes={votes}
       isSubmitting={isSubmitting}
+      isGuestMode={isGuestMode}
       getCurrentEditionCategories={getCurrentEditionCategories}
       handleLogin={handleLogin}
       handleLogout={handleLogout}

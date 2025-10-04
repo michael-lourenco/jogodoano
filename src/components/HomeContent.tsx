@@ -52,13 +52,13 @@ export function HomeContent() {
             </CardHeader>
           </Card>
 
-          {/* Banner de Doação - Reposicionado para melhor visibilidade */}
-          {!isLoadingDonation && donationMeta && (
+
+          {/* {!isLoadingDonation && donationMeta && (
             <DonationBanner
               donationMeta={donationMeta}
               onDonate={() => setIsDonationModalOpen(true)}
             />
-          )}
+          )} */}
 
           <Card className="border border-muted/50 bg-card/50 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
             <CardContent className="pt-8 pb-6 px-6">

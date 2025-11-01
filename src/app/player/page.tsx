@@ -167,14 +167,14 @@ export default function PlayerDashboard() {
                         <Icon name="LuUser" className="w-4 h-4 md:mr-2" />
                         <span className={isMobile ? "hidden" : "inline"}>Perfil</span>
                       </TabsTrigger>
-                      <TabsTrigger value="activity" className="px-2 h-12 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-primary">
+                      {/* <TabsTrigger value="activity" className="px-2 h-12 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-primary">
                         <Icon name="LuHistory" className="w-4 h-4 md:mr-2" />
                         <span className={isMobile ? "hidden" : "inline"}>Atividades</span>
                       </TabsTrigger>
                       <TabsTrigger value="settings" className="px-2 h-12 rounded-none data-[state=active]:bg-background data-[state=active]:border-b-2 data-[state=active]:border-primary">
                         <Icon name="LuSettings" className="w-4 h-4 md:mr-2" />
                         <span className={isMobile ? "hidden" : "inline"}>Preferências</span>
-                      </TabsTrigger>
+                      </TabsTrigger> */}
                     </TabsList>
 
                     <div className="p-4 md:p-6">
@@ -225,7 +225,7 @@ export default function PlayerDashboard() {
                               </Card>
                             </div>
                             
-                            <div className="md:w-2/3">
+                            {/* <div className="md:w-2/3">
                               <h3 className="text-lg md:text-xl font-bold mb-4 flex items-center gap-2 text-primary">
                                 <Icon name="LuBarChart" className="w-5 h-5" />
                                 Estatísticas
@@ -277,7 +277,7 @@ export default function PlayerDashboard() {
                                   </div>
                                 </div>
                               </div>
-                            </div>
+                            </div> */}
                           </div>
                         </motion.div>
                       </TabsContent>

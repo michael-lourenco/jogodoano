@@ -121,7 +121,6 @@ export const UserInfo: React.FC<UserInfoProps> = ({
                 <p>Apoiar via Apoia.se</p>
               </TooltipContent>
             </Tooltip> */}
-            <span>JOGO DO ANO</span>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button

@@ -1,6 +1,7 @@
 import { Game } from "@/types/types";
   
 export const games: Game[] = [
+  { id: "absolum", title: "Absolum", imageUrl: "/absolum.png?height=200&width=350", developer: "DotEmu, Gamera Games" },
   { id: "gtavi", title: "GTA VI", imageUrl: "/gta-vi.jpg?height=200&width=350", developer: "RockStar" },
   { id: "gosthofyotei", title: "Ghost of Yotei", imageUrl: "/ghost-of-yotei.jpg?height=200&width=350", developer: "Sucker Punch Productions" },
   { id: "doomthedarkages", title: "Doom: The Dark Ages", imageUrl: "/doom-dark-ages.jpg?height=200&width=350", developer: "Id Software / Bethesda Softworks" },
@@ -276,7 +277,7 @@ export const games: Game[] = [
   { id: "metal-gear-solid-delta-snake-eater", title: "Metal Gear Solid Delta: Snake Eater", imageUrl: "/metal-gear-solid-delta-snake-eater.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "the-knightling", title: "The Knightling", imageUrl: "/the-knightling.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "shinobi-art-of-vengeance", title: "Shinobi: Art of Vengeance", imageUrl: "/shinobi-art-of-vengeance.jpg?height=200&width=350", developer: "DEVELOPER" },
-  { id: "hell-is-us", title: "Hell is Us", imageUrl: "/hell-is-us.jpg?height=200&width=350", developer: "DEVELOPER" },
+  { id: "hell-is-us", title: "Hell is Us", imageUrl: "/hell-is-us.jpg?height=200&width=350", developer: "Rogue Factor" },
   { id: "deep-rock-galactic-survivor", title: "Deep Rock Galactic: Survivor", imageUrl: "/deep-rock-galactic-survivor.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "marathon", title: "Marathon", imageUrl: "/marathon.jpg?height=200&width=350", developer: "DEVELOPER" },
   { id: "directive-8020", title: "Directive 8020", imageUrl: "/directive-8020.jpg?height=200&width=350", developer: "DEVELOPER" },
@@ -440,5 +441,11 @@ export const games: Game[] = [
   { id: "e-lich-corporate-souls", title: "E-Lich:Corporate Souls", imageUrl: "/e-lich-corporate-souls.jpg?height=200&width=350", developer: "JohnnyR Designs" },
   { id: "no-heroes-here-2", title: "No Heroes Here 2", imageUrl: "/no-heroes-here-2.jpg?height=200&width=350", developer:"Mad Mimic"  },
   { id: "pipistrello-and-the-cursed-yoyo", title: "Pipistrello and the Cursed Yoyo", imageUrl: "/pipistrello-and-the-cursed-yoyo.png?height=200&width=350", developer: "Pocket Trap" },
+  { id: "silksong", title: "Hollow Knight: Silk Song", imageUrl: "/silksong.jpg?height=200&width=350", developer: "Team Cherry" },
+  { id: "the-outer-worlds-2", title: "The Outer Worlds 2", imageUrl: "/the-outer-worlds-2.jpg?height=200&width=350", developer: "Obsidian Entertainment" },
+  { id: "silent-hill-f", title: "Silent Hill F", imageUrl: "/silent-hill-f.jpg?height=200&width=350", developer: "NeoBards Entertainment Limited" },  
+  { id: "ball-x-pit", title: "Ball x Pit", imageUrl: "/ball-x-pit.jpg?height=200&width=350", developer: "Kenny Sun, Kenny Sun and Friends" },  
+  { id: "megabonk", title: "Megabonk", imageUrl: "/megabonk.jpg?height=200&width=350", developer: "vedinad" },  
+  { id: "9-kings", title: "9 Kings", imageUrl: "/9-kings.jpg?height=200&width=350", developer: "Sad Socket" },  
 ]
   

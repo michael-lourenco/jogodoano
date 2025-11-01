@@ -85,7 +85,7 @@ export function Header() {
             </button>
           )}
           
-          <div className={`flex items-center justify-between h-full transition-all duration-300 ${
+          <div className={`grid grid-cols-[auto,1fr,auto] items-center h-full transition-all duration-300 ${
             !isExpanded ? 'opacity-0 pointer-events-none' : 'opacity-100'
           }`}>
             {/* Logo com link para Home */}
@@ -96,12 +96,25 @@ export function Header() {
               </span> */}
             </Link>
 
+            {/* Título centralizado */}
+            <Link
+              href="/"
+              className="justify-self-center inline-flex items-center"
+              aria-label="Ir para a página inicial"
+            >
+              <span className="whitespace-nowrap text-xs sm:text-sm md:text-base font-black uppercase tracking-[0.35em] sm:tracking-[0.45em] md:tracking-[0.55em] text-transparent bg-gradient-to-r from-chart-2 via-primary to-chart-5 bg-clip-text px-4 py-2 rounded-full border border-primary/40 shadow-[0_6px_30px_rgba(59,130,246,0.25)] backdrop-blur-md">
+                JOGO DO ANO
+              </span>
+            </Link>
+
             {/* UserInfo */}
-            <UserInfo 
-              user={user} 
-              handleLogin={handleLoginWithExpand} 
-              handleLogout={handleLogoutWithExpand}
-            />
+            <div className="justify-self-end">
+              <UserInfo 
+                user={user} 
+                handleLogin={handleLoginWithExpand} 
+                handleLogout={handleLogoutWithExpand}
+              />
+            </div>
           </div>
         </nav>
       </header>

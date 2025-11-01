@@ -9,7 +9,7 @@ interface UseVotingManagerProps {
   editions: VotingEdition[]
   votes: Record<string, Record<string, string>>
   handleVoteInUI: (categoryId: string, gameId: string) => void
-  handleSubmitVotesInUI: () => void
+  handleSubmitVotesInUI: () => Promise<boolean>
   userEmail?: string | null
 }
 

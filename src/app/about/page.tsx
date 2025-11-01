@@ -13,6 +13,7 @@ import { Footer } from "@/components/Footer"
 import { Header } from "@/components/Header"
 import { motion } from "framer-motion"
 import { Separator } from "@/components/ui/separator"
+import Image from "next/image"
 
 export default function About() {
   const { user, loading, handleLogin, handleLogout } = useAuth()
@@ -129,17 +130,17 @@ export default function About() {
             transition={{ duration: 0.5 }}
             className="w-full mb-6 text-center"
           >
-            <h1 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-primary to-chart-2 text-transparent bg-clip-text mb-3 md:mb-4">
-              Jogo do Ano
-            </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-4 md:mb-6 max-w-2xl mx-auto px-2">
               Sua voz na celebração dos melhores jogos do ano
             </p>
-            <div className="relative w-full h-[360px] md:h-[600px] overflow-hidden rounded-lg mb-6 md:mb-8">
-              <img
-                src="/banner_min.jpg?height=600&width=800"
-                alt="Jogo do Ano - Votação"
-                className="w-full h-full object-cover rounded-lg"
+            <div className="relative w-full max-w-3xl mx-auto aspect-[4/3] sm:aspect-[16/9] overflow-hidden rounded-lg mb-6 md:mb-8 bg-gradient-to-br from-primary/10 via-background to-chart-2/20 shadow-lg">
+              <Image
+                src="/logo.png"
+                alt="Jogo do Ano"
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-contain p-6 sm:p-8 md:p-10"
               />
             </div>
           </motion.div>

@@ -60,7 +60,7 @@ export const UserInfo: React.FC<UserInfoProps> = ({
       {user ? (
         <>
           {/* Informações do usuário - Desktop */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* <div className="hidden md:flex items-center gap-3">
             <div className="flex items-center gap-2 text-sm">
               <Icon name="PiTarget" className="w-4 h-4 text-success" />
               <span className="font-medium">{user.best_score?.value ?? 0}</span>
@@ -73,10 +73,10 @@ export const UserInfo: React.FC<UserInfoProps> = ({
               <Icon name="PiStar" className="w-4 h-4 text-info" />
               <span className="font-medium">{user.credits?.value ?? 0}</span>
             </div>
-          </div>
+          </div> */}
 
           {/* Informações do usuário - Mobile */}
-          <div className="md:hidden flex items-center gap-1">
+          {/* <div className="md:hidden flex items-center gap-1">
             <div className="flex items-center gap-1 text-xs">
               <Icon name="PiTarget" className="w-3 h-3 text-success" />
               <span className="font-medium">{user.best_score?.value ?? 0}</span>
@@ -85,11 +85,11 @@ export const UserInfo: React.FC<UserInfoProps> = ({
               <Icon name="PiCoin" className="w-3 h-3 text-warning" />
               <span className="font-medium">{user.currency?.value ?? 0}</span>
             </div>
-          </div>
+          </div> */}
 
           {/* Botões de ação */}
           <div className="flex items-center gap-1">
-            <Tooltip>
+            {/* <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   onClick={handleDonation}
@@ -104,9 +104,9 @@ export const UserInfo: React.FC<UserInfoProps> = ({
               <TooltipContent>
                 <p>Apoiar via Apoia.se</p>
               </TooltipContent>
-            </Tooltip>
+            </Tooltip> */}
 
-            <Tooltip>
+            {/* <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   onClick={handleDonation}
@@ -120,8 +120,8 @@ export const UserInfo: React.FC<UserInfoProps> = ({
               <TooltipContent>
                 <p>Apoiar via Apoia.se</p>
               </TooltipContent>
-            </Tooltip>
-
+            </Tooltip> */}
+            <span>JOGO DO ANO</span>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button

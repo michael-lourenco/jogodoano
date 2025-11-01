@@ -1,7 +1,7 @@
 "use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Play, HelpCircle, Heart, Clock, Trophy, Youtube, Instagram, Mail } from "lucide-react"
+import { Play, Clock, Youtube, Instagram, Mail } from "lucide-react"
 import { useNavigation } from "@/hooks/useNavigation"
 import { useAuth } from "@/hooks/useAuth"
 import { Footer } from "@/components/Footer"
@@ -14,6 +14,7 @@ import { DonationBanner } from "@/components/DonationBanner"
 import { DonationModal } from "@/components/DonationModal"
 import { useState } from "react"
 import { useDonation } from "@/hooks/useDonation"
+import Image from "next/image"
 
 export function HomeContent() {
   const navigationService = useNavigation()
@@ -70,29 +71,35 @@ export function HomeContent() {
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Card da Edição 2025 */}
-            <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg hover:shadow-xl transition-all duration-300">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <Clock className="w-6 h-6 text-info" />
-                  <h3 className="text-xl font-semibold">Edição 2025</h3>
+          <div className="flex justify-center">
+            <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg hover:shadow-xl transition-all duration-300 max-w-md w-full">
+              <CardContent className="p-8 flex flex-col items-center gap-6 text-center">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-xl font-semibold">Edição 2025</h3>
+                  </div>
+                  <Image
+                    src="/logo.png"
+                    alt="Jogo do Ano"
+                    width={220}
+                    height={220}
+                    className="w-40 h-40 md:w-48 md:h-48 object-contain drop-shadow-lg"
+                    priority
+                  />
+                  <p className="text-muted-foreground max-w-sm">
+                    Acompanhe a principal votação do ano e escolha os jogos que marcaram 2025.
+                  </p>
                 </div>
                 {isVotingOpen ? (
-                  <div className="space-y-4">
-                    <p className="text-muted-foreground">
-                      A votação está aberta! Escolha seus jogos favoritos de 2025.
-                    </p>
-                    <Button
-                      onClick={handleNavigation("/voting?votingEdition=2025")}
-                      className="w-full bg-gradient-to-r from-chart-2 to-chart-5 hover:from-chart-2 hover:to-chart-4"
-                    >
-                      <Play className="w-4 h-4 mr-2" />
-                      Votar Agora
-                    </Button>
-                  </div>
+                  <Button
+                    onClick={handleNavigation("/voting?votingEdition=2025")}
+                    className="w-full bg-gradient-to-r from-chart-2 to-chart-5 hover:from-chart-2 hover:to-chart-4"
+                  >
+                    <Play className="w-5 h-5 mr-2" />
+                    Votar Agora
+                  </Button>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-4 w-full">
                     <p className="text-muted-foreground">
                       A votação começará em {format(edition2025?.startAt || new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}.
                     </p>
@@ -109,49 +116,27 @@ export function HomeContent() {
                 )}
               </CardContent>
             </Card>
-
-            {/* Card da Edição Todos os Tempos */}
-            <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg hover:shadow-xl transition-all duration-300">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <Trophy className="w-6 h-6 text-warning" />
-                  <h3 className="text-xl font-semibold">Todos os Tempos</h3>
-                </div>
-                <div className="space-y-4">
-                  <p className="text-muted-foreground">
-                    Vote nos melhores jogos de todos os tempos. Esta edição está sempre aberta!
-                  </p>
-                  <Button
-                    onClick={handleNavigation("/voting?votingEdition=all_time")}
-                    className="w-full bg-gradient-to-r from-warning to-warning/80 hover:from-warning/90 hover:to-warning"
-                  >
-                    <Play className="w-4 h-4 mr-2" />
-                    Votar Agora
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Seção de Patrocinadores */}
-          <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg">
+          {/* <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg">
             <CardContent className="p-6">
               <h3 className="text-xl font-semibold mb-4 text-center">Patrocinadores</h3>
               <div className="flex justify-center items-center gap-8">
-                {/* Adicione aqui as logos dos patrocinadores */}
+               
                 <div className="text-muted-foreground text-sm">Em breve</div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Modal de Doação */}
-          <DonationModal
+          {/* <DonationModal
             isOpen={isDonationModalOpen}
             onClose={() => setIsDonationModalOpen(false)}
-          />
+          /> */}
 
           {/* Links Úteis */}
-          <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg">
+          {/* <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg">
             <CardContent className="p-6">
               <h3 className="text-xl font-semibold mb-4 text-center">Links Úteis</h3>
               <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
@@ -172,7 +157,7 @@ export function HomeContent() {
                 </Button>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Redes Sociais */}
           <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg">

@@ -57,9 +57,9 @@ export const VotingCompletePage = ({
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-              <Button onClick={onBackToVoting} variant="outline" className="mt-2">
+              {/* <Button onClick={onBackToVoting} variant="outline" className="mt-2">
                 Votar em outra edição
-              </Button>
+              </Button> */}
 
               <Button
                 onClick={onBackToHome}

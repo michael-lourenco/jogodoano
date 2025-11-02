@@ -26,7 +26,7 @@ export function Header() {
           <div className="grid grid-cols-[auto,1fr,auto] items-center h-full">
             {/* Logo com link para Home */}
             <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <Image src="/logo.png" alt="Jogo do Ano BR" width={48} height={48} className="rounded-md" />
+              <Image src="/logo.png" alt="Jogo do Ano BR" width={48} height={48} className="rounded-md transition-transform duration-300 hover:scale-110" />
               {/* <span className="text-lg font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                 Jogo do Ano BR
               </span> */}

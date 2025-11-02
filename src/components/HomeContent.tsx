@@ -65,16 +65,6 @@ export function HomeContent() {
             />
           )} */}
 
-          <Card className="border border-muted/50 bg-card/50 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardContent className="pt-8 pb-6 px-6">
-              <p className="text-muted-foreground text-lg leading-relaxed">
-                Vote no seu jogo favorito em cada categoria. Você só pode escolher um jogo por categoria. Após
-                selecionar seus favoritos em todas as categorias, clique em "Enviar Votos" para registrar sua
-                participação.
-              </p>
-            </CardContent>
-          </Card>
-
           <div className="flex justify-center">
             <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg hover:shadow-xl transition-all duration-300 max-w-md w-full">
               <CardContent className="p-8 flex flex-col items-center gap-6 text-center">
@@ -121,7 +111,15 @@ export function HomeContent() {
               </CardContent>
             </Card>
           </div>
-
+          <Card className="border border-muted/50 bg-card/50 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="pt-8 pb-6 px-6">
+              <p className="text-muted-foreground text-lg leading-relaxed">
+                Vote no seu jogo favorito em cada categoria. Você só pode escolher um jogo por categoria. Após
+                selecionar seus favoritos em todas as categorias, clique em "Enviar Votos" para registrar sua
+                participação.
+              </p>
+            </CardContent>
+          </Card>
           {/* Seção de Patrocinadores */}
           {/* <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg">
             <CardContent className="p-6">

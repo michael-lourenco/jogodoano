@@ -365,7 +365,7 @@ export function VotingInterface({
               ref={editionsSelectorRef}
               className={`w-full transition-all duration-200 ${
                 isSticky 
-                  ? "fixed top-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm" 
+                  ? "fixed top-16 left-0 right-0 z-30 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm" 
                   : ""
               }`}
             >
@@ -385,8 +385,25 @@ export function VotingInterface({
             {selectedEditionId && editions.length > 0 && (
               <>
                 {isMobile ? (
-                  <div className="md:hidden mb-6 relative" ref={mobileMainContainerRef}>
-                    {/* Category heading and description */}
+                  <>
+                    {/* Category Selector Sticky para Mobile */}
+                    {isSticky && (
+                      <div ref={categoryTabsRef} className="fixed left-0 right-0 z-20 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm md:hidden" style={{ top: `${64 + editionsSelectorHeight.current}px` }}>
+                        <div className="max-w-4xl mx-auto px-4 py-2">
+                          <CategorySelector
+                            categories={getCurrentEditionCategories()}
+                            selectedCategoryId={localActiveCategory}
+                            onCategoryChange={handleCategoryClick}
+                            votes={votes[selectedEditionId] || {}}
+                            isMobile={true}
+                          />
+                        </div>
+                      </div>
+                    )}
+                    {isSticky && <div style={{ height: categoryTabsHeight.current + 16 }}></div>}
+                    
+                    <div className="md:hidden mb-6 relative" ref={mobileMainContainerRef}>
+                      {/* Category heading and description */}
                     <div 
                       className="mb-6 text-center" 
                       id={`category-header-${currentCategory?.id}`}
@@ -508,7 +525,8 @@ export function VotingInterface({
                         </div>
                       </div>
                     </div>
-                  </div>
+                    </div>
+                  </>
                 ) : (
                   // Desktop view with improved accessibility
                   <div className="hidden md:block mb-6">
@@ -518,12 +536,13 @@ export function VotingInterface({
                       className="w-full"
                     >
                       <div
-                        ref={tabsListRef}
+                        ref={categoryTabsRef}
                         className={`w-full ${
                           isSticky
-                            ? "fixed top-0 left-0 right-0 z-10 bg-background px-4 py-2 shadow-md mt-12 max-w-4xl mx-auto"
+                            ? "fixed left-0 right-0 z-10 bg-background px-4 py-2 shadow-md max-w-4xl mx-auto"
                             : ""
                         }`}
+                        style={isSticky ? { top: `${64 + editionsSelectorHeight.current}px` } : undefined}
                       >
                         <CategorySelector
                           categories={getCurrentEditionCategories()

@@ -36,7 +36,8 @@ export function useStickyHeader(): StickyHeaderState {
         }
 
         if (originalTopOffsetValue) {
-          setIsSticky(scrollPosition > originalTopOffsetValue)
+          const isCurrentlySticky = scrollPosition > originalTopOffsetValue
+          setIsSticky(isCurrentlySticky)
         }
       }
     }
@@ -61,6 +62,30 @@ export function useStickyHeader(): StickyHeaderState {
       window.removeEventListener("scroll", handleScroll)
     }
   }, [originalTopOffsetValue])
+
+  // Atualizar alturas quando sticky muda, com delay para garantir que o DOM foi atualizado
+  useEffect(() => {
+    if (!isSticky) return
+
+    const updateHeights = () => {
+      requestAnimationFrame(() => {
+        if (editionsSelectorRef.current) {
+          const height = editionsSelectorRef.current.offsetHeight
+          setEditionsSelectorHeightValue(height)
+        }
+
+        if (categoryTabsRef.current) {
+          const height = categoryTabsRef.current.offsetHeight
+          setCategoryTabsHeightValue(height)
+        }
+      })
+    }
+
+    // Pequeno delay para garantir que o DOM foi atualizado com as classes sticky
+    const timeoutId = setTimeout(updateHeights, 10)
+    
+    return () => clearTimeout(timeoutId)
+  }, [isSticky])
 
   return {
     isSticky,

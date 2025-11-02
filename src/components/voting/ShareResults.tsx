@@ -216,6 +216,71 @@ function ImageShareTab({ votes, editionId, categories, user }: ImageShareTabProp
   const [generatingImage, setGeneratingImage] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
 
+  // Componente interno para o conteúdo das votos
+  const VotesContent = () => (
+    <div className="p-12 h-full flex flex-col">
+      <div className="flex flex-col items-center mb-6">
+        <h1 className="text-6xl font-bold text-success mb-2 flex items-center">
+          <Trophy className="mr-4 h-12 w-12" />
+          Jogo do Ano {editionId}
+        </h1>
+        <p className="text-3xl text-muted-foreground">
+          @{user?.displayName || user?.email?.split("@")[0] || "user"}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 flex-1">
+        {categories &&
+          votes[editionId] &&
+          categories.map((category) => {
+            const gameId = votes[editionId][category.id]
+            const game = gameId ? category.games?.find((g) => g.id === gameId) : null
+
+            if (!game) return null
+
+            return (
+              <div key={category.id} className="border border-muted/20 rounded-lg p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-semibold text-2xl">{category.name}</h3>
+                  <Badge className="status-success text-lg">
+                    meu voto
+                  </Badge>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  {game.imageUrl ? (
+                    <div className="w-24 h-24 relative flex-shrink-0">
+                      <img
+                        src={game.imageUrl || "/placeholder.svg"}
+                        alt={game.title}
+                        className="object-cover w-full h-full rounded-md"
+                        crossOrigin="anonymous"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-24 h-24 flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-secondary to-card rounded-md">
+                      <span className="text-secondary-foreground text-2xl font-medium">{game.title.substring(0, 2)}</span>
+                    </div>
+                  )}
+
+                  <div>
+                    <h4 className="font-bold text-xl">{game.title}</h4>
+                    <p className="text-muted-foreground">{game.developer}</p>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+      </div>
+
+      <div className="flex justify-center items-center">
+        <div className="text-center">
+          <p className="text-muted-foreground text-xl">jogodoano.com.br</p>
+        </div>
+      </div>
+    </div>
+  )
+
   // Função para gerar e baixar a imagem
   const generateImage = async () => {
     if (!resultsRef.current) return
@@ -226,18 +291,14 @@ function ImageShareTab({ votes, editionId, categories, user }: ImageShareTabProp
       // Ensure the element is visible and properly rendered
       const element = resultsRef.current
 
-      // Configure html2canvas with settings that work better for this use case
+      // Configure html2canvas with settings optimized for Instagram Stories
       const canvas = await html2canvas(element, {
-        scale: 2, // Higher scale for better quality
+        scale: 2,
         backgroundColor: "#ffffff",
-        logging: true, // Enable logging for debugging
-        useCORS: true, // Enable CORS for images
+        logging: false,
+        useCORS: true,
         allowTaint: true,
-        // Don't use foreign objects which can cause issues
         foreignObjectRendering: false,
-        // Ensure we capture the full element
-        width: element.offsetWidth,
-        height: element.offsetHeight,
       })
 
       // Convert to image
@@ -290,6 +351,16 @@ function ImageShareTab({ votes, editionId, categories, user }: ImageShareTabProp
 
   return (
     <div className="space-y-4">
+      {/* Elemento off-screen para captura em tamanho real */}
+      <div className="fixed -left-[9999px] -top-[9999px] pointer-events-none opacity-0" style={{ width: '1080px', height: '1920px' }}>
+        <div 
+          ref={resultsRef}
+          className="w-[1080px] h-[1920px] bg-background"
+        >
+          <VotesContent />
+        </div>
+      </div>
+
       {/* Botão para gerar imagem */}
       <Button
         onClick={generateImage}
@@ -311,71 +382,15 @@ function ImageShareTab({ votes, editionId, categories, user }: ImageShareTabProp
 
       <div className="border rounded-md p-3">
         <p className="text-sm font-medium mb-2">Prévia:</p>
-        <ScrollArea className="h-48">
-          {/* Remove the scaling wrapper and make the preview directly visible */}
-          <div
-            ref={resultsRef}
-            className="w-full max-w-[600px] mx-auto p-6 bg-background text-foreground border border-muted/20 rounded-lg"
-          >
-            <div className="flex flex-col space-y-4">
-              <div className="flex flex-col items-center mb-4">
-                <h1 className="text-xl font-bold text-success mb-1 flex items-center">
-                  <Trophy className="mr-2 h-5 w-5" />
-                  Jogo do Ano {editionId}
-                </h1>
-                <p className="text-xs text-muted-foreground">
-                  @{user?.displayName || user?.email?.split("@")[0] || "user"}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-3">
-                {categories &&
-                  votes[editionId] &&
-                  categories.map((category) => {
-                    const gameId = votes[editionId][category.id]
-                    const game = gameId ? category.games?.find((g) => g.id === gameId) : null
-
-                    if (!game) return null
-
-                    return (
-                      <div key={category.id} className="border border-muted/20 rounded-lg p-3">
-                        <div className="flex justify-between items-center">
-                          <h3 className="font-semibold text-sm">{category.name}</h3>
-                          <Badge className="status-success text-xs">
-                            meu voto
-                          </Badge>
-                        </div>
-
-                        <div className="flex items-center mt-2 space-x-3">
-                          {game.imageUrl ? (
-                            <div className="w-12 h-12 relative flex-shrink-0">
-                              <img
-                                src={game.imageUrl || "/placeholder.svg"}
-                                alt={game.title}
-                                className="object-cover w-full h-full rounded-md"
-                                crossOrigin="anonymous"
-                              />
-                            </div>
-                          ) : (
-                            <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-secondary to-card rounded-md">
-                              <span className="text-secondary-foreground text-xs font-medium">{game.title.substring(0, 2)}</span>
-                            </div>
-                          )}
-
-                          <div>
-                            <h4 className="font-bold text-sm">{game.title}</h4>
-                            <p className="text-xs text-muted-foreground">{game.developer}</p>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-              </div>
-
-              <div className="flex justify-center items-center pt-2">
-                <div className="text-center">
-                  <p className="text-muted-foreground text-xs">jogodoano.com.br</p>
-                </div>
+        <ScrollArea className="h-64">
+          {/* Instagram Stories format: 9:16 aspect ratio */}
+          <div className="flex justify-center">
+            <div className="relative overflow-hidden border border-muted/20 rounded" style={{ width: '120px', height: '213px' }}>
+              <div 
+                className="absolute origin-top-left scale-[0.111111] top-0 left-0 bg-background"
+                style={{ width: '1080px', height: '1920px' }}
+              >
+                <VotesContent />
               </div>
             </div>
           </div>

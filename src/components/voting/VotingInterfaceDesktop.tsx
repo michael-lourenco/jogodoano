@@ -193,7 +193,7 @@ export function VotingInterfaceDesktop({
           isSticky && "fixed top-16 left-0 right-0 z-30 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm"
         )}
       >
-        <div className={cn(isSticky && "max-w-4xl mx-auto px-4 py-3")}>
+        <div className={cn("max-w-4xl mx-auto px-4", isSticky ? "py-3" : "py-3 mb-0")}>
           <EditionsSelector
             editions={editions}
             selectedEditionId={selectedEditionId}
@@ -219,11 +219,13 @@ export function VotingInterfaceDesktop({
               ref={categoryTabsRef}
               className={cn(
                 "w-full transition-all duration-200",
-                isSticky && "fixed left-0 right-0 z-20 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm"
+                isSticky 
+                  ? "fixed left-0 right-0 z-20 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm" 
+                  : "mb-4"
               )}
               style={isSticky ? { top: `${categorySelectorTop}px` } : undefined}
             >
-              <div className={cn("max-w-4xl mx-auto px-4", isSticky ? "py-2" : "py-0")}>
+              <div className={cn("max-w-4xl mx-auto px-4", isSticky ? "py-2" : "py-2")}>
                 <CategorySelector
                   categories={getCurrentEditionCategories()
                     .slice()

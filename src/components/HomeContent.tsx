@@ -42,16 +42,20 @@ export function HomeContent() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <Header />
-      <main className="flex-grow flex flex-col items-center justify-start pt-8 px-4">
+      <main className="flex-grow flex flex-col items-center justify-start pt-2 px-4">
         <div className="max-w-4xl w-full mx-auto space-y-6">
-          <Card className="bg-card/50 backdrop-blur-sm border-none shadow-none relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-chart-2/10 to-chart-5/10 animate-gradient" />
-            <CardHeader className="space-y-2 relative">
-              <CardTitle className="text-5xl font-bold text-center bg-gradient-to-r from-chart-2 to-chart-5 text-transparent bg-clip-text animate-gradient">
-                JOGO DO ANO
-              </CardTitle>
-            </CardHeader>
-          </Card>
+          <div className="w-full flex justify-center">
+            <div className="w-full max-w-4xl relative aspect-[1707/282]">
+              <Image
+                src="/channels4_banner.jpg"
+                alt="JOGO DO ANO"
+                fill
+                className="object-contain"
+                priority
+                sizes="(max-width: 768px) 100vw, 896px"
+              />
+            </div>
+          </div>
 
 
           {/* {!isLoadingDonation && donationMeta && (

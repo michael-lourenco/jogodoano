@@ -43,18 +43,18 @@ export function ShareResultsDialog({ votes, editionId, categories, user }: Share
           <DialogDescription>Escolha como deseja compartilhar seus resultados</DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="social" className="mt-4">
+        <Tabs defaultValue="image" className="mt-4">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="social">Redes Sociais</TabsTrigger>
             <TabsTrigger value="image">Imagem</TabsTrigger>
+            <TabsTrigger value="social">Redes Sociais</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="social" className="mt-4">
-            <SocialShareTab votes={votes} editionId={editionId} categories={categories} />
-          </TabsContent>
 
           <TabsContent value="image" className="mt-4">
             <ImageShareTab votes={votes} editionId={editionId} categories={categories} user={user} />
+          </TabsContent>
+
+          <TabsContent value="social" className="mt-4">
+            <SocialShareTab votes={votes} editionId={editionId} categories={categories} />
           </TabsContent>
         </Tabs>
       </DialogContent>

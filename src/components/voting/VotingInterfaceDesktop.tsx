@@ -1,19 +1,13 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent } from "@/components/ui/tabs"
-import { CheckCircle2, Clock, AlertCircle } from "lucide-react"
+import { CheckCircle2, Clock, AlertCircle, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react"
 import { CategorySection } from "@/components/voting/CategorySection"
-import { EditionsSelector } from "@/components/voting/EditionsSelector"
 import { VotingProgress } from "@/components/voting/VotingProgress"
 import { useCategoryNavigation } from "@/hooks/useCategoryNavigation"
-import { useStickyHeader } from "@/hooks/useStickyHeader"
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useCallback } from "react"
 import type { VotingInterfaceProps } from "@/types/voting/interfaces"
-import { CategorySelector } from "@/components/voting/CategorySelector"
-import { CategoryStepper } from "@/components/voting/CategoryStepper"
 import { cn } from "@/lib/utils"
 import { useVotingManager } from "@/hooks/useVotingManager"
-import { useVotingPeriod } from '@/hooks/useVotingPeriod'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { GuestLoginModal } from "@/components/voting/GuestLoginModal"
 
@@ -53,9 +47,6 @@ export function VotingInterfaceDesktop({
     containerRef: { current: null }
   })
 
-  const { isSticky, editionsSelectorRef, editionsSelectorHeight, categoryTabsRef, categoryTabsHeight } =
-    useStickyHeader()
-
   const categories = getCurrentEditionCategories()
 
   const {
@@ -83,7 +74,6 @@ export function VotingInterfaceDesktop({
   })
 
   const currentEdition = editions.find(edition => edition.id === selectedEditionId)
-  const votingPeriod = useVotingPeriod(currentEdition!)
 
   // Carregar votos locais ao entrar na edição
   useEffect(() => {
@@ -97,85 +87,41 @@ export function VotingInterfaceDesktop({
     if (currentIndex < categories.length - 1) {
       const nextCategory = categories[currentIndex + 1]
       handleCategoryClick(nextCategory.id)
+      // Scroll suave para o topo
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }, [getCurrentEditionCategories, localActiveCategory, handleCategoryClick])
 
-  // Estado para recalcular posição quando alturas mudarem
-  const [categorySelectorTop, setCategorySelectorTop] = useState(0)
-
-  // Função para atualizar posição do CategorySelector
-  const updateCategorySelectorPosition = useCallback(() => {
-    if (!isSticky) {
-      setCategorySelectorTop(0)
-      return
+  const navigateToPreviousCategory = useCallback(() => {
+    const categories = getCurrentEditionCategories()
+    const currentIndex = categories.findIndex(cat => cat.id === localActiveCategory)
+    
+    if (currentIndex > 0) {
+      const previousCategory = categories[currentIndex - 1]
+      handleCategoryClick(previousCategory.id)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
+  }, [getCurrentEditionCategories, localActiveCategory, handleCategoryClick])
 
-    requestAnimationFrame(() => {
-      let editionsHeight = editionsSelectorHeight.current
-      
-      // Atualizar altura do EditionsSelector quando sticky
-      if (editionsSelectorRef.current) {
-        editionsHeight = editionsSelectorRef.current.offsetHeight
-        editionsSelectorHeight.current = editionsHeight
-      }
-      
-      // Atualizar altura do CategorySelector quando sticky
-      if (categoryTabsRef.current) {
-        const height = categoryTabsRef.current.offsetHeight
-        categoryTabsHeight.current = height
-      }
-      
-      // Recalcular posição do CategorySelector: Header (64px) + altura do EditionsSelector
-      setCategorySelectorTop(64 + editionsHeight)
-    })
-  }, [isSticky, editionsSelectorRef, editionsSelectorHeight, categoryTabsRef, categoryTabsHeight])
-
-  // Atualizar posição quando sticky muda
-  useEffect(() => {
-    updateCategorySelectorPosition()
-  }, [updateCategorySelectorPosition])
-
-  // ResizeObserver para atualizar quando as alturas mudarem
-  useEffect(() => {
-    if (!isSticky) return
-
-    const resizeObserver = new ResizeObserver(() => {
-      updateCategorySelectorPosition()
-    })
-
-    if (editionsSelectorRef.current) {
-      resizeObserver.observe(editionsSelectorRef.current)
-    }
-
-    if (categoryTabsRef.current) {
-      resizeObserver.observe(categoryTabsRef.current)
-    }
-
-    return () => {
-      resizeObserver.disconnect()
-    }
-  }, [isSticky, updateCategorySelectorPosition])
+  const currentCategoryIndex = categories.findIndex(cat => cat.id === localActiveCategory)
+  const currentCategory = categories[currentCategoryIndex]
 
   return (
     <>
-      {/* Alerta de Status da Votação */}
-      {currentEdition && (
-        <div className="mb-6">
+      {/* Alerta de Status da Votação - Simplificado */}
+      {currentEdition && votingStatus !== 'active' && (
+        <div className="mb-4">
           <Alert className={cn(
             "mb-4",
             votingStatus === 'upcoming' 
               ? 'bg-info/10 border-info/20 text-info' 
-              : votingStatus === 'ended'
-              ? 'bg-destructive/10 border-destructive/20 text-destructive'
-              : 'bg-success/10 border-success/20 text-success'
+              : 'bg-destructive/10 border-destructive/20 text-destructive'
           )}>
             <div className="flex items-center gap-2">
               {votingStatus === 'upcoming' ? (
                 <Clock className="h-4 w-4 text-info" />
-              ) : votingStatus === 'ended' ? (
-                <AlertCircle className="h-4 w-4 text-destructive" />
               ) : (
-                <CheckCircle2 className="h-4 w-4 text-success" />
+                <AlertCircle className="h-4 w-4 text-destructive" />
               )}
               <AlertDescription className="text-sm font-medium">
                 {votingMessage}
@@ -185,146 +131,121 @@ export function VotingInterfaceDesktop({
         </div>
       )}
 
-      {/* EditionsSelector com sticky */}
-      <div
-        ref={editionsSelectorRef}
-        className={cn(
-          "w-full transition-all duration-200",
-          isSticky && "fixed top-16 left-0 right-0 z-30 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm"
-        )}
-      >
-        <div className={cn("max-w-4xl mx-auto px-4", isSticky ? "py-3" : "py-3 mb-0")}>
-          <EditionsSelector
-            editions={editions}
-            selectedEditionId={selectedEditionId}
-            votes={votes}
-            getCurrentEditionCategories={getCurrentEditionCategories}
-            onEditionChange={handleEditionChange}
-          />
-        </div>
-      </div>
-
-      {/* Espaçador para quando EditionsSelector fica sticky */}
-      {isSticky && <div style={{ height: editionsSelectorHeight.current }}></div>}
-
-      {selectedEditionId && editions.length > 0 && (
-        <div className="hidden md:block mb-6">
-          <Tabs 
-            value={localActiveCategory} 
-            onValueChange={(newValue) => handleCategoryClick(newValue)} 
-            className="w-full"
-          >
-            {/* CategorySelector com sticky */}
-            <div
-              ref={categoryTabsRef}
-              className={cn(
-                "w-full transition-all duration-200",
-                isSticky 
-                  ? "fixed left-0 right-0 z-20 bg-background/95 backdrop-blur-sm border-b border-muted shadow-sm" 
-                  : "mb-4"
-              )}
-              style={isSticky ? { top: `${categorySelectorTop}px` } : undefined}
-            >
-              <div className={cn("max-w-4xl mx-auto px-4", isSticky ? "py-2" : "py-2")}>
-                <CategorySelector
-                  categories={getCurrentEditionCategories()
-                    .slice()
-                    .sort((a, b) => {
-                      const hasVoteA = Boolean(votes[selectedEditionId]?.[a.id])
-                      const hasVoteB = Boolean(votes[selectedEditionId]?.[b.id])
-                      if (hasVoteA === hasVoteB) {
-                        return 0
-                      }
-                      return hasVoteA ? 1 : -1
-                    })}
-                  selectedCategoryId={localActiveCategory}
-                  votes={votes[selectedEditionId] || {}}
-                  onCategoryChange={handleCategoryClick}
-                  isMobile={false}
-                />
-              </div>
+      {selectedEditionId && currentCategory && (
+        <div className="w-full space-y-6">
+          {/* Cabeçalho Simplificado */}
+          <div className="text-center space-y-2">
+            <div className="text-sm text-muted-foreground">
+              Categoria {currentCategoryIndex + 1} de {categories.length}
             </div>
+            <h1 className="text-3xl font-bold text-primary">{currentCategory.name}</h1>
+            <p className="text-muted-foreground max-w-2xl mx-auto">{currentCategory.description}</p>
+          </div>
 
-            {/* Espaçador para quando CategorySelector fica sticky */}
-            {isSticky && <div style={{ height: categoryTabsHeight.current }}></div>}
+          {/* Barra de Progresso */}
+          <div className="w-full">
+            <VotingProgress
+              categories={categories}
+              votes={votes[selectedEditionId] || {}}
+              editionId={selectedEditionId}
+            />
+            <div className="text-center text-xs text-muted-foreground mt-2">
+              {Object.keys(votes[selectedEditionId] || {}).length} de {categories.length} categorias votadas
+            </div>
+          </div>
 
-            {getCurrentEditionCategories().map((category) => (
-              <TabsContent
-                key={category.id}
-                value={category.id}
-                className="mt-4"
-                role="tabpanel"
-                aria-labelledby={`tab-${category.id}`}
+          {/* Cards de Jogos */}
+          <CategorySection
+            category={currentCategory}
+            selectedGameId={votes[selectedEditionId]?.[currentCategory.id]}
+            onVote={(gameId) => handleGameSelection(currentCategory.id, gameId)}
+            disabled={!canVote}
+          />
+
+          {/* Navegação Simplificada */}
+          <div className="flex items-center justify-between gap-4 pt-4">
+            <Button
+              variant="outline"
+              onClick={navigateToPreviousCategory}
+              disabled={currentCategoryIndex === 0}
+              className="flex items-center gap-2"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Anterior</span>
+            </Button>
+
+            {isAllCategoriesVoted(categories) ? (
+              <Button
+                onClick={handleSubmitVotes}
+                disabled={isSubmittingVotes || !canVote}
+                className="flex-1 h-12 text-lg font-semibold text-primary-foreground bg-gradient-to-r from-chart-1 to-success hover:from-chart-1 hover:to-success-foreground shadow-lg hover:shadow-success/25 transition-all duration-300"
+                aria-live="polite"
               >
-                <div 
-                  className="mb-3 text-center" 
-                  id={`category-header-${category.id}`}
-                  style={{
-                    scrollMarginTop: isSticky ? `${64 + editionsSelectorHeight.current + categoryTabsHeight.current + 16}px` : '80px'
-                  }}
-                >
-                  <h2 className="text-xl font-bold text-primary mb-1">{category.name}</h2>
-                  <p className="text-sm text-muted-foreground">{category.description}</p>
-                </div>
-                <CategorySection
-                  category={category}
-                  selectedGameId={votes[selectedEditionId]?.[category.id]}
-                  onVote={(gameId) => handleGameSelection(category.id, gameId)}
-                  disabled={!canVote}
-                />
-
-                {/* Botões de navegação - Desktop */}
-                <div className="mt-6 px-4 pb-4 flex flex-col gap-4">
-                  <VotingProgress
-                    categories={categories}
-                    votes={votes[selectedEditionId] || {}}
-                    editionId={selectedEditionId}
-                  />
-                  <CategoryStepper
-                    categories={categories}
-                    currentCategoryId={localActiveCategory}
-                    onStepClick={handleCategoryClick}
-                    votes={votes[selectedEditionId] || {}}
-                  />
-                  <div className="flex items-center justify-between gap-2">
-                    {isAllCategoriesVoted(categories) ? (
-                      <Button
-                        onClick={handleSubmitVotes}
-                        disabled={isSubmittingVotes || !canVote}
-                        className="flex-1 h-10 text-primary-foreground bg-gradient-to-r from-chart-1 to-success hover:from-chart-1 hover:to-success-foreground shadow-lg hover:shadow-success/25 hover:text-secondary-foreground transition-all duration-300"
-                        aria-live="polite"
-                      >
-                        {isSubmittingVotes ? (
-                          <div className="flex items-center justify-center">
-                            <div
-                              className="w-5 h-5 border-2 border-t-transparent border-primary-foreground rounded-full animate-spin mr-2"
-                              aria-hidden="true"
-                            ></div>
-                            <span className="text-sm">Processando...</span>
-                          </div>
-                        ) : (
-                          <span className="text-sm">Enviar Votos</span>
-                        )}
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={navigateToNextCategory}
-                        disabled={!votes[selectedEditionId]?.[category.id] || !canVote}
-                        className={cn(
-                          "flex-1 h-10 transition-all duration-300",
-                          votes[selectedEditionId]?.[category.id] && canVote
-                            ? "text-primary-foreground bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-primary/25"
-                            : "text-muted-foreground bg-muted/50 cursor-not-allowed"
-                        )}
-                      >
-                        <span className="text-sm">Vote & Continue</span>
-                      </Button>
-                    )}
+                {isSubmittingVotes ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div
+                      className="w-5 h-5 border-2 border-t-transparent border-primary-foreground rounded-full animate-spin"
+                      aria-hidden="true"
+                    ></div>
+                    <span>Processando...</span>
                   </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2">
+                    <span>Enviar Votos</span>
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                )}
+              </Button>
+            ) : (
+              <Button
+                onClick={navigateToNextCategory}
+                disabled={!votes[selectedEditionId]?.[currentCategory.id] || !canVote || currentCategoryIndex === categories.length - 1}
+                className={cn(
+                  "flex-1 h-12 text-lg font-semibold transition-all duration-300",
+                  votes[selectedEditionId]?.[currentCategory.id] && canVote && currentCategoryIndex < categories.length - 1
+                    ? "text-primary-foreground bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-primary/25"
+                    : "text-muted-foreground bg-muted/50 cursor-not-allowed"
+                )}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <span>Próxima Categoria</span>
+                  <ArrowRight className="h-5 w-5" />
                 </div>
-              </TabsContent>
+              </Button>
+            )}
+
+            <Button
+              variant="outline"
+              onClick={navigateToNextCategory}
+              disabled={currentCategoryIndex === categories.length - 1 || !votes[selectedEditionId]?.[currentCategory.id]}
+              className="flex items-center gap-2"
+            >
+              <span className="hidden sm:inline">Próxima</span>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Indicador de Categorias */}
+          <div className="flex items-center justify-center gap-2 pt-4">
+            {categories.map((category, index) => (
+              <button
+                key={category.id}
+                onClick={() => {
+                  handleCategoryClick(category.id)
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }}
+                className={cn(
+                  "w-2 h-2 rounded-full transition-all duration-200",
+                  category.id === localActiveCategory
+                    ? "w-8 bg-primary"
+                    : votes[selectedEditionId]?.[category.id]
+                    ? "bg-success"
+                    : "bg-muted"
+                )}
+                aria-label={`Categoria ${index + 1}: ${category.name}`}
+              />
             ))}
-          </Tabs>
+          </div>
         </div>
       )}
 

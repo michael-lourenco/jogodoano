@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from "./providers";
 import { AuthProvider } from "./auth-provider";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 import CookieConsent from "@/components/CookieConsent";
 
 const geistSans = localFont({
@@ -42,21 +42,11 @@ export default function RootLayout({
             <Toaster
               richColors
               position="top-right"
-              theme="dark"
               className="font-sans"
               toastOptions={{
                 style: {
                   borderRadius: 'var(--radius)',
                   fontFamily: 'var(--font-geist-sans)',
-                  background: 'hsl(var(--background))',
-                  color: 'hsl(var(--foreground))',
-                  border: '1px solid hsl(var(--border))',
-                },
-                classNames: {
-                  toast: "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
-                  description: "group-[.toast]:text-muted-foreground",
-                  actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-                  cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
                 },
               }}
             />

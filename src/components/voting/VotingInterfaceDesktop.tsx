@@ -142,14 +142,40 @@ export function VotingInterfaceDesktop({
             <p className="text-muted-foreground max-w-2xl mx-auto">{currentCategory.description}</p>
           </div>
 
-          {/* Barra de Progresso */}
+          {/* Barra de Progresso com Navegação */}
           <div className="w-full">
-            <VotingProgress
-              categories={categories}
-              votes={votes[selectedEditionId] || {}}
-              editionId={selectedEditionId}
-            />
-            <div className="text-center text-xs text-muted-foreground mt-2">
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={navigateToPreviousCategory}
+                disabled={currentCategoryIndex === 0}
+                className="flex items-center gap-1"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span className="hidden sm:inline">Anterior</span>
+              </Button>
+              
+              <div className="flex-1">
+                <VotingProgress
+                  categories={categories}
+                  votes={votes[selectedEditionId] || {}}
+                  editionId={selectedEditionId}
+                />
+              </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={navigateToNextCategory}
+                disabled={currentCategoryIndex === categories.length - 1 || !votes[selectedEditionId]?.[currentCategory.id]}
+                className="flex items-center gap-1"
+              >
+                <span className="hidden sm:inline">Próxima</span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="text-center text-xs text-muted-foreground">
               {Object.keys(votes[selectedEditionId] || {}).length} de {categories.length} categorias votadas
             </div>
           </div>

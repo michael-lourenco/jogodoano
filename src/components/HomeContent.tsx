@@ -66,60 +66,25 @@ export function HomeContent() {
           )} */}
 
           <div className="flex justify-center">
-            <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg hover:shadow-xl transition-all duration-300 max-w-md w-full">
+            <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg hover:shadow-xl transition-all duration-300 max-w-2xl w-full">
               <CardContent className="p-8 flex flex-col items-center gap-6 text-center">
-                <div className="flex flex-col items-center gap-4">
-                  <div className="flex items-center gap-3">
-                    <h3 className="text-xl font-semibold">Edição 2025</h3>
+                <div className="flex flex-col items-center gap-4 w-full">
+                  <h3 className="text-2xl font-semibold">Vencedor da Edição 2025</h3>
+                  <div className="w-full relative aspect-[1024/576] rounded-lg overflow-hidden border border-muted/50">
+                    <Image
+                      src="/expedition-33.jpg"
+                      alt="Clair Obscur: Expedition 33"
+                      fill
+                      className="object-cover"
+                      priority
+                      sizes="(max-width: 768px) 100vw, 896px"
+                    />
                   </div>
-                  <Image
-                    src="/logo.png"
-                    alt="Jogo do Ano"
-                    width={220}
-                    height={220}
-                    className="w-40 h-40 md:w-48 md:h-48 object-contain drop-shadow-lg"
-                    priority
-                  />
-                  <p className="text-muted-foreground max-w-sm">
-                    Acompanhe a principal votação do ano e escolha os jogos que marcaram 2025.
-                  </p>
+                  <h4 className="text-xl font-bold text-primary">Clair Obscur: Expedition 33</h4>
                 </div>
-                {isVotingOpen ? (
-                  <Button
-                    onClick={handleNavigation("/voting?votingEdition=2025")}
-                    className="w-full bg-gradient-to-r from-chart-2 to-chart-5 hover:from-chart-2 hover:to-chart-4"
-                  >
-                    <Play className="w-5 h-5 mr-2" />
-                    Votar Agora
-                  </Button>
-                ) : (
-                  <div className="space-y-4 w-full">
-                    <p className="text-muted-foreground">
-                      A votação começará em {format(edition2025?.startAt || new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}.
-                    </p>
-                    <CountdownTimer targetDate={edition2025?.startAt || new Date()} />
-                    <Button
-                      variant="outline"
-                      className="w-full border-muted-foreground/50 text-muted-foreground"
-                      disabled
-                    >
-                      <Clock className="w-4 h-4 mr-2" />
-                      Em Breve
-                    </Button>
-                  </div>
-                )}
               </CardContent>
             </Card>
           </div>
-          <Card className="border border-muted/50 bg-card/50 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardContent className="pt-8 pb-6 px-6">
-              <p className="text-muted-foreground text-lg leading-relaxed">
-                Vote no seu jogo favorito em cada categoria. Você só pode escolher um jogo por categoria. Após
-                selecionar seus favoritos em todas as categorias, clique em "Enviar Votos" para registrar sua
-                participação.
-              </p>
-            </CardContent>
-          </Card>
           {/* Seção de Patrocinadores */}
           {/* <Card className="bg-card/50 backdrop-blur-sm border border-muted/50 shadow-lg">
             <CardContent className="p-6">

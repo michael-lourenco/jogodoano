@@ -33,7 +33,23 @@ export function useVotes({ user, editions }: UseVotesProps): UseVotesReturn {
 
   // Carregar votos do usuário quando disponíveis ou votos guest do localStorage
   useEffect(() => {
-    if (user && user.votes) {
+    if (user) {
+      setIsGuestMode(false);
+
+      if (!user.votes) {
+        const guestVotes = localStorage.getItem("jogodoano_guest_votes");
+        if (guestVotes) {
+          try {
+            setVotes(JSON.parse(guestVotes));
+          } catch (error) {
+            console.error("Erro ao carregar votos salvos:", error);
+            setVotes({});
+          }
+        }
+        setUserVotesLoaded(true);
+        return;
+      }
+
       // Usuário logado - carregar votos do Firebase
       console.log('🔄 Carregando votos do usuário logado:', user.votes);
       const votesData = user.votes;
@@ -122,12 +138,7 @@ export function useVotes({ user, editions }: UseVotesProps): UseVotesReturn {
       };
 
       console.log('📝 Novos votos:', newVotes);
-
-      // Se estiver em modo guest, salva no localStorage
-      if (isGuestMode) {
-        localStorage.setItem('jogodoano_guest_votes', JSON.stringify(newVotes));
-        console.log('💾 Votos salvos no localStorage');
-      }
+      localStorage.setItem('jogodoano_guest_votes', JSON.stringify(newVotes));
 
       return newVotes;
     });

@@ -1,7 +1,7 @@
 import {  doc, setDoc, updateDoc, Firestore } from "firebase/firestore";
 import { Session } from "next-auth";
 import { signIn, signOut } from "next-auth/react";
-import { fetchUserData } from "../firebase/FirebaseService";
+import { fetchUserData, USERS_COLLECTION } from "../firebase/FirebaseService";
 import { StoryEntry, Credit } from "@/application/entities/User";
 
 export interface Round {
@@ -99,12 +99,12 @@ async function handleAuthResponse(session: Session | null, db: Firestore): Promi
         match_history: [],
       };
 
-      const userRef = doc(db, process.env.NEXT_PUBLIC_USERS_COLLECTION!, email);
+      const userRef = doc(db, USERS_COLLECTION, email);
       await setDoc(userRef, userData);
     }
 
     if (session.user.image && userData.photoURL !== session.user.image) {
-      const userRef = doc(db, process.env.NEXT_PUBLIC_USERS_COLLECTION!, email);
+      const userRef = doc(db, USERS_COLLECTION, email);
       await updateDoc(userRef, { photoURL: session.user.image });
       userData.photoURL = session.user.image;
     }

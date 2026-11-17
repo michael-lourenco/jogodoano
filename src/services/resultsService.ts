@@ -1,4 +1,4 @@
-import { dbFirestore } from "@/services/FirebaseService"
+import { dbFirestore, USERS_COLLECTION } from "@/services/FirebaseService"
 import { collection, getDocs, type DocumentData } from "firebase/firestore"
 import { votingEditions } from "@/repositories/votingEditions"
 import { games } from "@/repositories/games"
@@ -16,7 +16,7 @@ async function fetchEditionVotes(editionId: string) {
       return []
     }
 
-    const usersRef = collection(dbFirestore, process.env.NEXT_PUBLIC_USERS_COLLECTION!)
+    const usersRef = collection(dbFirestore, USERS_COLLECTION)
     const usersSnapshot = await getDocs(usersRef)
     
     const votes: Array<{

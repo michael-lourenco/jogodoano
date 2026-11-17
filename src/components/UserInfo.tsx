@@ -10,12 +10,14 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 interface UserInfoProps {
   user: UserData | null;
+  status?: "loading" | "authenticated" | "unauthenticated";
   handleLogin: () => void;
   handleLogout: () => void;
 }
 
 export const UserInfo: React.FC<UserInfoProps> = ({
   user,
+  status,
   handleLogin,
   handleLogout,
 }) => {
@@ -40,17 +42,17 @@ export const UserInfo: React.FC<UserInfoProps> = ({
     setTheme(newTheme);
   };
 
-  if (!mounted) {
+  const loggedInName = user?.displayName?.trim() || user?.email || "";
+  const sessionPending = status === "loading" && !user;
+
+  if (!mounted || sessionPending) {
     return (
       <div className="flex items-center gap-2">
-        <Button 
-          onClick={handleLogin} 
-          size="sm"
-          className="bg-primary text-primary-foreground hover:bg-primary/90"
-        >
-          <span className="hidden sm:inline">Entrar</span>
-          <span className="sm:hidden">Login</span>
-        </Button>
+        {loggedInName ? (
+          <span className="max-w-[9rem] truncate text-sm font-medium">{loggedInName}</span>
+        ) : (
+          <div className="h-8 w-20 animate-pulse rounded-md bg-muted" />
+        )}
       </div>
     );
   }
@@ -141,19 +143,23 @@ export const UserInfo: React.FC<UserInfoProps> = ({
               </TooltipContent>
             </Tooltip>
 
+            <span className="max-w-[9rem] truncate text-sm font-medium" title={loggedInName}>
+              {loggedInName}
+            </span>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   onClick={handleLogout}
                   variant="outline"
-                  size="icon"
+                  size="sm"
                   className="border-border/40 hover:bg-muted/50"
                 >
                   <LogOut className="w-3 h-3" />
+                  <span className="hidden sm:inline">Sair</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Sair</p>
+                <p>Sair da conta</p>
               </TooltipContent>
             </Tooltip>
           </div>

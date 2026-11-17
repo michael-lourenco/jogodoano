@@ -7,6 +7,7 @@ import { useEditionManager } from "@/hooks/useEditionManager"
 import { votingEditions } from "@/repositories/votingEditions"
 import type { VotingEdition } from "@/types/types"
 import { rehydrateVotingEditions } from "@/utils/utils"
+import { isEditionActive } from "@/utils/editionUtils"
 import { VotingCompletePage } from "@/components/voting/VotingCompletePage"
 import { VotingInterface } from "@/components/voting/VotingInterface"
 import { LoginModal } from "@/components/voting/LoginModal"
@@ -37,7 +38,9 @@ function VotingContent() {
   // Carregar edições
   useEffect(() => {
     const hydratedEditions = rehydrateVotingEditions(votingEditions)
-    setEditions(hydratedEditions)
+    const openEditions = hydratedEditions.filter(isEditionActive)
+    const edition2026 = hydratedEditions.filter((edition) => edition.id === "2026")
+    setEditions(openEditions.length > 0 ? openEditions : edition2026)
   }, [])
 
   const handleBackToHome = () => {

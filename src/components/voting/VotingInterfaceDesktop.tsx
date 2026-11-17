@@ -135,6 +135,9 @@ export function VotingInterfaceDesktop({
         <div className="w-full space-y-6">
           {/* Cabeçalho Simplificado */}
           <div className="text-center space-y-2">
+            <div className="text-sm font-semibold tracking-wide text-primary">
+              {currentEdition?.name || "EDIÇÃO 2026"}
+            </div>
             <div className="text-sm text-muted-foreground">
               Categoria {currentCategoryIndex + 1} de {categories.length}
             </div>

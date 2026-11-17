@@ -33,7 +33,7 @@ interface ActivityItem {
 }
 
 export default function PlayerDashboard() {
-  const { user, loading, handleLogin, handleLogout } = useAuth();
+  const { user, loading, status, handleLogin, handleLogout } = useAuth();
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState("profile");
   const [avatarUrl, setAvatarUrl] = useState(null as string | null);
@@ -95,7 +95,7 @@ export default function PlayerDashboard() {
     notifications: true
   };
 
-  if (loading) {
+  if (loading || status === "loading" || (status === "authenticated" && !user)) {
     return (
       <div className="flex justify-center items-center h-screen bg-background">
         <div className="flex flex-col items-center gap-4">

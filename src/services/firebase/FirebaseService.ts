@@ -121,6 +121,8 @@ interface VotesData {
 
 let globalUser: UserData | null = null
 
+export const USERS_COLLECTION = process.env.NEXT_PUBLIC_USERS_COLLECTION || "users"
+
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
@@ -161,8 +163,10 @@ async function initUserFirebase(authFirestore: Auth, dbFirestore: Firestore) {
 }
 
 async function fetchUserData(db: Firestore, email: string): Promise<UserData | null> {
+  if (!email?.trim()) return null
+
   try {
-    const userRef = doc(db, process.env.NEXT_PUBLIC_USERS_COLLECTION!, email)
+    const userRef = doc(db, USERS_COLLECTION, email)
     const docSnap: DocumentSnapshot<DocumentData> = await getDoc(userRef)
 
     if (docSnap.exists()) {
@@ -177,7 +181,11 @@ async function fetchUserData(db: Firestore, email: string): Promise<UserData | n
 
 // Função atualizada para suportar a estrutura de votos por ano
 async function updateUserVotes(email: string, votes: Votes, db: Firestore): Promise<void> {
-  const userRef = doc(db, process.env.NEXT_PUBLIC_USERS_COLLECTION!, email)
+  if (!email?.trim()) {
+    throw new Error("E-mail do usuário ausente.")
+  }
+
+  const userRef = doc(db, USERS_COLLECTION, email)
 
   try {
     const userSnap = await getDoc(userRef)
@@ -207,7 +215,7 @@ function displayUserInfo(user: UserData): void {
 
 
 async function updateStory(email: string, story: StoryEntry[], db: Firestore): Promise<void> {
-  const userRef = doc(db, process.env.NEXT_PUBLIC_USERS_COLLECTION!, email)
+  const userRef = doc(db, USERS_COLLECTION, email)
 
   try {
     await updateDoc(userRef, {
@@ -222,7 +230,7 @@ async function updateStory(email: string, story: StoryEntry[], db: Firestore): P
 }
 
 async function updateUserBestScore(email: string, best_score: BestScoreData, db: Firestore): Promise<void> {
-  const userRef = doc(db, process.env.NEXT_PUBLIC_USERS_COLLECTION!, email)
+  const userRef = doc(db, USERS_COLLECTION, email)
 
   try {
     await updateDoc(userRef, {
@@ -237,7 +245,7 @@ async function updateUserBestScore(email: string, best_score: BestScoreData, db:
 }
 
 async function updateUserCredits(email: string, credits: Credit, db: Firestore): Promise<void> {
-  const userRef = doc(db, process.env.NEXT_PUBLIC_USERS_COLLECTION!, email)
+  const userRef = doc(db, USERS_COLLECTION, email)
 
   try {
     await updateDoc(userRef, {
@@ -252,7 +260,7 @@ async function updateUserCredits(email: string, credits: Credit, db: Firestore):
 }
 
 async function updateUserCurrency(email: string, currency: CurrencyData, db: Firestore): Promise<void> {
-  const userRef = doc(db, process.env.NEXT_PUBLIC_USERS_COLLECTION!, email)
+  const userRef = doc(db, USERS_COLLECTION, email)
 
   try {
     await updateDoc(userRef, {
@@ -267,7 +275,7 @@ async function updateUserCurrency(email: string, currency: CurrencyData, db: Fir
 }
 
 async function updateMatchHistory(email: string, match_history: MatchHistoryEntry[], db: Firestore): Promise<void> {
-  const userRef = doc(db, process.env.NEXT_PUBLIC_USERS_COLLECTION!, email)
+  const userRef = doc(db, USERS_COLLECTION, email)
 
   try {
     await updateDoc(userRef, {
@@ -282,7 +290,7 @@ async function updateMatchHistory(email: string, match_history: MatchHistoryEntr
 }
 
 async function updateUserTotalGames(email: string, total_games: TotalGamesData, db: Firestore): Promise<void> {
-  const userRef = doc(db, process.env.NEXT_PUBLIC_USERS_COLLECTION!, email)
+  const userRef = doc(db, USERS_COLLECTION, email)
 
   try {
     await updateDoc(userRef, {

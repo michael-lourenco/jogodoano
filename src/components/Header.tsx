@@ -7,7 +7,7 @@ import Link from "next/link"
 import Image from "next/image"
 
 export function Header() {
-  const { user, handleLogin, handleLogout } = useAuth()
+  const { user, status, handleLogin, handleLogout } = useAuth()
 
   const handleLoginWithExpand = async () => {
     await handleLogin()
@@ -46,7 +46,8 @@ export function Header() {
             {/* UserInfo */}
             <div className="justify-self-end">
               <UserInfo 
-                user={user} 
+                user={user}
+                status={status}
                 handleLogin={handleLoginWithExpand} 
                 handleLogout={handleLogoutWithExpand}
               />

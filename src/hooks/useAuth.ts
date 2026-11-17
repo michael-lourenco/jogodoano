@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import type { Session } from "next-auth";
 import {
   signInWithGoogle,
   signOutFromGoogle,
@@ -14,6 +15,19 @@ import {
 } from "@/services/firebase/FirebaseService";
 import { onAuthStateChanged, Auth } from "firebase/auth";
 import { useRouter } from "next/navigation";
+
+function userFromSession(session: Session): UserData {
+  const now = new Date();
+  return {
+    displayName: session.user?.name || "Jogador",
+    email: session.user?.email || "",
+    photoURL: session.user?.image || "",
+    best_score: { value: 0, updatedAt: now },
+    credits: { value: 0, updatedAt: now },
+    currency: { value: 0, updatedAt: now },
+    total_games: { value: 0, updatedAt: now },
+  };
+}
 
 export function useAuth() {
   // Tentar obter o usuário do localStorage imediatamente
@@ -38,6 +52,10 @@ export function useAuth() {
   const [db, setDb] = useState<any>(null);
 
   const handleLogin = async () => {
+    if (status === "authenticated" || user?.email) {
+      return;
+    }
+
     try {
       // Garantir que estamos no lado do cliente
       if (typeof window !== "undefined") {
@@ -73,22 +91,33 @@ export function useAuth() {
     }
   };
 
-  // Efeito para verificar a sessão do NextAuth
+  // A sessão do Google define quem está logado. O perfil do Firebase só complementa os dados.
   useEffect(() => {
-    const initializeAuth = async () => {
-      if (status === "authenticated" && session) {
-        const userData = await handleAuthResponse(session, dbFirestore);
+    if (status === "loading") {
+      return;
+    }
+
+    if (status === "authenticated" && session?.user) {
+      setUser((current) => {
+        if (current?.email && current.email === session.user?.email) {
+          return current;
+        }
+        return userFromSession(session);
+      });
+      setLoading(false);
+
+      handleAuthResponse(session, dbFirestore).then((userData) => {
         if (userData) {
           setUser(userData);
         }
-      } else if (status === "unauthenticated") {
-        // Verificamos apenas se não existe sessão, mas não resetamos o usuário
-        // que pode estar autenticado pelo Firebase
-        setLoading(false);
-      }
-    };
+      });
+      return;
+    }
 
-    initializeAuth();
+    if (status === "unauthenticated") {
+      setUser(null);
+      setLoading(false);
+    }
   }, [session, status]);
 
   // Efeito para inicializar o Firebase

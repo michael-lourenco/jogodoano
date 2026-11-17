@@ -11,12 +11,18 @@ export const handler = NextAuth({
   ],
   secret: process.env.NEXT_PUBLIC_NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token }: { token: Token; }) {
+    async jwt({ token, account }: { token: Token; account?: { id_token?: string | null } | null }) {
+      if (account?.id_token) {
+        token.idToken = account.id_token;
+      }
       return token;
     },
     async session({ session, token }: { session: any; token: Token; }) {
       if (session.user && token.sub) {
         session.user.id = token.sub;
+      }
+      if (token.idToken) {
+        session.idToken = token.idToken;
       }
       return session;
     },

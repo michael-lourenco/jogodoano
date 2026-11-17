@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react";
 import type { Session } from "next-auth";
 import {
   signInWithGoogle,
+  signInFirebaseWithGoogleIdToken,
   signOutFromGoogle,
   handleAuthResponse,
 } from "@/services/auth/NextAuthenticationService";
@@ -106,11 +107,6 @@ export function useAuth() {
       });
       setLoading(false);
 
-      handleAuthResponse(session, dbFirestore).then((userData) => {
-        if (userData) {
-          setUser(userData);
-        }
-      });
       return;
     }
 
@@ -137,6 +133,29 @@ export function useAuth() {
 
     initializeFirebase();
   }, []);
+
+  // Entra no Firebase Auth com o token do Google depois que o Firebase já inicializou.
+  useEffect(() => {
+    if (!auth || status !== "authenticated" || !session?.user) {
+      return;
+    }
+
+    const connectFirebaseAuth = async () => {
+      try {
+        if (session.idToken && !auth.currentUser) {
+          await signInFirebaseWithGoogleIdToken(session.idToken);
+        }
+        const userData = await handleAuthResponse(session, dbFirestore);
+        if (userData) {
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error("Erro ao entrar no Firebase Auth:", error);
+      }
+    };
+
+    connectFirebaseAuth();
+  }, [auth, status, session]);
 
   // Efeito para observar mudanças no estado de autenticação do Firebase
   useEffect(() => {

@@ -1,7 +1,8 @@
 import {  doc, setDoc, updateDoc, Firestore } from "firebase/firestore";
+import { GoogleAuthProvider, signInWithCredential, signOut as firebaseSignOut } from "firebase/auth";
 import { Session } from "next-auth";
 import { signIn, signOut } from "next-auth/react";
-import { fetchUserData, USERS_COLLECTION } from "../firebase/FirebaseService";
+import { authFirestore, fetchUserData, USERS_COLLECTION } from "../firebase/FirebaseService";
 import { StoryEntry, Credit } from "@/application/entities/User";
 
 export interface Round {
@@ -69,8 +70,18 @@ async function signInWithGoogle(): Promise<void> {
   }
 }
 
+async function signInFirebaseWithGoogleIdToken(idToken: string): Promise<void> {
+  if (!idToken || authFirestore.currentUser) return;
+
+  const credential = GoogleAuthProvider.credential(idToken);
+  await signInWithCredential(authFirestore, credential);
+}
+
 async function signOutUser(): Promise<void> {
   try {
+    if (authFirestore.currentUser) {
+      await firebaseSignOut(authFirestore);
+    }
     await signOut();
     globalUser = null;
   } catch (error) {
@@ -120,6 +131,7 @@ async function handleAuthResponse(session: Session | null, db: Firestore): Promi
 
 export {
   signInWithGoogle,
+  signInFirebaseWithGoogleIdToken,
   signOutUser as signOutFromGoogle,
   handleAuthResponse,
 };

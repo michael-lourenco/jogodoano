@@ -70,15 +70,33 @@ async function signInWithGoogle(): Promise<void> {
   }
 }
 
+let firebaseSignInPromise: Promise<void> | null = null;
+
 async function signInFirebaseWithGoogleIdToken(idToken: string): Promise<void> {
   if (!idToken || authFirestore.currentUser) return;
+  if (firebaseSignInPromise) return firebaseSignInPromise;
 
   const credential = GoogleAuthProvider.credential(idToken);
-  await signInWithCredential(authFirestore, credential);
+  firebaseSignInPromise = signInWithCredential(authFirestore, credential)
+    .then(() => undefined)
+    .catch((error: { code?: string }) => {
+      firebaseSignInPromise = null;
+      if (
+        authFirestore.currentUser ||
+        error?.code === "auth/provider-already-linked" ||
+        error?.code === "auth/credential-already-in-use"
+      ) {
+        return;
+      }
+      throw error;
+    });
+
+  return firebaseSignInPromise;
 }
 
 async function signOutUser(): Promise<void> {
   try {
+    firebaseSignInPromise = null;
     if (authFirestore.currentUser) {
       await firebaseSignOut(authFirestore);
     }
